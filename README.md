@@ -28,13 +28,18 @@ experimento. Cada una indica a qué parte del póster corresponde.
 
 ![Las dos ramas de la pérdida](gifs/ramas_de_la_perdida.gif)
 
+*Las dos generaciones del mismo clip, con el mismo ruido: a la izquierda la escena original, a la
+derecha la escena rotada 45°. La pérdida compara la cinemática de una contra la de la otra rotada.*
+
 En cada paso de entrenamiento el modelo genera el mismo clip dos veces, con el mismo ruido: una con la
 escena original y otra rotada. Si fuera equivariante, la cinemática de la segunda sería la de la
 primera rotada. La inconsistencia entre ambas es toda la señal de entrenamiento, y no requiere
 anotaciones. El costo es que hay que generar, decodificar y estimar flujo **dentro** del paso de
 entrenamiento, y retropropagar por todo eso.
 
-Archivo: `videos/06_dos_ramas_de_la_perdida.mp4`
+Archivo: `videos/06_dos_ramas_de_la_perdida.mp4`. El video de las ramas tal como las decodifica el
+entrenamiento dura sólo 5 cuadros, porque la rama física decodifica pocos latentes; el de acá es el par
+de generación completa, de 33 cuadros, que muestra lo mismo con más contexto.
 
 <a id="colapso"></a>
 
