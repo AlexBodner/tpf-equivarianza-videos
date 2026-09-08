@@ -20,6 +20,8 @@ experimento. Cada una indica a qué parte del póster corresponde.
   equivariante, los dos primeros serían iguales y el tercero negro.
 - Todos los MP4 están en [`videos/`](videos); los GIF de abajo son los mismos, reducidos.
 
+<a id="metodo"></a>
+
 ## 2. El método: las dos ramas que compara la pérdida
 
 *Póster: sección «Método».*
@@ -33,6 +35,8 @@ anotaciones. El costo es que hay que generar, decodificar y estimar flujo **dent
 entrenamiento, y retropropagar por todo eso.
 
 Archivo: `videos/06_dos_ramas_de_la_perdida.mp4`
+
+<a id="colapso"></a>
 
 ## 3. Primer experimento: la pérdida original colapsa al video quieto
 
@@ -51,6 +55,8 @@ video estático. Se corrigió recortando el numerador en cero.
 
 Archivo: `videos/12_colapso_vs_control_paso100.mp4`
 
+<a id="aceleracion"></a>
+
 ## 4. Segundo experimento: sobre aceleración no hay señal que aprender
 
 *Póster: sección «Diagnóstico y corrección».*
@@ -64,6 +70,8 @@ Sobre el *mismo video real* rotado píxel a píxel, el estimador ya se contradic
 generado, un 93 %, o sea que no mide nada.
 
 Archivo: `videos/11_aceleracion_pendulo_paso250.mp4`
+
+<a id="velocidad"></a>
 
 ## 5. Tercer experimento: sobre velocidad el modelo sí aprende la simetría
 
@@ -86,6 +94,8 @@ más equivariante.*
 pivote en su lugar y el hilo único.*
 
 Archivos: `videos/08_equivarianza_*_velocidad.mp4`, `videos/01_pendulo_bien_paso1000.mp4`
+
+<a id="degeneracion"></a>
 
 ## 6. Tercer experimento, la otra cara: cómo satisface la simetría
 
