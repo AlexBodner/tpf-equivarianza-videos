@@ -5,8 +5,13 @@ de difusión de video **sin ground truth físico**, imponiendo una simetría: si
 cinemática de lo generado tiene que rotar igual. El movimiento se estima con RAFT (flujo óptico) sobre
 los propios videos generados, y todo se retropropaga hasta los pesos.
 
-El resultado global es **negativo**, y las secciones de abajo cuentan por qué, experimento por
-experimento. Cada una indica a qué parte del póster corresponde.
+Con el método tal como está hoy **no logramos mejorar la física generada**, y las secciones de abajo
+cuentan por qué, experimento por experimento. La conclusión no es que la idea no sirva, sino algo más
+concreto y más accionable: la pérdida ve una versión **parcial y cruda** de lo que el modelo genera
+(24 de los 32 vectores de velocidad del clip, calculados sobre una generación de 12 pasos de Euler y
+no de los 50 de la inferencia), y contra esa señal incompleta el entrenamiento termina introduciendo
+**corrupciones** en la imagen que bajan la pérdida sin mejorar la dinámica. Cada sección indica a qué
+parte del póster corresponde.
 
 ---
 
@@ -262,7 +267,41 @@ Todas las evaluaciones son apareadas por clip: los dos brazos generan **los mism
 la misma semilla, y el test es un Wilcoxon sobre las diferencias por clip. Las tablas completas, con
 todos los escenarios y todas las métricas, están en el repositorio principal del proyecto.
 
-## 9. Control: la simetría por datos tampoco enseña
+<a id="ood"></a>
+
+## 9. Fuera de dominio: las corrupciones aparecen con los pasos
+
+*Póster: sección «Resultados», fila fuera de distribución.*
+
+Los prompts de abajo nunca se entrenaron. Es donde mejor se ve el mecanismo: no es que el modelo
+"aprenda mal la física", es que **la imagen se corrompe** a medida que avanza el entrenamiento, y la
+corrupción es justamente lo que baja la pérdida.
+
+![Rodando, evolución con los pasos](gifs/ood_rolling.gif)
+
+*Prompt «una pelota rodando por una superficie plana», el mismo en los cuatro paneles, generado por el
+modelo entrenado en distintos pasos. En el 250 y el 500 hay una pelota limpia; en el 750 aparecen
+**dos**; en el 1000 la pelota está deshecha. La pérdida no penaliza nada de eso: dos objetos que se
+mueven en direcciones distintas se cancelan en el flujo agregado, y el desacuerdo entre ramas baja.*
+
+![Péndulo fotográfico, evolución con los pasos](gifs/ood_pendulum_photo.gif)
+
+*Mismo efecto con otro prompt fuera de dominio.*
+
+![Fuera de dominio: control contra brazo con física](gifs/ood_control_vs_fisica.gif)
+
+*Y contra el control en el mismo paso: el control mantiene un objeto coherente.*
+
+En números, sobre el escenario fuera de distribución con ground truth (tiro vertical): la razón de
+movimiento del brazo con física cae a 0,12 contra 0,43 del control, por debajo de la de un video
+estático (0,22). Es el mismo fenómeno, medido.
+
+**Por qué esto apunta a una limitación del método y no a la hipótesis.** La pérdida se calcula sobre
+una generación truncada, de 12 pasos de Euler en vez de 50, y sobre 24 de los 32 vectores de velocidad
+del clip. El modelo puede degradar lo que la pérdida no mira, y eso es exactamente lo que hace. Las dos
+correcciones de la última sección apuntan ahí.
+
+## 10. Control: la simetría por datos tampoco enseña
 
 *Póster: no aparece; el contraste quedó confundido y se reporta como pendiente.*
 
@@ -273,14 +312,16 @@ resultado.
 
 Archivos: `videos/10_equivarianza_*_ablacion_aumentaciones.mp4`
 
-## 10. Qué quedó como recomendación
+## 11. Qué quedó como recomendación
 
 *Póster: sección «Trabajo futuro».*
 
-1. **Medir la cinemática por objeto** en vez de promediar la escena. Para cerrar el atajo de partir la
+1. **Que la pérdida vea todo lo que el modelo genera**: hoy mira 24 de 32 vectores y una generación de
+   12 pasos de Euler en vez de 50. Lo que queda fuera es donde el modelo mete la corrupción.
+2. **Medir la cinemática por objeto** en vez de promediar la escena. Para cerrar el atajo de partir la
    pelota ni siquiera hace falta emparejar objetos entre cuadros: alcanza con tomar el componente
    conexo mayor de la máscara de movimiento en cada par.
-2. **Anclar la escala del movimiento**, porque sin eso la restricción siempre admite el atajo de
+3. **Anclar la escala del movimiento**, porque sin eso la restricción siempre admite el atajo de
    moverse menos. El costo es que deja de ser una restricción sin ground truth, que era el atractivo.
 
 ---
