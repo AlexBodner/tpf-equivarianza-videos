@@ -165,10 +165,10 @@ Los dos brazos entrenan con el mismo clip, el mismo ruido y los mismos pesos ini
 los separa es la pérdida de equivarianza. Acá generan el **mismo clip**, así que la diferencia que se
 ve es atribuible a la pérdida y a nada más.
 
-Los videos de esta sección son del **checkpoint 250 de ambos brazos**, que es el que las dos reglas de
-selección eligen (ver sección 8). Las muestras del entrenamiento sólo se guardaron cada 250 pasos y para
-un brazo por vez, así que el paso 250 es el punto donde existe la generación pareada de los dos sobre
-los mismos clips. En el checkpoint 1000 la comparación existe en números, no en video.
+Los videos de esta sección son del **checkpoint 250 de ambos brazos**, y conviene ser claro sobre por
+qué: no porque sea el mejor (no lo es, ver sección 8), sino porque es el único paso donde se generaron
+los pares de ambos brazos sobre los mismos clips. En el checkpoint 1000, que es la elección primaria, la
+comparación existe en números pero todavía no en video.
 
 ![Los tres escenarios, control contra brazo con física](gifs/tres_escenarios_i2v.gif)
 
@@ -264,16 +264,24 @@ Las dos salidas que quedan:
 *Póster: sección «Resultados».*
 
 **El problema de elegir.** Las métricas de trayectoria oscilan entre checkpoints (ver la última tabla),
-así que elegir para cada brazo el checkpoint que mejor le va en la métrica de interés inflaría el
-resultado: sería seleccionar sobre el desenlace. Se reportan dos elecciones, ambas aplicadas **igual a
-los dos brazos**:
+así que elegir para cada brazo el que mejor le va en la métrica de interés inflaría el resultado: sería
+seleccionar sobre el desenlace.
 
-1. **El checkpoint final** (paso 1000), que es la elección preregistrada y no mira ningún resultado.
-2. **El mejor por validación de difusión** entre los checkpoints guardados, un criterio independiente
-   de lo que se quiere probar. Los dos brazos eligen el mismo paso, el 250 (0,0698 el brazo con física,
-   0,0667 el control), así que la comparación sigue siendo pareja.
+**La elección primaria es el checkpoint final** (paso 1000): es la preregistrada y no mira ningún
+resultado. Es la única defendible acá, y conviene decir por qué las alternativas no lo son.
 
-Las dos elecciones dan la misma respuesta, que es lo que hace creíble el resultado.
+Se intentó también elegir *el mejor por validación de difusión*, un criterio independiente de lo que se
+quiere probar. Los dos brazos caen en el paso 250. Pero esa elección **no es sólida**, por tres razones:
+
+- La validación se mide cada 50 pasos y los checkpoints se guardan cada 125, así que sólo **4 de los 8**
+  checkpoints tienen un valor exacto (250, 500, 750, 1000). La regla nunca pudo rankear la otra mitad.
+- El mínimo real de la validación está en el **paso 650**, que no quedó guardado como checkpoint.
+- La diferencia entre el 250 (0,0698) y el 1000 (0,0724) es de 3,7 %, mientras que el desvío de la
+  validación a lo largo del entrenamiento es del 8,6 % y el salto típico entre mediciones consecutivas
+  es mayor que esa diferencia. Está **dentro del ruido**.
+
+Así que el paso 250 se reporta abajo como control de sensibilidad, no como "el mejor modelo". Lo
+relevante es que **las dos elecciones dan la misma respuesta**: nada se distingue del control.
 
 ### Checkpoint final (paso 1000), en distribución
 
@@ -294,7 +302,7 @@ Cota del video quieto, error de velocidad por escenario: 11,498, 7,519, 9,953.
 | razón de movimiento (→1) | 0,427 | **0,119** | 0,216 | 0,001 |
 | jerk (↓) | 1,651 | **0,817** | 0,000 | 0,005 |
 
-### Checkpoint elegido por validación (paso 250), en distribución
+### Control de sensibilidad: paso 250, en distribución
 
 | métrica | control | con física | mejor | p |
 |---|---|---|---|---|
