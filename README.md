@@ -54,9 +54,31 @@ en 100 pasos. A la izquierda el brazo con la pérdida, a la derecha su control e
 sin ella, en el mismo paso. Medido en el paso 125: razón de movimiento 0,13 contra 0,60 del control,
 peor en los 30 clips.
 
-La causa está en la fórmula. La pérdida resta el piso de ruido del propio estimador, y cuando el
-desacuerdo cae por debajo de ese piso el numerador se vuelve negativo: el mínimo global pasa a ser un
-video estático. Se corrigió recortando el numerador en cero.
+**Por qué pasa, en una ecuación.** La pérdida compara la cinemática de las dos ramas, normalizada por
+la energía total para que no dependa de la escala, y le resta el piso de ruido $A$ del propio
+estimador (lo que RAFT se contradice a sí mismo al rotar un video real):
+
+$$\mathcal{L}_{\text{rot}} \;=\; \frac{N - A}{\max\left(D - A,\; A\right)}
+\qquad
+N = \lVert R(\theta)\,\hat a_{\text{orig}} - \hat a_{\text{rot}} \rVert^2
+\qquad
+D = \lVert \hat a_{\text{orig}} \rVert^2 + \lVert \hat a_{\text{rot}} \rVert^2$$
+
+Restar $A$ es correcto: sin eso la pérdida premia generar aceleraciones enormes, porque el ruido pesa
+proporcionalmente menos. El problema es qué pasa cuando el modelo **deja de moverse**. Ahí
+$N \to 0$ y $D \to 0$, y la pérdida tiende a
+
+$$\mathcal{L}_{\text{rot}} \;\longrightarrow\; \frac{0 - A}{\max(0 - A,\; A)} \;=\; \frac{-A}{A} \;=\; -1,$$
+
+que es su **mínimo global**. Un modelo perfectamente equivariante que sí se mueve da
+$(0-A)/(D-A) \approx -A/D \to 0^{-}$: *peor* que quedarse quieto. Con $A = 1$: la pérdida vale $0$ en
+$D = 2A$, $-0{,}40$ en $D = 1{,}5A$ y $-0{,}90$ en $D = 0{,}5A$. El descenso por gradiente encuentra
+eso antes que la simetría.
+
+La corrección es recortar el numerador en cero, con lo que por debajo del piso la pérdida vale $0$ y
+deja de empujar:
+
+$$\mathcal{L}_{\text{rot}}^{\text{corregida}} \;=\; \frac{\max(N - A,\; 0)}{\max(D - A,\; A)}$$
 
 Archivo: `videos/12_colapso_vs_control_paso100.mp4`
 
