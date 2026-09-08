@@ -205,28 +205,32 @@ Archivos: `videos/03_rebote_pelota_duplicada_paso1000.mp4`, `videos/05_caida_lib
 ### Cómo se cerraría cada atajo
 
 El primero, moverse menos, es una propiedad de la restricción: sin un ancla de escala siempre está
-disponible. El segundo es un defecto del **estimador**, y hay varias salidas. Ninguna está probada
-todavía; van de menor a mayor costo:
+disponible.
 
-1. **Quedarse con el componente conexo mayor** de la máscara de movimiento en cada par de cuadros, en
-   vez de promediar toda la escena. No necesita emparejar nada, ni entre cuadros ni entre videos, y
-   elimina la cancelación. Supone un objeto dominante, que acá es cierto por construcción.
-2. **Comparar los campos de flujo densos** en vez de reducirlos a un vector. La equivarianza dice que
-   el campo de la rama rotada tiene que ser el de la original rotado y remuestreado,
-   $R\,\Phi_{\text{orig}}(x) \approx \Phi_{\text{rot}}(Rx)$. Como la rotación la aplicamos nosotros y la
-   conocemos exactamente, esto **no requiere emparejar objetos**, usa todos los píxeles en vez de 24
-   vectores agregados, y es la versión fiel de la restricción. Es la que más nos convence hoy; el costo
-   es memoria, porque el campo denso entra en el grafo de gradiente.
-3. **Comparar la distribución de velocidades** de las dos ramas (momentos, histograma o transporte
-   óptimo) en lugar de su promedio. Es invariante a permutar objetos, así que tampoco necesita
-   emparejar, y tolera que las dos ramas generen distinta cantidad de objetos.
-4. **Emparejar las velocidades entre los dos videos**, segmentando y asociando identidad. Es lo más
-   general, y lo que haría falta con varios objetos de dinámicas distintas, pero también lo más caro y
-   frágil: hay que resolver la correspondencia entre dos videos generados que pueden ni siquiera tener
-   la misma cantidad de objetos. **Queda como trabajo futuro.**
+El segundo es un defecto del **estimador**, y es más difícil de cerrar de lo que parece. La dificultad
+de fondo es que las dos ramas son **generaciones independientes**: el modelo genera dos videos a partir
+de dos condicionamientos distintos, no rota un video ya hecho. Nada garantiza que la pelota esté en la
+misma fase ni en la posición correspondiente en ambos. Por eso:
 
-Las opciones 2 y 3 tienen una ventaja extra: atacan también la limitación de que hoy la pérdida ve 24
-de los 32 vectores del clip, porque comparar campos o distribuciones usa todo lo generado.
+- **Comparar los campos de flujo densos** píxel a píxel, $R\,\Phi_{\text{orig}}(x)$ contra
+  $\Phi_{\text{rot}}(Rx)$, **no alcanza**: supone correspondencia espacial entre las dos generaciones.
+  Si la pelota quedó en otra fase, la diferencia es enorme aunque la dinámica sea perfectamente
+  equivariante. Confunde "está en otro lugar" con "se mueve distinto".
+- **Quedarse con el objeto más grande** tampoco: es esencialmente lo que ya hace el agregador, no está
+  justificado, y se cae apenas hay varios objetos o cuando el movimiento del fondo es informativo, que
+  además hoy se descarta al restar el flujo medio global.
+
+Las dos salidas que quedan:
+
+1. **Comparar la distribución de velocidades** de las dos ramas (momentos, histograma o transporte
+   óptimo) en vez de un promedio o de una comparación posición a posición. Es invariante a dónde esté
+   cada objeto y a permutarlos, así que **no necesita correspondencia**, y tolera que las dos ramas
+   generen distinta cantidad de objetos. Es la única de la lista que esquiva el problema de raíz.
+2. **Emparejar las velocidades entre los dos videos generados**, con segmentación y asociación de
+   identidad. Es lo que hace falta para cualquier comparación que no sea distribucional, y es un
+   problema en sí mismo: hay que resolver correspondencia entre dos generaciones que pueden diferir en
+   fase, en posición y hasta en cuántos objetos tienen. **Queda como trabajo futuro**, y es la pieza
+   que hoy falta para que la restricción se pueda imponer sobre escenas con más de un objeto.
 
 <a id="numeros"></a>
 
@@ -369,9 +373,9 @@ Archivos: `videos/10_equivarianza_*_ablacion_aumentaciones.mp4`
 
 1. **Que la pérdida vea todo lo que el modelo genera**: hoy mira 24 de 32 vectores y una generación de
    12 pasos de Euler en vez de 50. Lo que queda fuera es donde el modelo mete la corrupción.
-2. **Dejar de promediar la escena**: comparar los campos de flujo densos rotados, o la distribución de
-   velocidades. Ninguna de las dos necesita emparejar objetos. Emparejar las velocidades entre los dos
-   videos es lo más general y queda como trabajo futuro.
+2. **Emparejar las velocidades entre las dos generaciones**, que es la pieza que falta para escenas con
+   más de un objeto. La única alternativa que esquiva el emparejamiento es comparar la **distribución**
+   de velocidades, invariante a posición y a permutar objetos.
 3. **Anclar la escala del movimiento**, porque sin eso la restricción siempre admite el atajo de
    moverse menos. El costo es que deja de ser una restricción sin ground truth, que era el atractivo.
 
