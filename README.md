@@ -18,11 +18,19 @@ estos videos. Detalle completo en el informe del proyecto.
   modelo fuera equivariante, los dos primeros paneles serían iguales y el tercero negro.
 - El video `06` muestra las dos ramas que la pérdida compara en cada paso de entrenamiento.
 
+![Las dos ramas de la pérdida](gifs/ramas_de_la_perdida.gif)
+
+*Las dos generaciones que la pérdida compara: mismo clip, mismo ruido, una con la escena rotada.*
+
 ## Resultados que salieron bien
 
 **`01_pendulo_bien_paso1000.mp4`** — Péndulo al final del entrenamiento con la pérdida sobre
 velocidad. La generación condicionada sigue el ground truth de cerca: pivote en su lugar, hilo único,
 ángulo y fase razonables. Es el escenario donde la pérdida bajó más limpio.
+
+![Péndulo al paso 1000](gifs/pendulo_bien.gif)
+
+*Ground truth · modelo base · generación por texto · generación condicionada.*
 
 **`06_dos_ramas_de_la_perdida.mp4`** — Las dos generaciones que la pérdida compara: mismo clip, mismo
 ruido, una con la escena original y otra rotada. La inconsistencia entre sus aceleraciones es toda la
@@ -33,6 +41,11 @@ velocidad. El tercer panel (la diferencia) es más oscuro que el del control, y 
 termina más equivariante que su control por las tres medidas que probamos. La pérdida sí enseña lo
 que dice enseñar.
 
+![Equivarianza del brazo entrenado](gifs/equivarianza_pendulo.gif)
+
+*Condicionamiento original · condicionamiento rotado 45° y des-rotado · diferencia absoluta. Si el
+modelo fuera perfectamente equivariante, el tercer panel sería negro.*
+
 ## Modos de falla
 
 **`03_rebote_pelota_duplicada_paso1000.mp4`** — El hallazgo más interesante. Aparecen **dos pelotas**
@@ -42,6 +55,11 @@ agregado se achica y **la pérdida de equivarianza baja sin que la física mejor
 que partir el objeto es más barato que aprender la simetría. Comparar con
 `04_rebote_una_pelota_paso250.mp4`, el mismo escenario 750 pasos antes, con una sola pelota.
 
+![Pelota duplicada en el rebote](gifs/pelota_duplicada.gif)
+
+*Dos pelotas de colores distintos en los paneles generados: el flujo agregado de ambas se cancela y
+la pérdida baja sin que la física mejore.*
+
 **`02_pendulo_hilo_doble_paso250.mp4`** — Versión temprana del mismo truco: dos hilos convergiendo a
 la pelota, y en el panel condicionado la pelota flota sin hilo. Desaparece más adelante en el
 entrenamiento, a diferencia del caso del rebote.
@@ -50,6 +68,8 @@ entrenamiento, a diferencia del caso del rebote.
 se pega al borde. Menos movimiento significa menos desacuerdo entre las dos ramas, así que la
 restricción también se satisface **moviéndose menos**. Fuera de distribución esto se vuelve severo: el
 modelo entrenado genera menos movimiento que un video estático de referencia.
+
+![Caída libre, la pelota se achica](gifs/caida_libre_encoge.gif)
 
 **`07_fuera_de_dominio_rodando.mp4`** — Un prompt que nunca se entrenó ("una pelota rodando"). Es
 donde la degeneración se ve sin ambigüedad.
