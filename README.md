@@ -162,6 +162,21 @@ Los dos brazos entrenan con el mismo clip, el mismo ruido y los mismos pesos ini
 los separa es la pérdida de equivarianza. Acá generan el **mismo clip**, así que la diferencia que se
 ve es atribuible a la pérdida y a nada más.
 
+![Los tres escenarios, control contra brazo con física](gifs/tres_escenarios_i2v.gif)
+
+*Los tres escenarios a la vez, generación condicionada en el primer cuadro. Arrancan idénticos porque
+el condicionamiento es el mismo. En **caída libre** las dos trayectorias son parecidas y el brazo con
+física termina más cerca del ground truth. En **péndulo** también. En **rebote** la pelota del brazo con
+física se desdibuja y queda atrás: es el escenario donde empeora, y donde después aparecen los
+duplicados.*
+
+![Los tres escenarios, generación libre](gifs/tres_escenarios_t2v.gif)
+
+*Lo mismo generando sólo desde el texto, sin condicionamiento: acá las dos ramas no tienen por qué
+coincidir en posición, y se ve mejor la diferencia de dinámica.*
+
+Y en detalle, dos casos:
+
 ![Rebote: control contra brazo con física](gifs/lado_a_lado_rebote.gif)
 
 *Rebote, generación condicionada en el primer cuadro. Arrancan idénticos, porque el condicionamiento
@@ -173,7 +188,9 @@ Es la degeneración empezando, en un caso donde las métricas en distribución t
 *Péndulo, generación libre por texto. Acá el brazo con física dibuja el pivote y el hilo, que el
 control no pone; es el escenario donde la pérdida ayudó más.*
 
-Los seis videos (tres escenarios × condicionada y libre) están en `videos/13_control_vs_fisica_*.mp4`.
+Los videos completos: `videos/16_tres_escenarios_*.mp4` para las grillas y
+`videos/13_control_vs_fisica_*.mp4` para los seis casos individuales (tres escenarios × condicionada y
+libre).
 
 <a id="degeneracion"></a>
 
