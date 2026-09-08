@@ -93,15 +93,28 @@ Archivo: `videos/12_colapso_vs_control_paso100.mp4`
 
 *Póster: sección «Diagnóstico y corrección».*
 
-![La pérdida sobre aceleración no aprende](gifs/aceleracion_no_aprende.gif)
+Ya corregida la fórmula, la pérdida se aplicó a la **aceleración** estimada por RAFT. Acá no hay nada
+que mostrar en video, y eso es exactamente el punto: **la falla no es visual, es que el término nunca
+baja**. Se ve en las curvas de entrenamiento, no en un cuadro.
 
-Ya corregida, la pérdida se aplicó a la **aceleración** estimada por RAFT. El término no baja en 800
-pasos y el modelo no cambia de forma medible. La razón es del instrumento, no del modelo: la
-aceleración es la segunda diferencia del flujo, y a esta escala su ruido es del tamaño de la señal.
-Sobre el *mismo video real* rotado píxel a píxel, el estimador ya se contradice un 26 %; sobre video
-generado, un 93 %, o sea que no mide nada.
+![La misma pérdida sobre aceleración y sobre velocidad](figuras/aceleracion_vs_velocidad.png)
 
-Archivo: `videos/11_aceleracion_pendulo_paso250.mp4`
+*Izquierda: el término de la pérdida, normalizado igual en los dos casos (0 sería equivarianza
+perfecta). Sobre aceleración se queda plano entre 0,5 y 0,6 durante 800 pasos; sobre velocidad baja un
+33 % (p = 0,010). Derecha: el acuerdo de dirección entre las dos ramas. Sobre aceleración arranca en
+0,42 y baja; sobre velocidad arranca en 0,81 y sube a 0,87 (p = 0,002). La curva de aceleración empieza
+en el paso 280 porque el registro de esa cantidad se agregó cuando la corrida se retomó.*
+
+La razón es del instrumento, no del modelo. La aceleración es la segunda diferencia del flujo, y a esta
+escala su ruido es del tamaño de la señal: sobre el *mismo video real* rotado píxel a píxel, el
+estimador ya se contradice un 26 %; sobre video generado, un 93 %, o sea que no mide nada. Con
+velocidad, sobre video real el desacuerdo baja al 2 %.
+
+**Y sin embargo la corrida se ve bien.** Sus muestras en el paso 250 son indistinguibles de las de
+cualquier otro brazo, porque un término que no aprende tampoco rompe nada. Recién en el paso 750
+colapsa (razón de movimiento 0,37 contra 0,71 del control) y ahí se cortó.
+
+Archivo: `videos/11_aceleracion_pendulo_paso250.mp4`, para ver que efectivamente no se distingue.
 
 <a id="velocidad"></a>
 
