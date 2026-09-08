@@ -1,0 +1,45 @@
+{
+    "_comment": "Resume from checkpoint-1050. steps=3950 so train() loop exits at step 1050+3950=5000.",
+    "experiment_name": "combined_v6_all_losses",
+    "model_id": "Efficient-Large-Model/SANA-Video_2B_480p_diffusers",
+    "data_dir": "data/synthetic_native",
+    "output_dir": "checkpoints_sana/combined_v6",
+    "variant": 6,
+    "steps": 3950,
+    "k_steps": 25,
+    "chunk_size": 1,
+    "max_frames": 40,
+    "train_res": null,
+    "batch_size": 1,
+    "lr": 0.0001,
+    "dtype": "bf16",
+    "seed": 42,
+    "save_every": 50,
+    "sample_every": 50,
+    "sample_frames": 40,
+    "gt_clip_path": "data/synthetic_native/free_fall/00000.mp4",
+    "physics_raft_scale": 1.0,
+    "physics_max_lat_frames": 4,
+    "physics_sigma_min": 0.1,
+    "physics_sigma_max": 0.4,
+    "physics_n_cond_lat": 1,
+    "prompt": "a solid colored circle moving on a textured background, side view, simple 2D physics animation",
+    "scenario_prompts": {
+        "free_fall": "a solid colored circle falling straight down under gravity, textured background, side view, simple 2D physics animation",
+        "projectile": "a solid colored circle traveling in a parabolic arc under gravity, textured background, side view, simple 2D physics animation",
+        "pendulum": "a solid colored circle swinging side to side from a fixed pivot, textured background, side view, simple 2D physics animation",
+        "bouncing": "a solid colored circle bouncing repeatedly off a flat floor, each bounce lower than the last, textured background, side view, simple 2D physics animation"
+    },
+    "ood_prompts": {
+        "rolling": "a solid colored circle rolling along a flat surface from left to right, side view",
+        "bowl": "a solid colored circle rolling around the inside of a curved bowl, top-down view",
+        "collision": "two solid colored circles colliding head-on and bouncing apart, side view"
+    },
+    "eval": {
+        "num_inference_steps": 50,
+        "height": 480,
+        "width": 832,
+        "n_examples": 5,
+        "metric_clips": 6
+    }
+}

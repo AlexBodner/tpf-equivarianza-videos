@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/tpf_e4/scripts/analizar_explor.py", line 180, in <module>
+    main()
+  File "/home/ubuntu/tpf_e4/scripts/analizar_explor.py", line 129, in main
+    fila[arm] = medir(np.load(f), esc, n_tramos=gt.get("tramos_gt")) if f.exists() else None
+  File "/home/ubuntu/tpf_e4/scripts/analizar_explor.py", line 108, in medir
+    res, p1, p2 = f(t, v, n_tramos) if esc == "bouncing" else f(t, v)
+TypeError: cannot unpack non-iterable float object

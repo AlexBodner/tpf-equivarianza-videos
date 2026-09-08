@@ -24,6 +24,8 @@ parte del póster corresponde.
   condicionamiento rotado 45° y luego des-rotada · diferencia absoluta**. Si el modelo fuera
   equivariante, los dos primeros serían iguales y el tercero negro.
 - Todos los MP4 están en [`videos/`](videos); los GIF de abajo son los mismos, reducidos.
+- Los JSON de todas las evaluaciones, los logs de entrenamiento y las configuraciones están en
+  [`resultados/`](resultados), para que los números se puedan verificar sin la máquina de entrenamiento.
 
 <a id="metodo"></a>
 
@@ -114,7 +116,17 @@ velocidad, sobre video real el desacuerdo baja al 2 %.
 cualquier otro brazo, porque un término que no aprende tampoco rompe nada. Recién en el paso 750
 colapsa (razón de movimiento 0,37 contra 0,71 del control) y ahí se cortó.
 
-Archivo: `videos/11_aceleracion_pendulo_paso250.mp4`, para ver que efectivamente no se distingue.
+**Qué terminó haciendo.** Esto sí se ve:
+
+![La corrida sobre aceleración, paso a paso](gifs/aceleracion_evolucion_bouncing.gif)
+
+*Generación condicionada del mismo clip de rebote en los pasos 250, 500 y 750. En el 250 hay varias
+pelotas a la vez, en el 500 quedan dos, y en el 750 una sola y pálida: la razón de movimiento cae a
+0,37 contra 0,71 del control y ahí se cortó la corrida. La pérdida no bajó en ningún momento; lo que
+cambió fue la imagen.*
+
+Archivos: `videos/15_aceleracion_evolucion_*.mp4` y `videos/11_aceleracion_pendulo_paso250.mp4`, este
+último para comprobar que en el paso 250 no se distingue de cualquier otro brazo.
 
 <a id="velocidad"></a>
 

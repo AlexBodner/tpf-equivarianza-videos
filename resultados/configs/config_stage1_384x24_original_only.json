@@ -1,0 +1,70 @@
+{
+  "_comment": "ABLACION DE AUMENTACIONES - brazo SIN aumentaciones, a 384x24. Clon EXACTO de config_stage1.json en el commit fb697cb6 ('feat: Stage-1 P1 training at 384px'), que es la config de la corrida P1 reportada en el informe (base 46.04 -> ft 17.53 en caida libre). Se cambian UNICAMENTE los dos flags de ablacion y los dos nombres. El brazo CON aumentaciones NO hay que correrlo: es la corrida P1 ya reportada, y su log vive en fb697cb6 bajo checkpoints_sana/stage1_p1/training_log.jsonl. Los dos flags de ablacion funcionan: use_augmented_clips corta en el trainer (trainer_sana.py:349) y load_augmentations corta antes, en el dataloader, evitando decodificar los mp4 que no se usan. load_augmentations estuvo roto hasta que se lo agrego a la lista blanca de train_sana.py:209-213. Verificar la ablacion mirando loss_diffusion y no el print: con use_augmented_clips=false y lambda_t2v=0 tiene que ser exactamente 0.0 en todos los pasos.",
+  "experiment_name": "stage1_384x24_original_only",
+  "dataset_type": "synthetic",
+  "data_dir": "data/synthetic_384",
+  "output_dir": "checkpoints_sana/stage1_384x24_original_only",
+  "variant": 8,
+  "model_id": "Efficient-Large-Model/SANA-Video_2B_480p_diffusers",
+  "steps": 3000,
+  "k_steps": 1,
+  "physics_n_bptt": 1,
+  "max_frames": 24,
+  "chunk_size": 1,
+  "train_res": 384,
+  "sample_h": 384,
+  "sample_w": 384,
+  "batch_size": 1,
+  "lr": 0.0001,
+  "dtype": "bf16",
+  "seed": 42,
+  "scenario_seeds": {
+    "free_fall": 123,
+    "pendulum": 7,
+    "bouncing": 42
+  },
+  "save_every": 100,
+  "sample_every": 100,
+  "sample_infer_steps": 50,
+  "val_every": 100,
+  "val_batches": 10,
+  "sample_fps": 8,
+  "sample_frames": 24,
+  "lora_rank": 32,
+  "lora_alpha": 64,
+  "lora_target_modules": [
+    "to_q",
+    "to_k",
+    "to_v",
+    "to_out.0"
+  ],
+  "lambda_t2v": 0.0,
+  "lambda_i2v": 1.5,
+  "i2v_on_augmented": false,
+  "lambda_trans": 0.0,
+  "lambda_rot": 0.0,
+  "lambda_boost": 0.0,
+  "lambda_gt": 0.0,
+  "physics_raft_scale": 1.0,
+  "physics_n_cond_lat": 2,
+  "physics_max_lat_frames": null,
+  "gt_clip_path": "data/synthetic_384/free_fall/00000.mp4",
+  "prompt": "a solid colored ball in motion, side view",
+  "scenario_prompts": {
+    "free_fall": "a single ball dropping straight down, black background, side view, slow motion",
+    "pendulum": "a ball on a string swinging back and forth repeatedly, dark background, side view, slow motion",
+    "bouncing": "a rubber ball repeatedly bouncing off the floor, dark background, side view, slow motion"
+  },
+  "display_prompts": {
+    "free_fall": "a single ball dropping straight down, black background, side view, slow motion",
+    "pendulum": "a ball on a string swinging back and forth repeatedly, dark background, side view, slow motion",
+    "bouncing": "a rubber ball repeatedly bouncing off the floor, dark background, side view, slow motion"
+  },
+  "ood_prompts": {
+    "rolling": "a solid colored ball rolling along a flat surface from left to right, side view",
+    "pendulum_photo": "a solid colored ball swinging as a pendulum from a fixed pivot, side view, slow motion"
+  },
+  "disable_gradient_checkpointing": false,
+  "use_augmented_clips": false,
+  "load_augmentations": false
+}

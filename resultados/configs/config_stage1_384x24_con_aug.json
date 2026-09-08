@@ -1,0 +1,70 @@
+{
+  "_comment": "BRAZO CON AUMENTACIONES, re-entrenado sobre data/synthetic_384 regenerado. Config identica a config_stage1.json@fb697cb6 (P1) salvo experiment_name y output_dir: lambda_t2v=0 y use_augmented_clips/load_augmentations=true, o sea los tres terminos de difusion sobre clips rot/trans/boost mas la continuacion I2V. POR QUE se re-entrena en vez de usar el checkpoint de P1 archivado: el dataset con el que P1 se entreno se perdio al terminarse la instancia EC2 (el volumen EBS se borro por DeleteOnTermination) y ninguno de los dos generadores del repo lo reproduce (traj_mae_base 41.05 vs 46.04; comparacion de pixeles contra el panel GT de sus muestras commiteadas: dif 23.5 y 20.5). Evaluar el checkpoint de P1 sobre un dataset ajeno lo pone fuera de su distribucion de entrenamiento mientras el otro brazo esta dentro, lo que sesga la comparacion a favor del brazo sin aumentaciones. Con este re-entrenamiento los dos brazos quedan entrenados Y evaluados sobre los mismos datos.",
+  "experiment_name": "stage1_384x24_con_aug",
+  "dataset_type": "synthetic",
+  "data_dir": "data/synthetic_384",
+  "output_dir": "checkpoints_sana/stage1_384x24_con_aug",
+  "variant": 8,
+  "model_id": "Efficient-Large-Model/SANA-Video_2B_480p_diffusers",
+  "steps": 3000,
+  "k_steps": 1,
+  "physics_n_bptt": 1,
+  "max_frames": 24,
+  "chunk_size": 1,
+  "train_res": 384,
+  "sample_h": 384,
+  "sample_w": 384,
+  "batch_size": 1,
+  "lr": 0.0001,
+  "dtype": "bf16",
+  "seed": 42,
+  "scenario_seeds": {
+    "free_fall": 123,
+    "pendulum": 7,
+    "bouncing": 42
+  },
+  "save_every": 100,
+  "sample_every": 100,
+  "sample_infer_steps": 50,
+  "val_every": 100,
+  "val_batches": 10,
+  "sample_fps": 8,
+  "sample_frames": 24,
+  "lora_rank": 32,
+  "lora_alpha": 64,
+  "lora_target_modules": [
+    "to_q",
+    "to_k",
+    "to_v",
+    "to_out.0"
+  ],
+  "lambda_t2v": 0.0,
+  "lambda_i2v": 1.5,
+  "i2v_on_augmented": false,
+  "lambda_trans": 0.0,
+  "lambda_rot": 0.0,
+  "lambda_boost": 0.0,
+  "lambda_gt": 0.0,
+  "physics_raft_scale": 1.0,
+  "physics_n_cond_lat": 2,
+  "physics_max_lat_frames": null,
+  "gt_clip_path": "data/synthetic_384/free_fall/00000.mp4",
+  "prompt": "a solid colored ball in motion, side view",
+  "scenario_prompts": {
+    "free_fall": "a single ball dropping straight down, black background, side view, slow motion",
+    "pendulum": "a ball on a string swinging back and forth repeatedly, dark background, side view, slow motion",
+    "bouncing": "a rubber ball repeatedly bouncing off the floor, dark background, side view, slow motion"
+  },
+  "display_prompts": {
+    "free_fall": "a single ball dropping straight down, black background, side view, slow motion",
+    "pendulum": "a ball on a string swinging back and forth repeatedly, dark background, side view, slow motion",
+    "bouncing": "a rubber ball repeatedly bouncing off the floor, dark background, side view, slow motion"
+  },
+  "ood_prompts": {
+    "rolling": "a solid colored ball rolling along a flat surface from left to right, side view",
+    "pendulum_photo": "a solid colored ball swinging as a pendulum from a fixed pivot, side view, slow motion"
+  },
+  "disable_gradient_checkpointing": false,
+  "use_augmented_clips": true,
+  "load_augmentations": true
+}

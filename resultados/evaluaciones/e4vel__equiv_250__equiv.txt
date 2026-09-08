@@ -1,0 +1,19 @@
+[equiv_vel250] bouncing/00500: diferencia media (círculo válido) 6.9
+[equiv_vel250] bouncing/00501: diferencia media (círculo válido) 6.5
+[equiv_vel250] bouncing/00502: diferencia media (círculo válido) 4.9
+[equiv_vel250] free_fall/00500: diferencia media (círculo válido) 4.4
+[equiv_vel250] free_fall/00501: diferencia media (círculo válido) 3.8
+[equiv_vel250] free_fall/00502: diferencia media (círculo válido) 4.6
+[equiv_vel250] pendulum/00500: diferencia media (círculo válido) 4.8
+[equiv_vel250] pendulum/00501: diferencia media (círculo válido) 4.9
+[equiv_vel250] pendulum/00502: diferencia media (círculo válido) 4.8
+[ctrl_rep250] bouncing/00500: diferencia media (círculo válido) 6.6
+[ctrl_rep250] bouncing/00501: diferencia media (círculo válido) 6.1
+[ctrl_rep250] bouncing/00502: diferencia media (círculo válido) 4.4
+[ctrl_rep250] free_fall/00500: diferencia media (círculo válido) 4.1
+[ctrl_rep250] free_fall/00501: diferencia media (círculo válido) 3.4
+[ctrl_rep250] free_fall/00502: diferencia media (círculo válido) 4.1
+[ctrl_rep250] pendulum/00500: diferencia media (círculo válido) 5.0
+[ctrl_rep250] pendulum/00501: diferencia media (círculo válido) 4.7
+[ctrl_rep250] pendulum/00502: diferencia media (círculo válido) 4.6
+VIDEOS-EQUIV-DONE

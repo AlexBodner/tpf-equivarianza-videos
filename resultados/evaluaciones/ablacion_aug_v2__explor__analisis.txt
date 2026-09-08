@@ -1,0 +1,14 @@
+/home/ubuntu/tpf_e4/scripts/analizar_explor.py:135: RuntimeWarning: Mean of empty slice
+  det_txt = "; ".join("%s det %.0f%%" % (b, 100*np.nanmean([f[b]["det"]/f[b]["T"] for f in filas if f.get(b)])) for b in arms)
+T2V, realismo = residuo normalizado del ajuste físico (menor mejor; GT = piso)
+free_fall: el GT es lineal en la ventana (velocidad terminal); la parábola mide suavidad, NO gravedad
+detecciones válidas tras filtrar saltos: A_con_aug det nan%; B_sin_aug det nan%
+esc          n       GT  A_con_aug  B_sin_aug   mov_ratio A_con_ B_sin_
+
+PARAMETROS FISICOS RECUPERADOS (mediana por escenario; si aprendio fisica, el brazo da lo del GT)
+Traceback (most recent call last):
+  File "/home/ubuntu/tpf_e4/scripts/analizar_explor.py", line 180, in <module>
+    main()
+  File "/home/ubuntu/tpf_e4/scripts/analizar_explor.py", line 172, in main
+    x, y = zip(*ok)
+ValueError: not enough values to unpack (expected 2, got 0)

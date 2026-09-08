@@ -1,0 +1,36 @@
+{
+    "experiment_name": "physiq_v7_baseline",
+    "model_id": "Efficient-Large-Model/SANA-Video_2B_480p_diffusers",
+    "data_dir": "data/physics_iq_matched",
+    "output_dir": "checkpoints_sana/v7_physiq",
+    "variant": 7,
+    "steps": 2000,
+    "k_steps": 1,
+    "chunk_size": 0,
+    "max_frames": 33,
+    "train_res": null,
+    "batch_size": 1,
+    "lr": 0.0001,
+    "dtype": "bf16",
+    "seed": 42,
+    "save_every": 100,
+    "sample_every": 25,
+    "sample_frames": 17,
+    "physics_raft_scale": 1.0,
+    "physics_sigma_min": 0.1,
+    "physics_sigma_max": 0.4,
+    "physics_n_cond_lat": 1,
+    "train_fraction": 0.8,
+    "prompt": "Two grabbers release a brown tennis ball and an orange block over two pillows on a table.",
+    "scenario_prompts": {
+        "Solid Mechanics": "A ball bounces off a hard floor and collides with a wooden block, side view",
+        "Fluid Dynamics": "A glass beverage dispenser pours liquid into a glass on a tray, side view"
+    },
+    "ood_prompts": {
+        "indist": "Two grabbers release a brown tennis ball and an orange block over two pillows on a table.",
+        "outdist": "A blue tennis ball rolls out of a black pipe and falls off the edge of a wooden table."
+    },
+    "gt_videos": {
+        "indist": "data/physics_iq_matched/full-videos/take-1/30FPS/0002_full-videos_30FPS_perspective-center_take-1_trimmed-ball-and-block-fall.mp4"
+    }
+}

@@ -1,0 +1,15 @@
+T2V, realismo = residuo normalizado del ajuste físico (menor mejor; GT = piso)
+free_fall: el GT es lineal en la ventana (velocidad terminal); la parábola mide suavidad, NO gravedad
+detecciones válidas tras filtrar saltos: equiv_vel det 69%
+esc          n       GT  equiv_vel   mov_ratio equiv_
+free_fall   10    0.020      0.061                0.79
+pendulum    10    0.029      0.209                1.50
+bouncing    10    0.016      0.055                0.67
+
+PARAMETROS FISICOS RECUPERADOS (mediana por escenario; si aprendio fisica, el brazo da lo del GT)
+  free_fall  aceleracion [px/cuadro^2] (GT~0)   GT    0.306   equiv    0.089
+  free_fall  CV de la velocidad (GT~0)          GT    0.326   equiv    0.402
+  pendulum   omega [rad/cuadro]                 GT    0.168   equiv    0.189
+  pendulum   amplitud fin/inicio (GT = referencia) GT    0.712   equiv    0.853
+  bouncing   g [px/cuadro^2]                    GT    3.281   equiv    0.465
+  bouncing   dispersion de g entre tramos       GT    0.229   equiv    0.041

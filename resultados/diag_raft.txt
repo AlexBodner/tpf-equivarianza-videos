@@ -1,0 +1,38 @@
+=== 1) CLIPS REALES rotados pixel a pixel (techo del instrumento). cos=1 y ratio=0 seria un instrumento perfecto ===
+free_fall 00500.mp4: n=23 | grid: cos +0.30 ratio 0.71 esc 0.76 | cv2: cos +0.54 ratio 0.47 | cv2 con R(-45): cos -0.11 ratio 1.10 | |a| medio 1.25
+free_fall 00501.mp4: n=22 | grid: cos -0.13 ratio 1.06 esc 4.15 | cv2: cos +0.22 ratio 0.94 | cv2 con R(-45): cos +0.05 ratio 0.98 | |a| medio 4.63
+free_fall 00502.mp4: n=23 | grid: cos +0.27 ratio 0.76 esc 0.58 | cv2: cos +0.59 ratio 0.42 | cv2 con R(-45): cos +0.09 ratio 0.91 | |a| medio 1.04
+pendulum  00500.mp4: n=31 | grid: cos +0.74 ratio 0.26 esc 0.99 | cv2: cos +0.69 ratio 0.31 | cv2 con R(-45): cos +0.04 ratio 0.96 | |a| medio 1.35
+pendulum  00501.mp4: n=31 | grid: cos +0.73 ratio 0.27 esc 1.02 | cv2: cos +0.77 ratio 0.23 | cv2 con R(-45): cos +0.03 ratio 0.97 | |a| medio 1.60
+pendulum  00502.mp4: n=31 | grid: cos +0.77 ratio 0.23 esc 1.03 | cv2: cos +0.74 ratio 0.26 | cv2 con R(-45): cos +0.12 ratio 0.88 | |a| medio 1.47
+bouncing  00500.mp4: n=31 | grid: cos +0.64 ratio 0.37 esc 1.18 | cv2: cos +0.97 ratio 0.05 | cv2 con R(-45): cos +0.02 ratio 0.98 | |a| medio 4.30
+bouncing  00501.mp4: n=31 | grid: cos +0.96 ratio 0.05 esc 1.21 | cv2: cos +0.98 ratio 0.05 | cv2 con R(-45): cos +0.00 ratio 1.00 | |a| medio 4.18
+bouncing  00502.mp4: n=31 | grid: cos +0.74 ratio 0.27 esc 1.19 | cv2: cos +0.97 ratio 0.03 | cv2 con R(-45): cos -0.00 ratio 1.00 | |a| medio 4.46
+MEDIANAS reales: grid cos 0.73 ratio 0.27 | cv2 cos 0.74 ratio 0.26 | cv2 R(-45) cos 0.03 ratio 0.98
+
+=== 2) GENERADOS (pares de equivarianza del 250: cond original vs cond rotado 45, generacion completa de 50 pasos) ===
+  ctrl_rep250  bouncing/00500: n=31 cos +0.22 ratio 0.81 esc 1.66 | R(-45): cos +0.12 ratio 0.89 | |a| 2.93
+  ctrl_rep250  bouncing/00501: n=31 cos +0.32 ratio 0.70 esc 1.42 | R(-45): cos +0.34 ratio 0.68 | |a| 4.74
+  ctrl_rep250  bouncing/00502: n=31 cos +0.14 ratio 0.88 esc 1.73 | R(-45): cos +0.21 ratio 0.82 | |a| 3.33
+  ctrl_rep250  free_fall/00500: n=31 cos +0.07 ratio 0.93 esc 1.01 | R(-45): cos +0.27 ratio 0.73 | |a| 2.95
+  ctrl_rep250  free_fall/00501: n=31 cos -0.89 ratio 1.62 esc 2.47 | R(-45): cos -0.05 ratio 1.04 | |a| 6.04
+  ctrl_rep250  free_fall/00502: n=31 cos -0.03 ratio 1.03 esc 0.92 | R(-45): cos +0.10 ratio 0.90 | |a| 3.15
+  ctrl_rep250  pendulum/00500: n=31 cos +0.01 ratio 1.00 esc 0.71 | R(-45): cos +0.14 ratio 0.87 | |a| 2.22
+  ctrl_rep250  pendulum/00501: n=31 cos +0.35 ratio 0.66 esc 0.84 | R(-45): cos +0.04 ratio 0.96 | |a| 1.93
+  ctrl_rep250  pendulum/00502: n=31 cos +0.07 ratio 0.97 esc 0.26 | R(-45): cos +0.07 ratio 0.96 | |a| 1.06
+MEDIANAS ctrl_rep250: cos +0.07 ratio 0.93 | con R(-45): cos +0.12
+  equiv_fix250 bouncing/00500: n=31 cos +0.05 ratio 0.95 esc 1.34 | R(-45): cos +0.22 ratio 0.79 | |a| 3.34
+  equiv_fix250 bouncing/00501: n=31 cos +0.31 ratio 0.73 esc 1.73 | R(-45): cos +0.36 ratio 0.69 | |a| 6.76
+  equiv_fix250 bouncing/00502: n=31 cos +0.05 ratio 0.96 esc 1.93 | R(-45): cos +0.29 ratio 0.77 | |a| 6.94
+  equiv_fix250 free_fall/00500: n=31 cos -0.08 ratio 1.08 esc 1.18 | R(-45): cos +0.03 ratio 0.97 | |a| 6.00
+  equiv_fix250 free_fall/00501: n=31 cos -0.80 ratio 1.79 esc 1.18 | R(-45): cos +0.00 ratio 1.00 | |a| 5.03
+  equiv_fix250 free_fall/00502: n=31 cos +0.27 ratio 0.74 esc 1.25 | R(-45): cos +0.23 ratio 0.78 | |a| 2.54
+  equiv_fix250 pendulum/00500: n=31 cos +0.27 ratio 0.73 esc 1.08 | R(-45): cos -0.12 ratio 1.12 | |a| 2.25
+  equiv_fix250 pendulum/00501: n=31 cos +0.54 ratio 0.47 esc 1.20 | R(-45): cos +0.22 ratio 0.79 | |a| 3.59
+  equiv_fix250 pendulum/00502: n=31 cos +0.06 ratio 0.94 esc 1.26 | R(-45): cos +0.15 ratio 0.85 | |a| 3.52
+MEDIANAS equiv_fix250: cos +0.06 ratio 0.94 | con R(-45): cos +0.22
+
+=== 3) RUIDO PURO: mismo clip real dos veces sin rotar (cos deberia ser 1.00, ratio 0.00) y clip real vs si mismo con ruido gaussiano sigma=8 ===
+  identico: {'n': 31, 'N': 0.0, 'D': 140.494, 'ratio': 0.0, 'cos': 1.0, 'esc': 1.0}
+  con ruido sigma=8: {'n': 31, 'N': 92.073, 'D': 141.372, 'ratio': 0.651, 'cos': 0.349, 'esc': 0.994}
+DIAG-RAFT-DONE

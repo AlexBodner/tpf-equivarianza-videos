@@ -1,0 +1,662 @@
+[
+ {
+  "esc": "free_fall",
+  "clip": "00500",
+  "gt": {
+   "residuo": 0.019061214286313487,
+   "param1": 0.27194662946423964,
+   "param2": 0.3136836797789111,
+   "camino": 265.93231118359915,
+   "det": 25,
+   "T": 25,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.06863574276746708,
+   "param1": 0.022501779144078266,
+   "param2": 2.0753109024839804,
+   "camino": 152.84428717886692,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "free_fall",
+  "clip": "00501",
+  "gt": {
+   "residuo": 0.01927283661269333,
+   "param1": 0.3031795152126301,
+   "param2": 0.3180241424355966,
+   "camino": 251.77957561154287,
+   "det": 24,
+   "T": 24,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.07773320325023832,
+   "param1": -0.2836433016325432,
+   "param2": 2.144042632282532,
+   "camino": 206.98360622207977,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "free_fall",
+  "clip": "00502",
+  "gt": {
+   "residuo": 0.020705042542567925,
+   "param1": 0.32832145015014413,
+   "param2": 0.3480706264292644,
+   "camino": 263.431719635243,
+   "det": 25,
+   "T": 25,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.10102259845113053,
+   "param1": -0.7955764514274838,
+   "param2": 2.4867027469790495,
+   "camino": 389.976061341341,
+   "det": 23,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "free_fall",
+  "clip": "00503",
+  "gt": {
+   "residuo": 0.01998466588575241,
+   "param1": 0.30833032227264706,
+   "param2": 0.3303302750335193,
+   "camino": 263.3184358954428,
+   "det": 25,
+   "T": 25,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.18467556600351806,
+   "param1": 0.7178579065747668,
+   "param2": 6.852965693540316,
+   "camino": 322.1806220051448,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "free_fall",
+  "clip": "00504",
+  "gt": {
+   "residuo": 0.0203421340330904,
+   "param1": 0.3472294532984134,
+   "param2": 0.3377906431252322,
+   "camino": 257.9313919526908,
+   "det": 24,
+   "T": 24,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.14924987864172004,
+   "param1": 0.32522743008239513,
+   "param2": 2.438826997997956,
+   "camino": 166.6300785024616,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "free_fall",
+  "clip": "00505",
+  "gt": {
+   "residuo": 0.019483746838313408,
+   "param1": 0.2909081381257585,
+   "param2": 0.3248935526344703,
+   "camino": 265.34275924310674,
+   "det": 25,
+   "T": 25,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": NaN,
+   "param1": NaN,
+   "param2": NaN,
+   "camino": NaN,
+   "det": 4,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "free_fall",
+  "clip": "00506",
+  "gt": {
+   "residuo": 0.018767298719911785,
+   "param1": 0.2554221795686552,
+   "param2": 0.31198981725947406,
+   "camino": 267.7055178300551,
+   "det": 25,
+   "T": 25,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.09398188786831115,
+   "param1": 0.5116529060203258,
+   "param2": 1.820396870445581,
+   "camino": 243.79914965830326,
+   "det": 27,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "free_fall",
+  "clip": "00507",
+  "gt": {
+   "residuo": 0.019613814624197118,
+   "param1": 0.2896301186153047,
+   "param2": 0.3272324119806282,
+   "camino": 267.1982175581968,
+   "det": 25,
+   "T": 25,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.1690238752141811,
+   "param1": 0.2449723241988989,
+   "param2": 3.78040100421036,
+   "camino": 242.48321186750354,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "free_fall",
+  "clip": "00508",
+  "gt": {
+   "residuo": 0.01927550445770931,
+   "param1": 0.3206680141416881,
+   "param2": 0.32272951329180477,
+   "camino": 258.0727950112385,
+   "det": 24,
+   "T": 24,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.20060216906009476,
+   "param1": 0.25109286292378746,
+   "param2": 4.302479332200381,
+   "camino": 392.0232303375066,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "free_fall",
+  "clip": "00509",
+  "gt": {
+   "residuo": 0.02107754321242799,
+   "param1": 0.3830636657216871,
+   "param2": 0.35749188195034004,
+   "camino": 249.67598542949764,
+   "det": 24,
+   "T": 24,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.24591561224990385,
+   "param1": -0.051023156635700936,
+   "param2": 3.837817248218358,
+   "camino": 153.14812611072097,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "pendulum",
+  "clip": "00500",
+  "gt": {
+   "residuo": 0.030038968183695166,
+   "param1": 0.16404682274247492,
+   "param2": 0.6069671096980628,
+   "camino": 155.1182675965308,
+   "det": 18,
+   "T": 33,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.025786171606359178,
+   "param1": 0.19214046822742475,
+   "param2": 1.0343940944168795,
+   "camino": 359.81723322611407,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "pendulum",
+  "clip": "00501",
+  "gt": {
+   "residuo": NaN,
+   "param1": NaN,
+   "param2": NaN,
+   "camino": 90.64793493155014,
+   "det": 12,
+   "T": 33,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.2697149954938596,
+   "param1": 0.3396321070234114,
+   "param2": 0.4147554567716248,
+   "camino": 292.281187033111,
+   "det": 17,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "pendulum",
+  "clip": "00502",
+  "gt": {
+   "residuo": 0.024143540668708042,
+   "param1": 0.17107023411371236,
+   "param2": 0.8684275576856231,
+   "camino": 222.7680501404348,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.26180823863331515,
+   "param1": 0.15,
+   "param2": 1.3683818379240105,
+   "camino": 312.7124047127348,
+   "det": 32,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "pendulum",
+  "clip": "00503",
+  "gt": {
+   "residuo": 0.029973070592521626,
+   "param1": 0.16755852842809366,
+   "param2": 0.6027906078510205,
+   "camino": 146.4107143160045,
+   "det": 20,
+   "T": 33,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": NaN,
+   "param1": NaN,
+   "param2": NaN,
+   "camino": 95.45256606846314,
+   "det": 12,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "pendulum",
+  "clip": "00504",
+  "gt": {
+   "residuo": 0.03314075746850857,
+   "param1": 0.15,
+   "param2": 0.26536656279992055,
+   "camino": 194.36179797814424,
+   "det": 27,
+   "T": 33,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.16943220613039678,
+   "param1": 0.15,
+   "param2": 0.3244209245557417,
+   "camino": 310.8281105796244,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "pendulum",
+  "clip": "00505",
+  "gt": {
+   "residuo": 0.03565384817938108,
+   "param1": 0.16755852842809366,
+   "param2": 0.8176609321333091,
+   "camino": 187.2090358636795,
+   "det": 24,
+   "T": 33,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.2549428114085596,
+   "param1": 0.15,
+   "param2": 1.6643892613716256,
+   "camino": 196.75216135896193,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "pendulum",
+  "clip": "00506",
+  "gt": {
+   "residuo": 0.020274929104613367,
+   "param1": 0.16755852842809366,
+   "param2": 0.8723809137208489,
+   "camino": 146.76092587530684,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.0725863859843283,
+   "param1": 0.15,
+   "param2": 0.6521931040817521,
+   "camino": 261.0090085301837,
+   "det": 31,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "pendulum",
+  "clip": "00507",
+  "gt": {
+   "residuo": NaN,
+   "param1": NaN,
+   "param2": NaN,
+   "camino": 98.51834501988716,
+   "det": 11,
+   "T": 33,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.5233881675001435,
+   "param1": 0.2939799331103679,
+   "param2": 0.4971976927769925,
+   "camino": 376.8039806672488,
+   "det": 26,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "pendulum",
+  "clip": "00508",
+  "gt": {
+   "residuo": 0.03206127281318892,
+   "param1": 0.1605351170568562,
+   "param2": 0.544484587063421,
+   "camino": 238.32830452559523,
+   "det": 26,
+   "T": 33,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.28821276687293546,
+   "param1": 0.15,
+   "param2": 0.41980295844333143,
+   "camino": 243.90349314892205,
+   "det": 30,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "pendulum",
+  "clip": "00509",
+  "gt": {
+   "residuo": 0.029991185089044678,
+   "param1": 0.20267558528428092,
+   "param2": 0.9636660339791133,
+   "camino": 178.41853145919376,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": null
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.05924913407633921,
+   "param1": 0.15,
+   "param2": 11.399895162568283,
+   "camino": 155.14404918360609,
+   "det": 17,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "bouncing",
+  "clip": "00500",
+  "gt": {
+   "residuo": 0.016367268448621252,
+   "param1": 3.521739871055892,
+   "param2": 0.23500499417136453,
+   "camino": 362.6451063400523,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 3
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.014115659530683042,
+   "param1": 6.1301807771389125,
+   "param2": 0.6422711824221258,
+   "camino": 434.2248597060419,
+   "det": 24,
+   "T": 33,
+   "tramos_gt": 2
+  }
+ },
+ {
+  "esc": "bouncing",
+  "clip": "00501",
+  "gt": {
+   "residuo": 0.017568623577673328,
+   "param1": 3.2539748716022743,
+   "param2": 0.20745693043182473,
+   "camino": 337.4092363046444,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 3
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.06230864529913814,
+   "param1": 0.11000807200870089,
+   "param2": 11.8944423163278,
+   "camino": 370.26280537601565,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 2
+  }
+ },
+ {
+  "esc": "bouncing",
+  "clip": "00502",
+  "gt": {
+   "residuo": 0.016861769070330684,
+   "param1": 3.170493472720054,
+   "param2": 0.14939809746884736,
+   "camino": 349.0485627100534,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 3
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.0457788599434476,
+   "param1": 0.45745454365826405,
+   "param2": 0.22197051546412222,
+   "camino": 314.94235576138703,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 2
+  }
+ },
+ {
+  "esc": "bouncing",
+  "clip": "00503",
+  "gt": {
+   "residuo": 0.01122293443688475,
+   "param1": 2.203696328276468,
+   "param2": 0.10600736945874366,
+   "camino": 340.14328315854186,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 3
+  },
+  "equiv_lambdafix": {
+   "residuo": NaN,
+   "param1": NaN,
+   "param2": NaN,
+   "camino": NaN,
+   "det": 2,
+   "T": 33,
+   "tramos_gt": null
+  }
+ },
+ {
+  "esc": "bouncing",
+  "clip": "00504",
+  "gt": {
+   "residuo": 0.009920630824722824,
+   "param1": 3.4045511766424865,
+   "param2": 0.10917809076291968,
+   "camino": 329.3350961324099,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 3
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.04381897490550266,
+   "param1": 6.3919658040593035,
+   "param2": 0.09449463536362152,
+   "camino": 288.5195736874318,
+   "det": 22,
+   "T": 33,
+   "tramos_gt": 3
+  }
+ },
+ {
+  "esc": "bouncing",
+  "clip": "00505",
+  "gt": {
+   "residuo": 0.02020940007599515,
+   "param1": 2.231993084082721,
+   "param2": 0.25440255726105415,
+   "camino": 304.7664646636808,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 3
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.06847564261318172,
+   "param1": 2.785971450079412,
+   "param2": 0.21720228604298106,
+   "camino": 294.21347200746413,
+   "det": 27,
+   "T": 33,
+   "tramos_gt": 3
+  }
+ },
+ {
+  "esc": "bouncing",
+  "clip": "00506",
+  "gt": {
+   "residuo": 0.01471566105470986,
+   "param1": 4.20970705613317,
+   "param2": 0.32889772994057825,
+   "camino": 353.6064804172803,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 4
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.1373810603817333,
+   "param1": 0.3723695896816239,
+   "param2": NaN,
+   "camino": 179.26679892087168,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 1
+  }
+ },
+ {
+  "esc": "bouncing",
+  "clip": "00507",
+  "gt": {
+   "residuo": 0.017820917445740388,
+   "param1": 2.156427744905246,
+   "param2": 0.3581019790512194,
+   "camino": 398.2825695701757,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 3
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.07109364744091799,
+   "param1": 0.8352328323066692,
+   "param2": 0.8170319215099864,
+   "camino": 397.9036994170972,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 3
+  }
+ },
+ {
+  "esc": "bouncing",
+  "clip": "00508",
+  "gt": {
+   "residuo": 0.01650984108216434,
+   "param1": 3.68965559252198,
+   "param2": 0.22333478453158717,
+   "camino": 349.90126649945694,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 4
+  },
+  "equiv_lambdafix": {
+   "residuo": 0.052736008010538564,
+   "param1": 0.23188856719626,
+   "param2": NaN,
+   "camino": 188.06342710406975,
+   "det": 13,
+   "T": 33,
+   "tramos_gt": 2
+  }
+ },
+ {
+  "esc": "bouncing",
+  "clip": "00509",
+  "gt": {
+   "residuo": 0.014491324026867008,
+   "param1": 3.3072318102952982,
+   "param2": 0.28374644897901263,
+   "camino": 351.2104785284243,
+   "det": 33,
+   "T": 33,
+   "tramos_gt": 3
+  },
+  "equiv_lambdafix": {
+   "residuo": NaN,
+   "param1": NaN,
+   "param2": NaN,
+   "camino": NaN,
+   "det": 2,
+   "T": 33,
+   "tramos_gt": null
+  }
+ }
+]
