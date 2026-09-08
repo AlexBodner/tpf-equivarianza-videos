@@ -95,9 +95,32 @@ pivote en su lugar y el hilo único.*
 
 Archivos: `videos/08_equivarianza_*_velocidad.mp4`, `videos/01_pendulo_bien_paso1000.mp4`
 
+<a id="ladoalado"></a>
+
+## 6. Lado a lado: el control contra el brazo con física
+
+*Póster: sección «Resultados». Es el contraste que decide todo el trabajo.*
+
+Los dos brazos entrenan con el mismo clip, el mismo ruido y los mismos pesos iniciales; lo único que
+los separa es la pérdida de equivarianza. Acá generan el **mismo clip**, así que la diferencia que se
+ve es atribuible a la pérdida y a nada más.
+
+![Rebote: control contra brazo con física](gifs/lado_a_lado_rebote.gif)
+
+*Rebote, generación condicionada en el primer cuadro. Arrancan idénticos, porque el condicionamiento
+es el mismo, y divergen: la pelota del brazo con física recorre menos y hacia el final se desdibuja.
+Es la degeneración empezando, en un caso donde las métricas en distribución todavía no la marcan.*
+
+![Péndulo: control contra brazo con física](gifs/lado_a_lado_pendulo.gif)
+
+*Péndulo, generación libre por texto. Acá el brazo con física dibuja el pivote y el hilo, que el
+control no pone; es el escenario donde la pérdida ayudó más.*
+
+Los seis videos (tres escenarios × condicionada y libre) están en `videos/13_control_vs_fisica_*.mp4`.
+
 <a id="degeneracion"></a>
 
-## 6. Tercer experimento, la otra cara: cómo satisface la simetría
+## 7. Tercer experimento, la otra cara: cómo satisface la simetría
 
 *Póster: sección «Resultados» (fuera de distribución) y «Conclusiones».*
 
@@ -122,7 +145,7 @@ parcialmente: el vector agregado se achica y la pérdida baja sin que la dinámi
 Archivos: `videos/03_rebote_pelota_duplicada_paso1000.mp4`, `videos/05_caida_libre_paso1000.mp4`,
 `videos/07_fuera_de_dominio_rodando.mp4`
 
-## 7. Control: la simetría por datos tampoco enseña
+## 8. Control: la simetría por datos tampoco enseña
 
 *Póster: no aparece; el contraste quedó confundido y se reporta como pendiente.*
 
@@ -133,7 +156,7 @@ resultado.
 
 Archivos: `videos/10_equivarianza_*_ablacion_aumentaciones.mp4`
 
-## 8. Qué quedó como recomendación
+## 9. Qué quedó como recomendación
 
 *Póster: sección «Trabajo futuro».*
 
