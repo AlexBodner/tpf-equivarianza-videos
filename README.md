@@ -172,7 +172,72 @@ parcialmente: el vector agregado se achica y la pérdida baja sin que la dinámi
 Archivos: `videos/03_rebote_pelota_duplicada_paso1000.mp4`, `videos/05_caida_libre_paso1000.mp4`,
 `videos/07_fuera_de_dominio_rodando.mp4`
 
-## 8. Control: la simetría por datos tampoco enseña
+<a id="numeros"></a>
+
+## 8. Los números, y cómo se eligió el checkpoint
+
+*Póster: sección «Resultados».*
+
+**El problema de elegir.** Las métricas de trayectoria oscilan entre checkpoints (ver la última tabla),
+así que elegir para cada brazo el checkpoint que mejor le va en la métrica de interés inflaría el
+resultado: sería seleccionar sobre el desenlace. Se reportan dos elecciones, ambas aplicadas **igual a
+los dos brazos**:
+
+1. **El checkpoint final** (paso 1000), que es la elección preregistrada y no mira ningún resultado.
+2. **El mejor por validación de difusión** entre los checkpoints guardados, un criterio independiente
+   de lo que se quiere probar. Los dos brazos eligen el mismo paso, el 250 (0,0698 el brazo con física,
+   0,0667 el control), así que la comparación sigue siendo pareja.
+
+Las dos elecciones dan la misma respuesta, que es lo que hace creíble el resultado.
+
+### Checkpoint final (paso 1000), en distribución
+
+| métrica | control | con física | mejor | p |
+|---|---|---|---|---|
+| error de velocidad (↓) | 4,895 | 5,009 | 24/60 | 0,299 |
+| razón de movimiento (→1) | 0,616 | 0,598 | 29/60 | 0,802 |
+| jerk (↓) | 1,640 | 1,495 | 35/60 | 0,067 |
+| MAE de aceleración (↓) | 1,828 | 1,880 | 24/60 | 0,126 |
+
+Cota del video quieto, error de velocidad por escenario: 11,498, 7,519, 9,953.
+
+### Checkpoint final (paso 1000), fuera de distribución: tiro vertical
+
+| métrica | control | con física | cota del video quieto | p |
+|---|---|---|---|---|
+| error de velocidad (↓) | 7,634 | **8,799** | 8,899 | 0,005 |
+| razón de movimiento (→1) | 0,427 | **0,119** | 0,216 | 0,001 |
+| jerk (↓) | 1,651 | **0,817** | 0,000 | 0,005 |
+
+### Checkpoint elegido por validación (paso 250), en distribución
+
+| métrica | control | con física | mejor | p |
+|---|---|---|---|---|
+| error de velocidad (↓) | 4,838 | 5,190 | 13/30 | 0,096 |
+| razón de movimiento (→1) | 0,608 | 0,568 | 16/30 | 0,213 |
+| jerk (↓) | 1,592 | 1,271 | 18/30 | 0,164 |
+| pérdida de equivarianza cruda (↓) | 3,649 | 2,277 | 25/30 | &lt;0,001 |
+
+### Todos los checkpoints, para que se vea que no hay tendencia
+
+Formato: control → con física (p). Apareado por clip, n=30.
+
+| paso | error de velocidad | razón de movimiento | jerk |
+|---|---|---|---|
+| 125 | 4,915 → 5,166 (0,328) | 0,604 → 0,598 (1,000) | 1,588 → 1,332 (0,031) |
+| 250 | 4,838 → 5,190 (0,096) | 0,608 → 0,568 (0,213) | 1,592 → 1,271 (0,164) |
+| 375 | 4,913 → 5,312 (0,050) | 0,599 → 0,609 (0,598) | 1,728 → 1,184 (0,001) |
+| 500 | 4,540 → 4,365 (0,792) | 0,682 → 0,799 (0,017) | 1,857 → 1,473 (0,047) |
+| 625 | 5,299 → 4,326 (0,080) | 0,570 → 0,726 (&lt;0,001) | 1,565 → 1,532 (0,339) |
+| 750 | 4,212 → 5,225 (0,003) | 0,715 → 0,645 (0,105) | 1,820 → 1,101 (&lt;0,001) |
+| 875 | 4,939 → 4,767 (0,465) | 0,592 → 0,617 (0,393) | 1,546 → 1,256 (0,280) |
+| 1000 | 4,619 → 4,900 (0,213) | 0,651 → 0,613 (0,452) | 1,907 → 1,503 (0,253) |
+
+Todas las evaluaciones son apareadas por clip: los dos brazos generan **los mismos clips held-out** con
+la misma semilla, y el test es un Wilcoxon sobre las diferencias por clip. Las tablas completas, con
+todos los escenarios y todas las métricas, están en el repositorio principal del proyecto.
+
+## 9. Control: la simetría por datos tampoco enseña
 
 *Póster: no aparece; el contraste quedó confundido y se reporta como pendiente.*
 
@@ -183,7 +248,7 @@ resultado.
 
 Archivos: `videos/10_equivarianza_*_ablacion_aumentaciones.mp4`
 
-## 9. Qué quedó como recomendación
+## 10. Qué quedó como recomendación
 
 *Póster: sección «Trabajo futuro».*
 
