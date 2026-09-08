@@ -24,6 +24,8 @@ parte del póster corresponde.
   condicionamiento rotado 45° y luego des-rotada · diferencia absoluta**. Si el modelo fuera
   equivariante, los dos primeros serían iguales y el tercero negro.
 - Todos los MP4 están en [`videos/`](videos); los GIF de abajo son los mismos, reducidos.
+- **Cada video dice de qué checkpoint sale.** Los dos brazos siempre se comparan en el *mismo* paso, y
+  el nombre del archivo lo lleva.
 - Los JSON de todas las evaluaciones, los logs de entrenamiento y las configuraciones están en
   [`resultados/`](resultados), para que los números se puedan verificar sin la máquina de entrenamiento.
 
@@ -35,8 +37,8 @@ parte del póster corresponde.
 
 ![Las dos ramas de la pérdida](gifs/ramas_de_la_perdida.gif)
 
-*Las dos generaciones del mismo clip, con el mismo ruido: a la izquierda la escena original, a la
-derecha la escena rotada 45°. La pérdida compara la cinemática de una contra la de la otra rotada.*
+*Checkpoint 250 del brazo con física. Las dos generaciones del mismo clip, con el mismo ruido: a la
+izquierda la escena original, a la derecha la escena rotada 45°. La pérdida compara la cinemática de una contra la de la otra rotada.*
 
 En cada paso de entrenamiento el modelo genera el mismo clip dos veces, con el mismo ruido: una con la
 escena original y otra rotada. Si fuera equivariante, la cinemática de la segunda sería la de la
@@ -58,7 +60,7 @@ de generación completa, de 33 cuadros, que muestra lo mismo con más contexto.
 
 Con λ calibrado para que la física pese la mitad del gradiente, el modelo **deja de mover la pelota**
 en 100 pasos. A la izquierda el brazo con la pérdida, a la derecha su control entrenado en paralelo
-sin ella, en el mismo paso. Medido en el paso 125: razón de movimiento 0,13 contra 0,60 del control,
+sin ella, **ambos en el paso 100**. Medido en el paso 125: razón de movimiento 0,13 contra 0,60 del control,
 peor en los 30 clips.
 
 **Por qué pasa, en una ecuación.** La pérdida compara la cinemática de las dos ramas, normalizada por
@@ -142,13 +144,14 @@ más equivariante que su control (0,56 contra 0,37).
 
 ![Equivarianza del brazo entrenado](gifs/equivarianza_pendulo.gif)
 
-*Condicionamiento original · rotado 45° y des-rotado · diferencia. Cuanto más oscuro el tercer panel,
-más equivariante.*
+*Checkpoint 250. Condicionamiento original · rotado 45° y des-rotado · diferencia. Cuanto más oscuro el
+tercer panel, más equivariante. La medición equivalente en el checkpoint 1000 está en la tabla de la
+sección 8: 0,56 contra 0,37 del control.*
 
 ![Péndulo al paso 1000](gifs/pendulo_bien.gif)
 
-*El péndulo es el escenario donde mejor sale: la generación condicionada sigue al ground truth con el
-pivote en su lugar y el hilo único.*
+*Checkpoint 1000. El péndulo es el escenario donde mejor sale: la generación condicionada sigue al
+ground truth con el pivote en su lugar y el hilo único.*
 
 Archivos: `videos/08_equivarianza_*_velocidad.mp4`, `videos/01_pendulo_bien_paso1000.mp4`
 
@@ -162,9 +165,14 @@ Los dos brazos entrenan con el mismo clip, el mismo ruido y los mismos pesos ini
 los separa es la pérdida de equivarianza. Acá generan el **mismo clip**, así que la diferencia que se
 ve es atribuible a la pérdida y a nada más.
 
+Los videos de esta sección son del **checkpoint 250 de ambos brazos**, que es el que las dos reglas de
+selección eligen (ver sección 8). Las muestras del entrenamiento sólo se guardaron cada 250 pasos y para
+un brazo por vez, así que el paso 250 es el punto donde existe la generación pareada de los dos sobre
+los mismos clips. En el checkpoint 1000 la comparación existe en números, no en video.
+
 ![Los tres escenarios, control contra brazo con física](gifs/tres_escenarios_i2v.gif)
 
-*Los tres escenarios a la vez, generación condicionada en el primer cuadro. Arrancan idénticos porque
+*Checkpoint 250 de los dos brazos. Los tres escenarios a la vez, generación condicionada en el primer cuadro. Arrancan idénticos porque
 el condicionamiento es el mismo. En **caída libre** las dos trayectorias son parecidas y el brazo con
 física termina más cerca del ground truth. En **péndulo** también. En **rebote** la pelota del brazo con
 física se desdibuja y queda atrás: es el escenario donde empeora, y donde después aparecen los
@@ -172,21 +180,21 @@ duplicados.*
 
 ![Los tres escenarios, generación libre](gifs/tres_escenarios_t2v.gif)
 
-*Lo mismo generando sólo desde el texto, sin condicionamiento: acá las dos ramas no tienen por qué
+*Checkpoint 250, generando sólo desde el texto, sin condicionamiento: acá las dos ramas no tienen por qué
 coincidir en posición, y se ve mejor la diferencia de dinámica.*
 
 Y en detalle, dos casos:
 
 ![Rebote: control contra brazo con física](gifs/lado_a_lado_rebote.gif)
 
-*Rebote, generación condicionada en el primer cuadro. Arrancan idénticos, porque el condicionamiento
-es el mismo, y divergen: la pelota del brazo con física recorre menos y hacia el final se desdibuja.
+*Rebote, checkpoint 250 de los dos brazos, generación condicionada. Arrancan idénticos, porque el
+condicionamiento es el mismo, y divergen: la pelota del brazo con física recorre menos y hacia el final se desdibuja.
 Es la degeneración empezando, en un caso donde las métricas en distribución todavía no la marcan.*
 
 ![Péndulo: control contra brazo con física](gifs/lado_a_lado_pendulo.gif)
 
-*Péndulo, generación libre por texto. Acá el brazo con física dibuja el pivote y el hilo, que el
-control no pone; es el escenario donde la pérdida ayudó más.*
+*Péndulo, checkpoint 250, generación libre por texto. Acá el brazo con física dibuja el pivote y el
+hilo, que el control no pone; es el escenario donde la pérdida ayudó más.*
 
 Los videos completos: `videos/16_tres_escenarios_*.mp4` para las grillas y
 `videos/13_control_vs_fisica_*.mp4` para los seis casos individuales (tres escenarios × condicionada y
@@ -213,7 +221,7 @@ parcialmente: el vector agregado se achica y la pérdida baja sin que la dinámi
 
 ![Pelota duplicada en el rebote](gifs/pelota_duplicada.gif)
 
-*Dos pelotas de colores distintos en los paneles generados, al paso 1000. Comparar con
+*Checkpoint 1000. Dos pelotas de colores distintos en los paneles generados. Comparar con
 `videos/04_rebote_una_pelota_paso250.mp4`, el mismo escenario 750 pasos antes.*
 
 Archivos: `videos/03_rebote_pelota_duplicada_paso1000.mp4`, `videos/05_caida_libre_paso1000.mp4`,
