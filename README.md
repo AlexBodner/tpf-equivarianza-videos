@@ -218,6 +218,31 @@ Cota del video quieto, error de velocidad por escenario: 11,498, 7,519, 9,953.
 | jerk (↓) | 1,592 | 1,271 | 18/30 | 0,164 |
 | pérdida de equivarianza cruda (↓) | 3,649 | 2,277 | 25/30 | &lt;0,001 |
 
+### Por checkpoint y por escenario
+
+![Error y movimiento por checkpoint, abierto por escenario](figuras/por_checkpoint_y_escenario.png)
+
+**El promedio escondía el resultado más interesante.** Agrupando los tres escenarios, el brazo con
+física no se distingue del control (p = 0,299). Abriendo por escenario, en el checkpoint final los
+efectos son opuestos y significativos:
+
+| escenario | error de velocidad (control → física) | p | razón de movimiento | p |
+|---|---|---|---|---|
+| caída libre | 4,274 → **3,234** | 0,001 | 0,695 → **0,797** | &lt;0,001 |
+| péndulo | 4,325 → 4,825 | 0,044 | 0,621 → 0,588 | 0,522 |
+| rebote | 6,084 → **6,967** | 0,007 | 0,533 → **0,410** | 0,015 |
+
+En **caída libre** el brazo con física es mejor: se acerca más al ground truth y además **se mueve
+más**, o sea que no es degeneración. En **rebote** es peor y se mueve menos, que es exactamente donde
+aparece la pelota duplicada. El péndulo queda en el medio. Con seis tests, una corrección de
+Bonferroni deja en pie la mejora en caída libre y el empeoramiento en velocidad del rebote.
+
+La lectura que esto sugiere: la pérdida ayuda donde la cinemática es simple y constante (caída libre
+tras la velocidad terminal, que es movimiento uniforme) y estorba donde hay impactos, que es donde el
+estimador se rompe y el modelo encuentra el atajo de partir el objeto. Es un resultado **post-hoc**:
+no estaba preregistrado por escenario, aunque la metodología sí exige reportar los escenarios por
+separado y nunca promediados.
+
 ### Todos los checkpoints, para que se vea que no hay tendencia
 
 Formato: control → con física (p). Apareado por clip, n=30.
