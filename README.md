@@ -63,6 +63,46 @@ por paso de entrenamiento, con un índice que rastrea cada archivo hasta su orig
 - Los JSON de todas las evaluaciones, los logs de entrenamiento y las configuraciones están en
   [`resultados/`](resultados), para que los números se puedan verificar sin la máquina de entrenamiento.
 
+<a id="metricas"></a>
+
+## Qué mide cada número
+
+Todas las tablas usan estas cantidades. Vale la pena leer esto una vez: varias tienen una trampa.
+
+**Error de velocidad** — cuánto se aparta la rapidez de lo generado respecto de la del simulador, cuadro
+a cuadro, en píxeles por cuadro. Menos es mejor. **Es la métrica principal**, y la razón es que es la
+única donde un video congelado queda claramente último: no se puede ganar quedándose quieto.
+
+**Razón de movimiento** — cuánto se mueve lo generado dividido por cuánto se mueve el ground truth. 1
+sería exacto; 0,6 quiere decir que el modelo se mueve un 40 % de menos. No es una métrica de calidad
+sino el **control** que acompaña a todas las demás, porque varias se ganan moviéndose menos.
+
+**ρ** — la fracción del movimiento que **no** respeta la simetría. Se genera el mismo clip dos veces,
+una con la escena rotada, se des-rota la segunda y se mide cuánto difieren, dividido por cuánto
+movimiento hay en total. Menos es mejor, pero la escala engaña: **ρ = 1 significa "dos movimientos sin
+ninguna relación entre sí"**, así que 0,43 no es bueno, es un desacuerdo del 92 % de la magnitud del
+movimiento. Es la cantidad que la pérdida minimiza, así que mide directamente si el modelo aprendió lo
+que se le pidió.
+
+**Ángulo entre ramas** — el mismo dato que ρ pero legible: cuántos grados separan las velocidades de
+las dos generaciones. 0° sería simetría perfecta. Se reporta al lado de ρ porque se entiende sin
+explicación.
+
+**Jerk** — la variación de la aceleración; mide qué tan "a los tirones" es el movimiento. Menos es más
+suave. **Trampa: un video congelado tiene jerk cero**, así que ganar acá no es ganar en física; hay que
+leerlo junto con la razón de movimiento.
+
+**MAE de aceleración** — el error de aceleración contra el simulador. Misma trampa que el jerk, y peor:
+en caída libre el ground truth tiene aceleración casi nula porque la pelota ya va a velocidad terminal,
+así que quedarse quieto puntúa perfecto.
+
+**Las cotas triviales** — dos referencias que aparecen en las tablas y sirven para saber si un número
+significa algo: el **video quieto** (congelar el último cuadro de condicionamiento) y la **velocidad
+constante** (extrapolar en línea recta). Si un modelo no le gana claramente a las dos, no está haciendo
+física.
+
+---
+
 <a id="metodo"></a>
 
 ## El método: las dos ramas que compara la pérdida
@@ -342,6 +382,12 @@ elección primaria sigue siendo el paso 1000, que es la preregistrada y no selec
 La pregunta es obligada: si el modelo a veces genera dos pelotas, puede que el error no mida física
 sino que el instrumento se rompe. Tres comprobaciones.
 
+> ⚠️ **Estas tablas usan el paso 750 para el brazo con física**, que era el que elegía la regla que
+> después resultó estar mal medida. Los números son mediciones reales de ese checkpoint, pero **ya no
+> es "el mejor"**: se rehacen con el checkpoint que elija la validación corregida, que está corriendo.
+> Lo que no cambia es la conclusión, porque en el paso 1000 y en el 250 —las dos elecciones que sí se
+> sostienen— tampoco hay diferencia.
+
 **No lo arruinan unos pocos clips.** Descartando el peor clip de cada brazo, después los dos peores, y
 así hasta cinco, la brecha entre brazos queda igual: +0,39 · +0,35 · +0,32 · +0,34 · +0,41. La
 **mediana** de la diferencia por clip (+0,65) es incluso mayor que la media (+0,39). El brazo con
@@ -382,6 +428,12 @@ escena, que es el primer punto de [Qué quedó como recomendación](#recomendaci
 
 ## Todas las evaluaciones, sin filtrar
 
+> ⚠️ **Estas tablas usan el paso 750 para el brazo con física**, que era el que elegía la regla que
+> después resultó estar mal medida. Los números son mediciones reales de ese checkpoint, pero **ya no
+> es "el mejor"**: se rehacen con el checkpoint que elija la validación corregida, que está corriendo.
+> Lo que no cambia es la conclusión, porque en el paso 1000 y en el 250 —las dos elecciones que sí se
+> sostienen— tampoco hay diferencia.
+
 Control en el paso **250** (mínimo de su validación de difusión) y brazo con física en el paso
 **750** (mínimo de la suma de sus dos términos de validación). Mismos 30 clips held-out, misma
 semilla por clip. El modelo base y las cotas triviales van de referencia.
@@ -397,7 +449,9 @@ semilla por clip. El modelo base y las cotas triviales van de referencia.
 | equivarianza cruda, **sobre aceleraciones** (↓) | 7.902 | 3.649 | 1.441 | 28/30 | 0.000 |
 | equivarianza normalizada, **sobre aceleraciones** (↓) | 0.000 | 0.264 | 0.144 | 13/30 | 0.124 |
 
-#### Por escenario
+<details>
+<summary><b>Por escenario</b> (desplegar)</summary>
+
 
 **caída libre**
 
@@ -431,6 +485,8 @@ semilla por clip. El modelo base y las cotas triviales van de referencia.
 | MAE de aceleración (↓) | 3.232 | 3.820 | 3.771 | 6/10 | 0.695 |
 | equivarianza cruda, **sobre aceleraciones** (↓) | 0.214 | 5.648 | 2.340 | 9/10 | 0.006 |
 | equivarianza normalizada, **sobre aceleraciones** (↓) | 0.000 | 0.233 | 0.431 | 3/10 | 0.469 |
+
+</details>
 
 #### Cotas triviales, por escenario
 
@@ -499,7 +555,9 @@ relevante es que **las dos elecciones dan la misma respuesta**: nada se distingu
 | jerk (↓) | 1,640 | 1,495 | 35/60 | 0,067 |
 | MAE de aceleración (↓) | 1,828 | 1,880 | 24/60 | 0,126 |
 
-Cota del video quieto, error de velocidad por escenario: 11,498, 7,519, 9,953.
+Para leer esos números: la cota del video quieto en error de velocidad es 11,5 en caída libre, 7,5 en
+péndulo y 10,0 en rebote. Los dos brazos están bastante por debajo, o sea que los dos hacen algo; lo
+que no hay es diferencia **entre** ellos.
 
 ### Checkpoint final (paso 1000), fuera de distribución: tiro vertical
 
@@ -509,6 +567,13 @@ Cota del video quieto, error de velocidad por escenario: 11,498, 7,519, 9,953.
 | razón de movimiento (→1) | 0,427 | **0,119** | 0,216 | 0,001 |
 | jerk (↓) | 1,651 | **0,817** | 0,000 | 0,005 |
 
+El brazo con física es peor en las tres. En razón de movimiento cae a 0,119: **se mueve una octava
+parte de lo que debería**, cuando el control se mueve casi la mitad.
+
+<sub>Una advertencia sobre la columna de la cota: en razón de movimiento su promedio (0,216) lo produce
+un solo clip donde el trazador falla; la mediana de esa cota es 0,04. No conviene apoyar nada en esa
+comparación — la degeneración se sostiene igual con el error de velocidad y con los videos.</sub>
+
 ### Control de sensibilidad: paso 250, en distribución
 
 | métrica | control | con física | mejor | p |
@@ -516,7 +581,7 @@ Cota del video quieto, error de velocidad por escenario: 11,498, 7,519, 9,953.
 | error de velocidad (↓) | 4,838 | 5,190 | 13/30 | 0,096 |
 | razón de movimiento (→1) | 0,608 | 0,568 | 16/30 | 0,213 |
 | jerk (↓) | 1,592 | 1,271 | 18/30 | 0,164 |
-| equivarianza cruda, **sobre aceleraciones** (↓) | 3,649 | 2,277 | 25/30 | &lt;0,001 |
+| equivarianza cruda, sobre aceleraciones (↓) *(no interpretable, ver abajo)* | 3,649 | 2,277 | 25/30 | &lt;0,001 |
 
 ### Por checkpoint y por escenario
 
@@ -532,10 +597,14 @@ efectos son opuestos y significativos:
 | péndulo | 4,325 → 4,825 | 0,044 | 0,621 → 0,588 | 0,522 |
 | rebote | 6,084 → **6,967** | 0,007 | 0,533 → **0,410** | 0,015 |
 
-En **caída libre** el brazo con física es mejor: se acerca más al ground truth y además **se mueve
-más**, o sea que no es degeneración. En **rebote** es peor y se mueve menos, que es exactamente donde
-aparece la pelota duplicada. El péndulo queda en el medio. Con seis tests, una corrección de
-Bonferroni deja en pie la mejora en caída libre y el empeoramiento en velocidad del rebote.
+En **caída libre** el brazo con física es mejor y además **se mueve más**, o sea que no es
+degeneración. En **rebote** es peor y se mueve menos, que es donde aparece la pelota duplicada.
+
+Los dos hallazgos no son igual de sólidos, y conviene decirlo: **el del rebote tiene el mismo signo en
+los ocho checkpoints**, mientras que **el de caída libre cambia de signo** —es peor en cuatro de los
+ocho y mejor en los otros cuatro—. Sólo uno de los dos es una tendencia; el otro puede ser este
+checkpoint en particular. Además en caída libre la respuesta correcta es una recta, así que es el
+escenario menos informativo de los tres.
 
 La lectura que esto sugiere: la pérdida ayuda donde la cinemática es simple y constante (caída libre
 tras la velocidad terminal, que es movimiento uniforme) y estorba donde hay impactos, que es donde el
@@ -543,9 +612,12 @@ estimador se rompe y el modelo encuentra el atajo de partir el objeto. Es un res
 no estaba preregistrado por escenario, aunque la metodología sí exige reportar los escenarios por
 separado y nunca promediados.
 
-### Todos los checkpoints, para que se vea que no hay tendencia
+### Todos los checkpoints
 
-Formato: control → con física (p). Apareado por clip, n=30.
+La figura de arriba ya muestra que no hay tendencia; la tabla está por si hace falta el número exacto.
+
+<details>
+<summary>Los ocho checkpoints, control → con física (p). Apareado por clip, n = 30.</summary>
 
 | paso | error de velocidad | razón de movimiento | jerk |
 |---|---|---|---|
@@ -558,9 +630,10 @@ Formato: control → con física (p). Apareado por clip, n=30.
 | 875 | 4,939 → 4,767 (0,465) | 0,592 → 0,617 (0,393) | 1,546 → 1,256 (0,280) |
 | 1000 | 4,619 → 4,900 (0,213) | 0,651 → 0,613 (0,452) | 1,907 → 1,503 (0,253) |
 
+</details>
+
 Todas las evaluaciones son apareadas por clip: los dos brazos generan **los mismos clips held-out** con
-la misma semilla, y el test es un Wilcoxon sobre las diferencias por clip. Las tablas completas, con
-todos los escenarios y todas las métricas, están en el repositorio principal del proyecto.
+la misma semilla, y el test compara las diferencias clip por clip.
 
 <a id="ood"></a>
 
