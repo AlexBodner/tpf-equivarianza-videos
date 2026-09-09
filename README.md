@@ -80,7 +80,7 @@ las dos ramas cubren el clip entero, 33 cuadros, que es lo que muestra este vide
 
 <a id="colapso"></a>
 
-## 3. Primer experimento: la pérdida original colapsa al video quieto
+## 3. La pérdida original colapsa al video quieto
 
 *Póster: sección «Diagnóstico y corrección».*
 
@@ -119,48 +119,9 @@ $$\mathcal{L}_{\text{rot}}^{\text{corregida}} \;=\; \frac{\max(N - A,\; 0)}{\max
 
 Archivo: `videos/12_colapso_vs_control_paso100.mp4`
 
-<a id="aceleracion"></a>
-
-## 4. Segundo experimento: sobre aceleración no hay señal que aprender
-
-*Póster: sección «Diagnóstico y corrección».*
-
-Ya corregida la fórmula, la pérdida se aplicó a la **aceleración** estimada por RAFT. Acá no hay nada
-que mostrar en video, y eso es exactamente el punto: **la falla no es visual, es que el término nunca
-baja**. Se ve en las curvas de entrenamiento, no en un cuadro.
-
-![La misma pérdida sobre aceleración y sobre velocidad](figuras/aceleracion_vs_velocidad.png)
-
-*Izquierda: el término de la pérdida, normalizado igual en los dos casos (0 sería equivarianza
-perfecta). Sobre aceleración se queda plano entre 0,5 y 0,6 durante 800 pasos; sobre velocidad baja un
-31 % (p = 0,043 de una cola). Derecha: el acuerdo de dirección entre las dos ramas. Sobre aceleración arranca en
-0,42 y baja; sobre velocidad arranca en 0,81 y sube a 0,86 (p = 0,062 de una cola). La curva de aceleración empieza
-en el paso 280 porque el registro de esa cantidad se agregó cuando la corrida se retomó.*
-
-La razón es del instrumento, no del modelo. La aceleración es la segunda diferencia del flujo, y a esta
-escala su ruido es del tamaño de la señal: sobre el *mismo video real* rotado píxel a píxel, el
-estimador ya se contradice un 26 %; sobre video generado, un 93 %, o sea que no mide nada. Con
-velocidad, sobre video real el desacuerdo baja al 2 %.
-
-**Y sin embargo la corrida se ve bien.** Sus muestras en el paso 250 son indistinguibles de las de
-cualquier otro brazo, porque un término que no aprende tampoco rompe nada. Recién en el paso 750
-colapsa (razón de movimiento 0,37 contra 0,71 del control) y ahí se cortó.
-
-**Qué terminó haciendo.** Esto sí se ve:
-
-![La corrida sobre aceleración, paso a paso](gifs/aceleracion_evolucion_bouncing.gif)
-
-*Generación condicionada del mismo clip de rebote en los pasos 250, 500 y 750. En el 250 hay varias
-pelotas a la vez, en el 500 quedan dos, y en el 750 una sola y pálida: la razón de movimiento cae a
-0,37 contra 0,71 del control y ahí se cortó la corrida. La pérdida no bajó en ningún momento; lo que
-cambió fue la imagen.*
-
-Archivos: `videos/15_aceleracion_evolucion_*.mp4` y `videos/11_aceleracion_pendulo_paso250.mp4`, este
-último para comprobar que en el paso 250 no se distingue de cualquier otro brazo.
-
 <a id="velocidad"></a>
 
-## 5. Tercer experimento: sobre velocidad el modelo sí se vuelve más equivariante
+## 4. Sobre velocidad el modelo sí se vuelve más equivariante
 
 *Póster: sección «Resultados».*
 
@@ -203,7 +164,7 @@ Archivos: `videos/08_equivarianza_*_velocidad.mp4`, `videos/01_pendulo_bien_paso
 
 <a id="ladoalado"></a>
 
-## 6. Lado a lado: el control contra el brazo con física
+## 5. Lado a lado: el control contra el brazo con física
 
 *Póster: sección «Resultados». Es el contraste que decide todo el trabajo.*
 
@@ -212,7 +173,7 @@ los separa es la pérdida de equivarianza. Acá generan el **mismo clip**, así 
 ve es atribuible a la pérdida y a nada más.
 
 Los videos de esta sección son del **checkpoint 250 de ambos brazos**, y conviene ser claro sobre por
-qué: no porque sea el mejor (no lo es, ver sección 8), sino porque es el único paso donde se generaron
+qué: no porque sea el mejor (no lo es, ver sección 7), sino porque es el único paso donde se generaron
 los pares de ambos brazos sobre los mismos clips. En el checkpoint 1000, que es la elección primaria, la
 comparación existe en números pero todavía no en video.
 
@@ -248,7 +209,7 @@ libre).
 
 <a id="degeneracion"></a>
 
-## 7. Tercer experimento, la otra cara: cómo satisface la simetría
+## 6. La otra cara: cómo satisface la simetría
 
 *Póster: sección «Resultados» (fuera de distribución) y «Conclusiones».*
 
@@ -305,7 +266,7 @@ Las dos salidas que quedan:
 
 <a id="numeros"></a>
 
-## 8. Los números, y cómo se eligió el checkpoint
+## 7. Los números, y cómo se eligió el checkpoint
 
 *Póster: sección «Resultados».*
 
@@ -505,7 +466,7 @@ para un modelo cuya generación condicionada es mala el piso se come la señal e
 recortado da cero.
 
 **Qué sobrevive.** La única medición de equivarianza del trabajo hecha sobre velocidades es el
-diagnóstico directo del checkpoint 1000 (sección 5): coseno 0,56 contra 0,37 del control, sobre 9 pares,
+diagnóstico directo del checkpoint 1000 (sección 4): coseno 0,56 contra 0,37 del control, sobre 9 pares,
 con la salida cruda publicada. El error de velocidad y la razón de movimiento no están afectados —se
 calculan con RAFT sobre velocidades— y son las dos donde el base queda claramente último, que es
 exactamente por qué son las primarias.
@@ -664,7 +625,7 @@ péndulo y rebote. En caída libre, donde el ground truth ya va a velocidad cons
 igual. Es la misma firma de la ruta degenerada, ahora en el eje temporal: donde el modelo tiene que
 inventar dinámica que nunca vio, el brazo entrenado con la restricción se queda más quieto.
 
-## 9. Fuera de dominio: las corrupciones aparecen con los pasos
+## 8. Fuera de dominio: las corrupciones aparecen con los pasos
 
 *Póster: sección «Resultados», fila fuera de distribución.*
 
@@ -699,6 +660,54 @@ explicación: **no está medido** que la corrupción viva en los cuadros excluid
 fuerte aparece fuera de distribución, donde la pérdida no vio ningún vector. Lo que sí está medido son
 los dos atajos de la sección 7, que operan sobre cuadros que la pérdida **sí** mira. Las correcciones
 de la última sección apuntan a las dos cosas.
+
+<a id="aceleracion"></a>
+
+## 9. Un desvío que no hacía falta: la pérdida sobre aceleración
+
+*Póster: sección «Diagnóstico y corrección».*
+
+**Por qué está acá abajo y no en el hilo principal.** La restricción que este trabajo impone es de
+**rotación**, y bajo una rotación la velocidad es tan equivariante como la aceleración: si se rota la
+escena, las velocidades rotan igual. La aceleración era necesaria para el otro término, el **boost
+galileano** —ahí la velocidad cambia y la aceleración no—, pero ese término quedó apagado (λ_boost = 0).
+O sea que aplicar la pérdida sobre aceleraciones fue una decisión heredada de una motivación que
+terminamos no usando, y su fracaso no dice nada sobre la hipótesis: dice que elegimos mal la cantidad.
+Se conserva porque el diagnóstico que lo cerró —comparar el acuerdo del estimador sobre las dos
+cantidades— es lo que justificó el cambio a velocidad.
+
+Ya corregida la fórmula, la pérdida se aplicó a la **aceleración** estimada por RAFT. Acá no hay nada
+que mostrar en video, y eso es exactamente el punto: **la falla no es visual, es que el término nunca
+baja**. Se ve en las curvas de entrenamiento, no en un cuadro.
+
+![La misma pérdida sobre aceleración y sobre velocidad](figuras/aceleracion_vs_velocidad.png)
+
+*Izquierda: el término de la pérdida, normalizado igual en los dos casos (0 sería equivarianza
+perfecta). Sobre aceleración se queda plano entre 0,5 y 0,6 durante 800 pasos; sobre velocidad baja un
+31 % (p = 0,043 de una cola). Derecha: el acuerdo de dirección entre las dos ramas. Sobre aceleración arranca en
+0,42 y baja; sobre velocidad arranca en 0,81 y sube a 0,86 (p = 0,062 de una cola). La curva de aceleración empieza
+en el paso 280 porque el registro de esa cantidad se agregó cuando la corrida se retomó.*
+
+La razón es del instrumento, no del modelo. La aceleración es la segunda diferencia del flujo, y a esta
+escala su ruido es del tamaño de la señal: sobre el *mismo video real* rotado píxel a píxel, el
+estimador ya se contradice un 26 %; sobre video generado, un 93 %, o sea que no mide nada. Con
+velocidad, sobre video real el desacuerdo baja al 2 %.
+
+**Y sin embargo la corrida se ve bien.** Sus muestras en el paso 250 son indistinguibles de las de
+cualquier otro brazo, porque un término que no aprende tampoco rompe nada. Recién en el paso 750
+colapsa (razón de movimiento 0,37 contra 0,71 del control) y ahí se cortó.
+
+**Qué terminó haciendo.** Esto sí se ve:
+
+![La corrida sobre aceleración, paso a paso](gifs/aceleracion_evolucion_bouncing.gif)
+
+*Generación condicionada del mismo clip de rebote en los pasos 250, 500 y 750. En el 250 hay varias
+pelotas a la vez, en el 500 quedan dos, y en el 750 una sola y pálida: la razón de movimiento cae a
+0,37 contra 0,71 del control y ahí se cortó la corrida. La pérdida no bajó en ningún momento; lo que
+cambió fue la imagen.*
+
+Archivos: `videos/15_aceleracion_evolucion_*.mp4` y `videos/11_aceleracion_pendulo_paso250.mp4`, este
+último para comprobar que en el paso 250 no se distingue de cualquier otro brazo.
 
 ## 10. Control: la simetría por datos tampoco enseña
 
@@ -761,7 +770,7 @@ completo se va a cero (+0,0000, p = 0,66), y lo mismo pasa si se comparan sólo 
 pareja al 5 % (p = 0,57).
 
 **Conclusión honesta:** con 150 pasos por brazo y sin guardar pesos, este barrido no ordena ventanas.
-Lo que sí deja es la advertencia metodológica de la sección 8: ninguna de las métricas internas sirve
+Lo que sí deja es la advertencia metodológica de la sección 7: ninguna de las métricas internas sirve
 para comparar brazos sin controlar por cuánto se mueve el video. Para decidir la ventana haría falta
 guardar checkpoints y evaluar el error de trayectoria contra el ground truth, que es la única métrica
 que no se puede ganar moviéndose más o menos.
