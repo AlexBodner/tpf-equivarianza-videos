@@ -645,6 +645,14 @@ péndulo y rebote. En caída libre, donde el ground truth ya va a velocidad cons
 igual. Es la misma firma de la ruta degenerada, ahora en el eje temporal: donde el modelo tiene que
 inventar dinámica que nunca vio, el brazo entrenado con la restricción se queda más quieto.
 
+**No depende de qué checkpoint se mire.** El mismo par en el paso 250 da la misma dirección, así que
+esto no es una peculiaridad del checkpoint final ni de la regla con que se lo elija:
+
+| paso | control | con física |
+|---|---|---|
+| 250 | 0,42× | **0,29×** |
+| 1000 | 0,57× | **0,22×** |
+
 ## 8. Fuera de dominio: las corrupciones aparecen con los pasos
 
 *Póster: sección «Resultados», fila fuera de distribución.*
