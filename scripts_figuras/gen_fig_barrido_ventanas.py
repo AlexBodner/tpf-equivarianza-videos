@@ -11,6 +11,10 @@ Dos decisiones de dibujo:
   ventanas de treinta pasos va de 0,220 a 0,137 y se queda ahí.
 * Los brazos se agrupan por cuántos pasos se retropropagan, porque de eso depende el
   costo: la cola y la ventana no contigua usan cuatro pasos y cuestan lo mismo.
+* Los dos brazos "mejor-6" comparten la lista de pasos y difieren en una clave de
+  configuración cuyo efecto no se puede reconstruir desde los logs: el lambda es el mismo
+  en los cinco, y sus gradientes físicos difieren 1,35 veces. No es el control de magnitud
+  que se preregistró, que iba a re-escalar lambda.
 """
 import json, statistics as st
 import matplotlib; matplotlib.use("Agg")
@@ -20,7 +24,7 @@ BR = [("full",       "BPTT completo",               12, "#2e7d32"),
       ("ventana4",   "no contigua [2,3,8,11]",       4, "#2b7bba"),
       ("cola4",      "cola [8..11] (DRaFT-4)",       4, "#c0503d"),
       ("mejor6",     "mejor-6 [0,1,2,4,5,6]",        6, "#c98f2b"),
-      ("mejor6comp", "mejor-6, magnitud compensada", 6, "#7a5ba6")]
+      ("mejor6comp", "mejor-6, segunda configuración", 6, "#7a5ba6")]
 COSTO = {4: 21.6, 6: 23.4, 12: 27.8}   # s/paso medianos por cantidad de pasos
 
 def cargar(a):

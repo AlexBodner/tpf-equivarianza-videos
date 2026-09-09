@@ -794,15 +794,22 @@ Reproducible con `scripts_figuras/gen_fig_barrido_ventanas.py`.*
 | ventana4 | 2, 3, 8, 11 | 11,17 | 0,0877 | 1317 | 21,7 |
 | cola4 | 8, 9, 10, 11 | 13,59 | 0,0858 | 1314 | 21,6 |
 | mejor6 | 0, 1, 2, 4, 5, 6 | 14,66 | 0,0811 | 1577 | 23,4 |
-| mejor6comp | los mismos 6, magnitud compensada | **17,04** | 0,0800 | 1697 | 23,4 |
+| mejor6comp | los mismos 6, otra configuración | **17,04** | 0,0800 | 1697 | 23,4 |
 
 **Los dos instrumentos ordenan los brazos al revés.** En el MSE crudo el completo es el mejor y
 `mejor6comp` el peor; sobre el cociente normalizado quedan iguales. La explicación es la energía del
 movimiento: el brazo que más se mueve gana en el cociente y pierde en el error crudo.
 
-**Y sobre lo que se minimiza no hay diferencia.** Los diez pares posibles dan p entre 0,15 y 0,66. En
-particular la única comparación que estaba preregistrada como legible (`mejor6` contra su gemelo con la magnitud del gradiente compensada por diseño) da una mediana de +0,0000 con p = 0,22: una vez
-controlada la magnitud, la ventana no cambia nada.
+**Y sobre lo que se minimiza no hay diferencia.** Los diez pares posibles dan p entre 0,15 y 0,66,
+ninguno significativo.
+
+<sub>Una aclaración sobre el quinto brazo. El prerregistro lo llamaba «magnitud compensada» y lo
+señalaba como la única comparación legible, con la idea de re-escalar λ para que su gradiente físico
+igualara al del BPTT completo. Eso **no ocurrió**: los cinco brazos corrieron con el mismo λ = 0,0047, y
+la norma del gradiente físico de ese brazo (0,0065) queda lejos de la del completo (0,0183). Comparte
+la lista de pasos con `mejor6` y difiere en una clave de configuración cuyo efecto no se puede
+reconstruir desde los logs. Así que no hay control de magnitud, y la conclusión se apoya en los diez
+pares, no en esa pareja.</sub>
 
 **Conclusión honesta:** con 150 pasos por brazo y sin guardar pesos, este barrido no ordena ventanas.
 Lo que sí deja es la advertencia metodológica de [Los números](#numeros): ninguna de las métricas internas sirve
