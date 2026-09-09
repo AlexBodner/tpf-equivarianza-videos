@@ -231,20 +231,20 @@ signo en cuatro de ocho, así que sólo uno de los dos es una tendencia.
 *Póster: sección «Resultados». Es el contraste que decide todo el trabajo.*
 
 Los dos brazos entrenan con el mismo clip, el mismo ruido y los mismos pesos iniciales; lo único que
-los separa es la pérdida. Acá generan el **mismo clip**, así que la diferencia es atribuible a eso y a
-nada más.
+los separa es la pérdida. Acá generan el **mismo clip**, con la misma semilla y el mismo
+condicionamiento, en **los checkpoints que eligió la validación**: control en el paso 125 y brazo con
+física en el 875.
 
-![Los tres escenarios, control contra brazo con física](gifs/tres_escenarios_i2v.gif)
+![Los checkpoints elegidos contra el ground truth](gifs/elegidos_lado_a_lado.gif)
 
-*Checkpoint 250 de los dos brazos, generación condicionada en los 2 primeros latentes. Arrancan
-idénticos porque el condicionamiento es el mismo. En **rebote** la pelota del brazo con física se
-desdibuja y queda atrás: es el escenario donde empeora y donde después aparecen los duplicados. En
-caída libre y péndulo las trayectorias son parecidas —en los números de ese checkpoint el brazo con
-física es levemente peor en los dos, sin que la diferencia sea significativa—.*
+*Arriba el ground truth del simulador, en el medio el control, abajo el brazo con física. En
+**péndulo** se ve el modo de falla en el modelo que efectivamente reportamos: **dos pelotas** donde el
+control tiene una. En caída libre las dos trayectorias son parecidas, que es donde los números dan a
+favor del brazo con física. Archivo: `videos/20_elegidos_gt_control_fisica.mp4`.*
 
-> **Pendiente:** estos videos son del paso 250, que es el único donde se generaron los pares de ambos
-> brazos sobre los mismos clips. Se van a regenerar con el checkpoint que elija la regla de validación
-> cuando termine la medición en curso.
+Que la duplicación aparezca en el checkpoint elegido —y no sólo en los que descartamos— es lo que hace
+que el resultado no se pueda contar como «casi funciona»: el modelo que la regla señala como el mejor
+del brazo con física sigue partiendo el objeto en dos.
 
 <a id="degeneracion"></a>
 
