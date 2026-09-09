@@ -364,6 +364,47 @@ su óptimo es también el que menos se mueve. Y eso no se apoya sólo en estos c
 mecanismo está medido aparte, sobre los cuatro brazos del barrido de la sección 12, donde la métrica
 cruda ordena al revés que la normalizada.
 
+### ¿Y qué tan bien medimos el error de velocidad?
+
+La pregunta es obligada: si el modelo a veces genera dos pelotas, puede que el error no mida física
+sino que el instrumento se rompe. Tres comprobaciones.
+
+**No lo arruinan unos pocos clips.** Descartando el peor clip de cada brazo, después los dos peores, y
+así hasta cinco, la brecha entre brazos queda igual: +0,39 · +0,35 · +0,32 · +0,34 · +0,41. La
+**mediana** de la diferencia por clip (+0,65) es incluso mayor que la media (+0,39). El brazo con
+física está parejamente un poco peor, no arrastrado por dos clips rotos. Y la brecha más grande no está
+en rebote, que es donde aparece la pelota duplicada, sino en caída libre.
+
+**El número sí distingue.** Contra la cota de un video congelado, el modelo base queda pegado a ella
+(1,01 a 1,15× mejor, o sea prácticamente indistinguible de no moverse) mientras que los dos brazos
+afinados están a 1,5-2,8×. La métrica separa un modelo que hace algo de uno que no.
+
+**Pero está dominado por cuánto se mueve el modelo**, y ahí sí hay una advertencia seria:
+
+| brazo | escenario | error de velocidad | razón de movimiento |
+|---|---|---|---|
+| control (250) | péndulo | 3,74 | 0,65 |
+| con física (750) | péndulo | **3,48** | **0,88** |
+| control (250) | caída libre | **4,61** | **0,66** |
+| con física (750) | caída libre | 5,58 | 0,57 |
+| control (250) | rebote | **6,16** | 0,51 |
+| con física (750) | rebote | 6,62 | 0,48 |
+
+Todos los brazos se mueven **menos** que el ground truth, y el único escenario donde el brazo con
+física gana es el único donde se mueve más que el control. El error de velocidad y la razón de
+movimiento no son independientes: la duplicación de la pelota actúa justamente por ahí, porque el
+agregador promedia el flujo de toda la escena y dos objetos en direcciones opuestas se cancelan, con lo
+que la rapidez estimada baja y el error contra el ground truth sube. El mecanismo existe; lo que los
+datos dicen es que no es lo que explica la diferencia entre brazos.
+
+**Una advertencia sobre caída libre.** En la ventana que se evalúa el ground truth ya está en velocidad
+terminal, así que la cota de "extrapolar velocidad constante" da **0,00**: la respuesta correcta es una
+recta. Cualquier modelo es infinitamente peor que lo trivial ahí, y ese escenario no debería pesar en
+ninguna conclusión sobre física aprendida.
+
+**Lo que arreglaría el instrumento** es medir la cinemática **por objeto** en vez de agregando sobre la
+escena, que es el primer punto de la sección 11.
+
 **Qué habría que cambiar para la próxima corrida.** La validación corre cada 50 pasos y los checkpoints
 se guardan cada 125: sólo coinciden en cuatro puntos, así que la mitad de los checkpoints nunca pudo
 entrar en ninguna regla. Alcanza con alinear las dos cadencias. Y hay que registrar en validación la
