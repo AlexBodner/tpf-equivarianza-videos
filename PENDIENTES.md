@@ -40,6 +40,22 @@ convertiría en una curva citable.
 (control 125, física 875), que se fijó después del prerregistro. Correrlo también en 1000 contra 1000,
 que es la elección que no selecciona nada, cerraría la duda de si la regla favorece a alguno.
 
+## Videos que faltan publicar
+
+Tres conjuntos que se generaron después de armar el archivo y quedaron sólo en el volumen de la
+instancia detenida. Sus números están citados en el README y en el póster, pero los videos que los
+sustentan no se pueden mirar todavía.
+
+| qué | dónde está | qué sostiene |
+|---|---|---|
+| `results/gen_largo` | volumen de la instancia | las generaciones a 65 cuadros, el péndulo más allá del horizonte de entrenamiento |
+| `results/ood_serie` | volumen de la instancia | la serie fuera de dominio en los cinco checkpoints, de donde salió la medición del rodado |
+| `results/ood_semillas` | volumen de la instancia | el barrido de tres semillas, que es la evidencia de que con una sola generación no hay señal |
+
+Son unos pocos cientos de megas. Para recuperarlos hay que arrancar la instancia
+`i-0ddf3238c2000b70f`, que el 9 de septiembre no arrancaba por falta de capacidad de `g6e.xlarge` en
+`us-east-1b`.
+
 ## Problemas del instrumental
 
 **El volcado por clip del evaluador.** En `run_eval.py`, la lista `clips` se llena antes del `continue`
