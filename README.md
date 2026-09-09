@@ -1,4 +1,4 @@
-# Equivarianza como prior físico en difusión de video — los videos
+# Equivarianza como prior físico en difusión de video: los videos
 
 Videos del TPF de Visión Artificial Avanzada (UdeSA). El trabajo intenta enseñarle física a un modelo
 de difusión de video **sin ground truth físico**, imponiendo una simetría: si se rota la escena, la
@@ -14,31 +14,26 @@ checkpoints. Pero conviene no exagerarlo: 51° sigue estando lejos de los 0° de
 toda la ventaja aparece en los primeros 125 pasos y después se estanca.
 
 **Y no se traduce en mejor física.** El error de velocidad contra el ground truth del simulador no
-mejora, y fuera de distribución el modelo degenera. Lo que sí podemos señalar como causa —medido, no
-conjeturado— es **cómo** el modelo satisface la restricción: se mueve menos, y descubre que partir la
+mejora, y fuera de distribución el modelo degenera. Lo que sí podemos señalar como causa (medido, no conjeturado) es **cómo** el modelo satisface la restricción: se mueve menos, y descubre que partir la
 pelota en dos hace que el flujo agregado de la escena se cancele. Las dos cosas bajan la pérdida sin
-mejorar la dinámica. A eso se suma que la pérdida ve una versión parcial de lo generado —24 de 32
-vectores de velocidad en péndulo y rebote, 12 o 16 en caída libre, sobre 12 pasos de Euler contra los
-20 de la inferencia— aunque **eso último es una hipótesis, no algo que hayamos medido**.
+mejorar la dinámica. A eso se suma que la pérdida ve una versión parcial de lo generado (24 de 32 vectores de velocidad en péndulo y rebote, 12 o 16 en caída libre, sobre 12 pasos de Euler contra los 20 de la inferencia) aunque **eso último es una hipótesis, no algo que hayamos medido**.
 
 Cada sección indica a qué parte del póster corresponde.
 
 **Los pesos y el archivo completo de videos están en Hugging Face:
 [AlexBodner/tpf-equivarianza-video](https://huggingface.co/AlexBodner/tpf-equivarianza-video).** Acá
-van los videos *comentados*, elegidos para contar la historia; allá están **los 16 checkpoints LoRA**
-—los 8 del brazo con física y los 8 de su control, para poder reproducir cualquier comparación
-apareada— y **los ~2400 videos** que produjeron todos los experimentos, ordenados por experimento y
+van los videos *comentados*, elegidos para contar la historia; allá están **los 16 checkpoints LoRA** (los 8 del brazo con física y los 8 de su control, para poder reproducir cualquier comparación apareada) y **los ~2400 videos** que produjeron todos los experimentos, ordenados por experimento y
 por paso de entrenamiento, con un índice que rastrea cada archivo hasta su origen.
 
 
 <details>
-<summary><b>Estado de este documento</b> — qué se está midiendo ahora y qué va a cambiar</summary>
+<summary><b>Estado de este documento</b>: qué se está midiendo ahora y qué va a cambiar</summary>
 
 **Última actualización: 9 de septiembre de 2026.**
 
 Todas las mediciones están cerradas. El resultado principal sale del **test final**: los 88 clips
 held-out que nunca se miraron (00520–00549 de cada escenario), con el checkpoint de cada brazo elegido
-por su propia validación —control en el paso 125, brazo con física en el 875— sobre los mismos ocho
+por su propia validación (control en el paso 125, brazo con física en el 875) sobre los mismos ocho
 candidatos.
 
 Ni la regla de selección ni ninguno de los análisis exploratorios tocaron esos clips, así que es el
@@ -132,8 +127,7 @@ así que las 12 mediciones no son 12 clips distintos. Por eso van sin p.
 
 Y no se gana quedándose quieto, pero eso hay que apoyarlo en la **razón de movimiento**, no en la cota:
 el brazo con física se mueve igual o un poco más que el control (0,583 contra 0,567). La cota del video
-congelado no sirve acá porque **satura en 45 de los 88 clips** —el numerador cae por debajo del piso del
-instrumento y da exactamente cero—, y el modelo base todavía más.
+congelado no sirve acá porque **satura en 45 de los 88 clips** (el numerador cae por debajo del piso del instrumento y da exactamente cero), y el modelo base todavía más.
 
 **Pero 51° no es poco.** ρ = 1 significa "dos movimientos sin ninguna relación", así que 0,43 equivale a un desacuerdo
 del 92 % de la magnitud del movimiento. La frase honesta no es "aprende la simetría" sino que la
@@ -152,8 +146,7 @@ más equivariante.*
 <details>
 <summary>Las otras dos mediciones de equivarianza, y la tabla por checkpoint</summary>
 
-Durante el entrenamiento el término baja de 0,1834 a 0,1266 entre los primeros y los últimos 100 pasos
-—un 31 % menos, con un 4 % de probabilidad de que sea casualidad— y el acuerdo de dirección sube de
+Durante el entrenamiento el término baja de 0,1834 a 0,1266 entre los primeros y los últimos 100 pasos (un 31 % menos, con un 4 % de probabilidad de que sea casualidad) y el acuerdo de dirección sube de
 0,81 a 0,86. Las dos salen de la misma función sobre los mismos vectores, así que **no son evidencia
 independiente**: son la norma y el ángulo de la misma diferencia.
 
@@ -174,7 +167,7 @@ contra 0,37, desacuerdo 0,45 contra 0,64 y diferencia de píxeles 4,99 contra 5,
 
 **Cuánto importaba medir la cantidad correcta**, en la misma comparación de n = 60 del paso 250: sobre
 velocidades la equivarianza normalizada da 0,577 contra 0,455 con p = 0,0015 y gana en 42 de 60 clips;
-sobre aceleraciones —como estaba medida hasta el 9 de septiembre— da 0,238 contra 0,196 con p = 0,40 y
+sobre aceleraciones (como estaba medida hasta el 9 de septiembre) da 0,238 contra 0,196 con p = 0,40 y
 gana en 22 de 60. La versión vieja medía ruido.
 
 Los p del entrenamiento son de un Mann-Whitney de una cola, legítimo porque la dirección estaba
@@ -191,13 +184,12 @@ preregistrada; a dos colas darían 0,085 y 0,124. Salida cruda en
 *Póster: sección «Resultados».*
 
 Ésta es la medición limpia: los **88 clips que nunca miramos**, con cada brazo en el checkpoint que
-eligió su propia validación —control en el paso 125, con física en el 875— sobre los mismos ocho
+eligió su propia validación (control en el paso 125, con física en el 875) sobre los mismos ocho
 candidatos.
 
 Tres advertencias sobre esa regla, porque no es tan limpia como suena. **No estaba preregistrada**: se
 fijó el 9 de septiembre, después de haber visto las evaluaciones de desarrollo. Es **asimétrica**, porque
-cada brazo se elige por un criterio distinto —el control por difusión sola, el brazo con física por la
-suma de sus dos términos—. Y **decide por un margen mínimo**: entre el paso 875 (0,1089) y el 375
+cada brazo se elige por un criterio distinto (el control por difusión sola, el brazo con física por la suma de sus dos términos). Y **decide por un margen mínimo**: entre el paso 875 (0,1089) y el 375
 (0,1091) hay un 0,2 %. La elección preregistrada, que no selecciona nada, es el paso 1000, y sobre los
 primeros 20 clips da lo mismo (4,926 contra 4,994, p = 0,31).
 
@@ -213,7 +205,7 @@ evaluador los saltea; el salteo es del clip, así que afecta a los dos brazos po
 | MAE de aceleración (↓) | 2,015 | 1,260 | 1,729 | 1,663 | 45/88 | 0,162 |
 
 **En la métrica principal no hay diferencia** (p = 0,36), y tampoco en la razón de movimiento ni en el
-MAE de aceleración. Las dos que sí dan significativas son la equivarianza —lo que la pérdida pide— y el
+MAE de aceleración. Las dos que sí dan significativas son la equivarianza (lo que la pérdida pide) y el
 jerk, que es una de las que **gana un video quieto**: su cota es exactamente 0,000.
 
 Las lecturas alternativas coinciden. Sobre los primeros 20 clips por escenario, en el paso 1000 sin
@@ -231,8 +223,7 @@ La mejora en caída libre era un hallazgo **post hoc**, encontrado mirando el co
 aparezca también en clips nunca vistos, con el checkpoint elegido de antemano, es una replicación: la
 saca de la categoría de exploratoria.
 
-Dos salvedades igual. Su signo **no es estable entre checkpoints** —en el conjunto de desarrollo cambia
-en cuatro de ocho—, y en caída libre el ground truth ya va a velocidad terminal, así que la respuesta
+Dos salvedades igual. Su signo **no es estable entre checkpoints** (en el conjunto de desarrollo cambia en cuatro de ocho), y en caída libre el ground truth ya va a velocidad terminal, así que la respuesta
 correcta es una recta y la cota de velocidad constante da 0,02: es el escenario menos informativo de
 los tres. En **rebote**, que es donde hay impactos y donde aparece la pelota duplicada, no hay mejora.
 
@@ -254,7 +245,7 @@ física en el 875.
 control tiene una. En caída libre las dos trayectorias son parecidas, que es donde los números dan a
 favor del brazo con física. Archivo: `videos/20_elegidos_gt_control_fisica.mp4`.*
 
-Que la duplicación aparezca en el checkpoint elegido —y no sólo en los que descartamos— es lo que hace
+Que la duplicación aparezca en el checkpoint elegido (y no sólo en los que descartamos) es lo que hace
 que el resultado no se pueda contar como «casi funciona»: el modelo que la regla señala como el mejor
 del brazo con física sigue partiendo el objeto en dos.
 
@@ -286,7 +277,7 @@ Archivos: `videos/03_rebote_pelota_duplicada_paso1000.mp4`, `videos/05_caida_lib
 `videos/07_fuera_de_dominio_rodando.mp4`
 
 <details>
-<summary><b>Cómo se cerraría cada atajo</b> — qué habría que cambiar en el instrumento</summary>
+<summary><b>Cómo se cerraría cada atajo</b>: qué habría que cambiar en el instrumento</summary>
 
 El primero, moverse menos, es una propiedad de la restricción: sin un ancla de escala siempre está
 disponible.
@@ -333,7 +324,7 @@ el 500 hay una pelota limpia; en el 750 aparecen **dos**; en el 1000 está deshe
 penaliza nada de eso: dos objetos que se mueven en direcciones distintas se cancelan en el flujo
 agregado.*
 
-En el único escenario fuera de distribución con ground truth —tiro vertical— el error de velocidad
+En el único escenario fuera de distribución con ground truth (tiro vertical) el error de velocidad
 empeora de 7,63 a 8,80 (p = 0,005) y la razón de movimiento cae a 0,12 contra 0,43 del control.
 
 <details>
@@ -351,8 +342,7 @@ máxima del video es 15 sobre 255: la pelota sale gris. El control está igual o
 objetos tenues en vez de una pelota. Archivo: `videos/19_ood_rodando_paso875.mp4`.*
 
 Y hay una advertencia más general: repitiendo con **tres semillas** por celda, la saturación de un
-mismo checkpoint va de 26 a 136 y el número de objetos de 0 a 9. Con una generación por celda —que es
-lo que tienen las mediciones de arriba— **no hay señal que leer** en generación fuera de dominio.
+mismo checkpoint va de 26 a 136 y el número de objetos de 0 a 9. Con una generación por celda (que es lo que tienen las mediciones de arriba) **no hay señal que leer** en generación fuera de dominio.
 Cualquier afirmación sobre esto necesita varias semillas, y las que están acá no las tienen.
 
 </details>
@@ -377,7 +367,7 @@ receta **sin** el término físico, así que la diferencia entre las dos es el p
 | barrido BPTT, ventana completa | 150 | 18,8 GB | 26,0 GB | 27,8 | 1,0 | 2 |
 | barrido BPTT, ventana de 4 pasos | 150 | 15,5 GB | 22,8 GB | 21,6 | 0,8 | 1,5 |
 
-**Imponer la simetría cuesta 3,1× la memoria y 4,6× el tiempo total** —16,0 horas contra 3,5— de
+**Imponer la simetría cuesta 3,1× la memoria y 4,6× el tiempo total** (16,0 horas contra 3,5) de
 entrenar sólo con difusión. Los segundos por paso de la tabla son medianas, y en mediana la relación es
 3,8×; la diferencia entre las dos cifras son los pasos lentos, que pesan más en el total. Es lo
 que se paga por generar, decodificar y estimar el flujo *dentro* del paso de entrenamiento, y
@@ -395,7 +385,7 @@ baja el tiempo un 22 % y la memoria un 18 %, sin cambiar nada más.
 
 1. **Que la pérdida vea todo lo que el modelo genera**: hoy mira 24 de 32 vectores en péndulo y
    rebote, 12 o 16 en caída libre, y una generación de 12 pasos de Euler en vez de 20. Es una hipótesis
-   razonable —no comprobada— que la corrupción se aloje en lo que queda fuera.
+   razonable (no comprobada) que la corrupción se aloje en lo que queda fuera.
 2. **Emparejar las velocidades entre las dos generaciones**, que es la pieza que falta para escenas con
    más de un objeto. La única alternativa que esquiva el emparejamiento es comparar la **distribución**
    de velocidades, invariante a posición y a permutar objetos.
@@ -421,7 +411,7 @@ diseño final es como es.
 <a id="tablas-completas"></a>
 
 <details>
-<summary><b>Todas las evaluaciones, sin filtrar</b> — las seis métricas, agregadas y por escenario, con el modelo base y las cotas triviales</summary>
+<summary><b>Todas las evaluaciones, sin filtrar</b>: las seis métricas, agregadas y por escenario, con el modelo base y las cotas triviales</summary>
 
 > ⚠️ **Estas tablas usan el paso 750 para el brazo con física**, que era el que elegía la regla que
 > después resultó estar mal medida. Los números son mediciones reales de ese checkpoint, pero **ya no
@@ -498,7 +488,7 @@ así que la respuesta correcta es una recta y ese escenario no puede sostener co
 Al revisar la tabla completa apareció que las dos métricas de equivarianza de la evaluación están
 calculadas **sobre aceleraciones**, no sobre las velocidades que este brazo optimiza. En
 `evaluation/run_eval.py`, `compute_l_rot` y `compute_l_rot_norm` toman el segundo retorno de
-`extract_kinematics` —que es la aceleración— y el piso se pide sin argumento, con lo que también sale
+`extract_kinematics` (que es la aceleración) y el piso se pide sin argumento, con lo que también sale
 sobre aceleraciones. Es el mismo defecto que se corrigió en la validación del entrenamiento (commit
 `bbc6778d`), que nunca se aplicó acá.
 
@@ -506,7 +496,7 @@ Importa porque la aceleración estimada sobre video generado es **ruido**: el di
 el [desvío sobre aceleración](#aceleracion-desvio) mide un acuerdo de 0,07. Así que el "28 de 30 clips, p < 0,001" de esas filas no es evidencia
 de simetría aprendida; es una diferencia en una cantidad que no mide lo que dice.
 
-Se nota en la fila del **modelo base**, que saca 0,000 —el puntaje perfecto— en la versión normalizada
+Se nota en la fila del **modelo base**, que saca 0,000 (el puntaje perfecto) en la versión normalizada
 y en los tres escenarios, siendo el peor modelo de los tres por error de velocidad (9,26 contra 4,84).
 No es que sea equivariante: el piso del instrumento se mide **sobre su propio video generado**, así que
 para un modelo cuya generación condicionada es mala el piso se come la señal entera y el numerador
@@ -514,8 +504,7 @@ recortado da cero.
 
 **Qué sobrevive.** La única medición de equivarianza del trabajo hecha sobre velocidades es el
 diagnóstico directo del checkpoint 1000 ([sobre velocidad](#velocidad)): coseno 0,56 contra 0,37 del control, sobre 9 pares,
-con la salida cruda publicada. El error de velocidad y la razón de movimiento no están afectados —se
-calculan con RAFT sobre velocidades— y son las dos donde el base queda claramente último, que es
+con la salida cruda publicada. El error de velocidad y la razón de movimiento no están afectados (se calculan con RAFT sobre velocidades) y son las dos donde el base queda claramente último, que es
 exactamente por qué son las primarias.
 
 
@@ -565,7 +554,7 @@ parte de lo que debería**, cuando el control se mueve casi la mitad.
 
 <sub>Una advertencia sobre la columna de la cota: en razón de movimiento su promedio (0,216) lo produce
 un solo clip donde el trazador falla; la mediana de esa cota es 0,04. No conviene apoyar nada en esa
-comparación — la degeneración se sostiene igual con el error de velocidad y con los videos.</sub>
+comparación: la degeneración se sostiene igual con el error de velocidad y con los videos.</sub>
 
 ### Control de sensibilidad: paso 250, en distribución
 
@@ -594,8 +583,7 @@ En **caída libre** el brazo con física es mejor y además **se mueve más**, o
 degeneración. En **rebote** es peor y se mueve menos, que es donde aparece la pelota duplicada.
 
 Los dos hallazgos no son igual de sólidos, y conviene decirlo: **el del rebote tiene el mismo signo en
-los ocho checkpoints**, mientras que **el de caída libre cambia de signo** —es peor en cuatro de los
-ocho y mejor en los otros cuatro—. Sólo uno de los dos es una tendencia; el otro puede ser este
+los ocho checkpoints**, mientras que **el de caída libre cambia de signo** (es peor en cuatro de los ocho y mejor en los otros cuatro). Sólo uno de los dos es una tendencia; el otro puede ser este
 checkpoint en particular. Además en caída libre la respuesta correcta es una recta, así que es el
 escenario menos informativo de los tres.
 
@@ -633,7 +621,7 @@ la misma semilla, y el test compara las diferencias clip por clip.
 <a id="numeros"></a>
 
 <details>
-<summary><b>Los números, y cómo se eligió el checkpoint</b> — por qué elegir checkpoint es un problema acá y qué reglas sobreviven</summary>
+<summary><b>Los números, y cómo se eligió el checkpoint</b>: por qué elegir checkpoint es un problema acá y qué reglas sobreviven</summary>
 
 *Póster: sección «Resultados».*
 
@@ -681,7 +669,7 @@ física 875, con las salvedades que están arriba.
 <a id="calidad-mae"></a>
 
 <details>
-<summary><b>¿Qué tan bien medimos el error de velocidad?</b> — si la métrica principal aguanta las corrupciones, y contra qué cotas se lee</summary>
+<summary><b>¿Qué tan bien medimos el error de velocidad?</b>: si la métrica principal aguanta las corrupciones, y contra qué cotas se lee</summary>
 
 La pregunta es obligada: si el modelo a veces genera dos pelotas, puede que el error no mida física
 sino que el instrumento se rompe. Tres comprobaciones.
@@ -731,7 +719,7 @@ escena, que es el primer punto de [Qué quedó como recomendación](#recomendaci
 <a id="largas"></a>
 
 <details>
-<summary><b>Generaciones más largas que el horizonte de entrenamiento</b> — qué pasa cuando se generan 65 cuadros y el modelo entrenó con 33</summary>
+<summary><b>Generaciones más largas que el horizonte de entrenamiento</b>: qué pasa cuando se generan 65 cuadros y el modelo entrenó con 33</summary>
 
 El período del péndulo es de 37,4 cuadros y generamos 33: **nunca se ve una oscilación completa**.
 Para ver si la dinámica sobrevive más allá de lo que el modelo vio, se generaron los mismos clips a 65
@@ -771,7 +759,7 @@ esto no es una peculiaridad del checkpoint final ni de la regla con que se lo el
 <a id="bptt"></a>
 
 <details>
-<summary><b>Cuántos pasos de Euler hay que retropropagar</b> — la ventana de BPTT: cuánto cuesta y por qué el barrido no la decide</summary>
+<summary><b>Cuántos pasos de Euler hay que retropropagar</b>: la ventana de BPTT: cuánto cuesta y por qué el barrido no la decide</summary>
 
 *Póster: sección «Análisis del gradiente».*
 
@@ -794,9 +782,9 @@ ventana, sobre la pérdida arreglada y la cantidad que sí tiene señal.
 
 ![Barrido de ventanas de BPTT](figuras/barrido_ventanas_bptt.png)
 
-*Izquierda: la pérdida física en entrenamiento, promedio móvil sobre los 147 pasos con física de cada
-brazo; las curvas se cruzan todo el tiempo. Derecha: la misma pérdida en validación, donde hay sólo
-tres mediciones por brazo. Los brazos están agrupados por **cuántos pasos de Euler se retropropagan**,
+*Izquierda: la pérdida física en entrenamiento, mediana móvil centrada sobre los 147 pasos con física
+de cada brazo; las curvas se cruzan todo el tiempo. Derecha: la misma pérdida en validación, donde hay
+sólo tres mediciones por brazo. Los brazos están agrupados por **cuántos pasos de Euler se retropropagan**,
 que es de lo que depende el costo: la cola y la ventana no contigua usan cuatro y cuestan lo mismo.
 Reproducible con `scripts_figuras/gen_fig_barrido_ventanas.py`.*
 
@@ -813,8 +801,7 @@ Reproducible con `scripts_figuras/gen_fig_barrido_ventanas.py`.*
 movimiento: el brazo que más se mueve gana en el cociente y pierde en el error crudo.
 
 **Y sobre lo que se minimiza no hay diferencia.** Los diez pares posibles dan p entre 0,15 y 0,66. En
-particular la única comparación que estaba preregistrada como legible —`mejor6` contra su gemelo con la
-magnitud del gradiente compensada por diseño— da una mediana de +0,0000 con p = 0,22: una vez
+particular la única comparación que estaba preregistrada como legible (`mejor6` contra su gemelo con la magnitud del gradiente compensada por diseño) da una mediana de +0,0000 con p = 0,22: una vez
 controlada la magnitud, la ventana no cambia nada.
 
 **Conclusión honesta:** con 150 pasos por brazo y sin guardar pesos, este barrido no ordena ventanas.
@@ -828,7 +815,7 @@ que no se puede ganar moviéndose más o menos.
 <a id="colapso"></a>
 
 <details>
-<summary><b>La pérdida original colapsa al video quieto</b> — el primer intento: la fórmula tenía su mínimo global en un video sin movimiento</summary>
+<summary><b>La pérdida original colapsa al video quieto</b>: el primer intento: la fórmula tenía su mínimo global en un video sin movimiento</summary>
 
 *Póster: sección «Diagnóstico y corrección».*
 
@@ -878,18 +865,17 @@ Archivo: `videos/12_colapso_vs_control_paso100.mp4`
 <a id="aceleracion-desvio"></a>
 
 <details>
-<summary><b>Un desvío que no hacía falta: la pérdida sobre aceleración</b> — por qué la aceleración nunca fue necesaria y qué pasó cuando la usamos</summary>
+<summary><b>Un desvío que no hacía falta: la pérdida sobre aceleración</b>: por qué la aceleración nunca fue necesaria y qué pasó cuando la usamos</summary>
 
 *Póster: sección «Diagnóstico y corrección».*
 
 **Por qué está acá abajo y no en el hilo principal.** La restricción que este trabajo impone es de
 **rotación**, y bajo una rotación la velocidad es tan equivariante como la aceleración: si se rota la
 escena, las velocidades rotan igual. La aceleración era necesaria para el otro término, el **boost
-galileano** —ahí la velocidad cambia y la aceleración no—, pero ese término quedó apagado (λ_boost = 0).
+galileano** (ahí la velocidad cambia y la aceleración no), pero ese término quedó apagado (λ_boost = 0).
 O sea que aplicar la pérdida sobre aceleraciones fue una decisión heredada de una motivación que
 terminamos no usando, y su fracaso no dice nada sobre la hipótesis: dice que elegimos mal la cantidad.
-Se conserva porque el diagnóstico que lo cerró —comparar el acuerdo del estimador sobre las dos
-cantidades— es lo que justificó el cambio a velocidad.
+Se conserva porque el diagnóstico que lo cerró (comparar el acuerdo del estimador sobre las dos cantidades) es lo que justificó el cambio a velocidad.
 
 Ya corregida la fórmula, la pérdida se aplicó a la **aceleración** estimada por RAFT. Acá no hay nada
 que mostrar en video, y eso es exactamente el punto: **la falla no es visual, es que el término nunca
@@ -927,7 +913,7 @@ Archivos: `videos/15_aceleracion_evolucion_*.mp4` y `videos/11_aceleracion_pendu
 </details>
 
 <details>
-<summary><b>Control: la simetría por datos tampoco enseña</b> — la ablación de aumentaciones, que quedó confundida</summary>
+<summary><b>Control: la simetría por datos tampoco enseña</b>: la ablación de aumentaciones, que quedó confundida</summary>
 
 *Póster: no aparece; el contraste quedó confundido y se reporta como pendiente.*
 
@@ -943,38 +929,38 @@ Archivos: `videos/10_equivarianza_*_ablacion_aumentaciones.mp4`
 <a id="metricas"></a>
 
 <details>
-<summary><b>Qué mide cada número</b> — definición de cada métrica y la trampa de cada una</summary>
+<summary><b>Qué mide cada número</b>: definición de cada métrica y la trampa de cada una</summary>
 
 Todas las tablas usan estas cantidades. Vale la pena leer esto una vez: varias tienen una trampa.
 
-**Error de velocidad** — cuánto se aparta la rapidez de lo generado respecto de la del simulador, cuadro
+**Error de velocidad**: cuánto se aparta la rapidez de lo generado respecto de la del simulador, cuadro
 a cuadro, en píxeles por cuadro. Menos es mejor. **Es la métrica principal**, y la razón es que es la
 única donde un video congelado queda claramente último: no se puede ganar quedándose quieto.
 
-**Razón de movimiento** — cuánto se mueve lo generado dividido por cuánto se mueve el ground truth. 1
+**Razón de movimiento**: cuánto se mueve lo generado dividido por cuánto se mueve el ground truth. 1
 sería exacto; 0,6 quiere decir que el modelo se mueve un 40 % de menos. No es una métrica de calidad
 sino el **control** que acompaña a todas las demás, porque varias se ganan moviéndose menos.
 
-**ρ** — la fracción del movimiento que **no** respeta la simetría. Se genera el mismo clip dos veces,
+**ρ**: la fracción del movimiento que **no** respeta la simetría. Se genera el mismo clip dos veces,
 una con la escena rotada, se des-rota la segunda y se mide cuánto difieren, dividido por cuánto
 movimiento hay en total. Menos es mejor, pero la escala engaña: **ρ = 1 significa "dos movimientos sin
 ninguna relación entre sí"**, así que 0,43 no es bueno, es un desacuerdo del 92 % de la magnitud del
 movimiento. Es la cantidad que la pérdida minimiza, así que mide directamente si el modelo aprendió lo
 que se le pidió.
 
-**Ángulo entre ramas** — el mismo dato que ρ pero legible: cuántos grados separan las velocidades de
+**Ángulo entre ramas**: el mismo dato que ρ pero legible: cuántos grados separan las velocidades de
 las dos generaciones. 0° sería simetría perfecta. Se reporta al lado de ρ porque se entiende sin
 explicación.
 
-**Jerk** — la variación de la aceleración; mide qué tan "a los tirones" es el movimiento. Menos es más
+**Jerk**: la variación de la aceleración; mide qué tan "a los tirones" es el movimiento. Menos es más
 suave. **Trampa: un video congelado tiene jerk cero**, así que ganar acá no es ganar en física; hay que
 leerlo junto con la razón de movimiento.
 
-**MAE de aceleración** — el error de aceleración contra el simulador. Misma trampa que el jerk, y peor:
+**MAE de aceleración**: el error de aceleración contra el simulador. Misma trampa que el jerk, y peor:
 en caída libre el ground truth tiene aceleración casi nula porque la pelota ya va a velocidad terminal,
 así que quedarse quieto puntúa perfecto.
 
-**Las cotas triviales** — dos referencias que aparecen en las tablas y sirven para saber si un número
+**Las cotas triviales**: dos referencias que aparecen en las tablas y sirven para saber si un número
 significa algo: el **video quieto** (congelar el último cuadro de condicionamiento) y la **velocidad
 constante** (extrapolar en línea recta). Si un modelo no le gana claramente a las dos, no está haciendo
 física.
@@ -984,7 +970,7 @@ física.
 </details>
 
 <details>
-<summary><b>Parámetros</b> — la configuración exacta de entrenamiento y evaluación</summary>
+<summary><b>Parámetros</b>: la configuración exacta de entrenamiento y evaluación</summary>
 
 Todo lo de abajo sale de `config_resolved.json` de la corrida, publicado en
 [`resultados/configs/`](resultados/configs).
