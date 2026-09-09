@@ -328,15 +328,26 @@ mueve** (0,853 contra 0,90–1,03 en todos los demás). No es casualidad: la val
 MSE crudo en px²/cuadro², no el cociente normalizado que se optimiza, así que baja cuando el video se
 mueve menos, y la suma hereda ese defecto.
 
-**Y acá está el resultado más limpio de todo el trabajo.** En el paso 750 —el que la propia pérdida
-señala como su mejor modelo— el brazo con física es **significativamente peor** que el control en error
-de velocidad: 4,212 contra 5,225, p = 0,003 (ver la tabla por checkpoint más abajo). O sea que la regla
-que elige por el objetivo de entrenamiento aterriza justo en el punto donde la física generada es peor.
-Minimizar esta pérdida y mejorar la física no son la misma cosa, y esto lo muestra sin necesidad de
-ningún argumento.
+**Qué pasa en ese checkpoint, con las salvedades que corresponden.** En el paso 750 la diferencia
+contra el control es la mayor de los ocho: 4,212 contra 5,225 en error de velocidad, p = 0,003. Tres
+cosas hay que decir antes de leer eso como un resultado:
 
-Por eso el trabajo reporta el 750 **declarado como lo que es** —el óptimo de la pérdida, no el mejor
-modelo— y mantiene el paso 1000 como elección primaria, que es la preregistrada y no selecciona nada.
+- **No es que el brazo con física esté en su peor momento.** Su peor valor es 5,312, en el paso 375.
+  Lo que pasa en el 750 es que el **control toca su propio mínimo** (4,212, el mejor de sus ocho), así
+  que la brecha se agranda por los dos lados.
+- **Es una observación post hoc sobre el conjunto de evaluación.** La regla de selección usa la
+  validación, que son otros clips, y hasta ahí está limpio; pero ir a buscar qué pasa en ese paso es
+  mirar una tabla de 8 checkpoints × 3 métricas ya calculada. Con Bonferroni sobre esas 24
+  comparaciones el umbral es 0,0021, y **p = 0,003 no lo pasa**.
+- **La validación de rotación tiene sólo cuatro puntos**, así que "el mínimo está en el 750" es una
+  afirmación sobre cuatro valores, no sobre una curva.
+
+Lo que sí queda en pie, y no depende de ninguno de esos tres reparos, es el hecho de partida: el
+checkpoint que la pérdida señala como su óptimo es también el que menos se mueve. Esa es una relación
+entre dos cantidades medidas, no una comparación entre brazos.
+
+Por eso el trabajo mantiene el paso 1000 como elección primaria, que es la preregistrada y no
+selecciona nada, y reporta el 750 declarado como lo que es: el óptimo de la pérdida.
 
 **Qué habría que cambiar para la próxima corrida.** La validación corre cada 50 pasos y los checkpoints
 se guardan cada 125: sólo coinciden en cuatro puntos, así que la mitad de los checkpoints nunca pudo
