@@ -781,23 +781,32 @@ alcanza con una ventana. Ese parámetro es `physics_n_bptt` (cuántos pasos llev
 - **El BPTT completo cuesta un 29 % más por paso** que cualquier ventana truncada (27,8 s/paso contra
   21,6-21,7 en los brazos de abajo).
 
-**Lo que el barrido no logra decidir.** Se corrieron cinco brazos de 150 pasos, idénticos salvo la
-ventana, sobre la pérdida arreglada y la cantidad que sí tiene señal. El resultado es que **ninguna
-ventana se distingue de las otras** sobre lo que efectivamente se minimiza, y que los instrumentos
-disponibles se contradicen entre sí:
+**Lo que el barrido no logra decidir.** Se corrieron **cinco** brazos de 150 pasos, idénticos salvo la
+ventana, sobre la pérdida arreglada y la cantidad que sí tiene señal.
 
-| brazo | pasos retropropagados | val_rot cruda | ρ = N/D apareado | energía de movimiento | s/paso |
+![Barrido de ventanas de BPTT](figuras/barrido_ventanas_bptt.png)
+
+*Izquierda: el MSE crudo de validación, que ordena los brazos. Derecha: la diferencia apareada contra
+el BPTT completo sobre la cantidad que efectivamente se minimiza —el cociente con el piso del estimador
+restado—; los cuatro intervalos cruzan el cero. Reproducible con
+`scripts_figuras/gen_fig_barrido_ventanas.py`.*
+
+| brazo | pasos retropropagados | val_rot cruda | cociente con el piso | energía | s/paso |
 |---|---|---|---|---|---|
-| completo | los 12 | **10,31** (el mejor) | el peor de los cuatro | referencia | 27,8 |
-| ventana4 | 2, 3, 8, 11 | 11,17 | −0,014 (p = 0,21) | +2,2 % | 21,7 |
-| cola4 | 8, 9, 10, 11 | 13,59 | −0,012 (p = 0,15) | −0,9 % | 21,6 |
-| mejor6 | 0, 1, 2, 4, 5, 6 | **14,66** (el peor) | −0,020 (p = 0,005), el mejor | +9,6 % | 23,4 |
+| completo | los 12 | **10,31** | 0,0794 | 1550 | 27,8 |
+| ventana4 | 2, 3, 8, 11 | 11,17 | 0,0877 | 1317 | 21,7 |
+| cola4 | 8, 9, 10, 11 | 13,59 | 0,0858 | 1314 | 21,6 |
+| mejor6 | 0, 1, 2, 4, 5, 6 | 14,66 | 0,0811 | 1577 | 23,4 |
+| mejor6comp | los mismos 6, magnitud compensada | **17,04** | 0,0800 | 1697 | 23,4 |
 
-Los dos instrumentos ordenan los brazos **al revés**, y la explicación es la energía del movimiento:
-el brazo que más se mueve gana en el cociente normalizado y pierde en el error crudo. Al restar el piso
-de RAFT —o sea, mirando exactamente la cantidad que se optimiza— la diferencia entre `mejor6` y el
-completo se va a cero (+0,0000, p = 0,66), y lo mismo pasa si se comparan sólo los pasos con energía
-pareja al 5 % (p = 0,57).
+**Los dos instrumentos ordenan los brazos al revés.** En el MSE crudo el completo es el mejor y
+`mejor6comp` el peor; sobre el cociente normalizado quedan iguales. La explicación es la energía del
+movimiento: el brazo que más se mueve gana en el cociente y pierde en el error crudo.
+
+**Y sobre lo que se minimiza no hay diferencia.** Los diez pares posibles dan p entre 0,15 y 0,66. En
+particular la única comparación que estaba preregistrada como legible —`mejor6` contra su gemelo con la
+magnitud del gradiente compensada por diseño— da una mediana de +0,0000 con p = 0,22: una vez
+controlada la magnitud, la ventana no cambia nada.
 
 **Conclusión honesta:** con 150 pasos por brazo y sin guardar pesos, este barrido no ordena ventanas.
 Lo que sí deja es la advertencia metodológica de [Los números](#numeros): ninguna de las métricas internas sirve
