@@ -125,8 +125,12 @@ imagen. En los ocho checkpoints el brazo con física es más equivariante, en la
 | ángulo entre las dos ramas (0° sería perfecto) | 63° | **51°** |
 | ρ, la fracción del movimiento que viola la simetría | 0,596 | **0,427** |
 
-Son los valores del checkpoint final; la diferencia no es casualidad (p = 0,012). **Pero 51° no es
-poco.** ρ = 1 significa "dos movimientos sin ninguna relación", así que 0,43 equivale a un desacuerdo
+Son los valores del checkpoint final; la diferencia no es casualidad (p = 0,012). Y se repite con
+cinco veces más clips: en el conjunto held-out, con **n = 60** y sobre la cantidad normalizada —la que
+no se puede ganar moviéndose menos— el brazo con física da 0,455 contra 0,577 del control, ganando en
+42 de los 60 clips (p = 0,0015).
+
+**Pero 51° no es poco.** ρ = 1 significa "dos movimientos sin ninguna relación", así que 0,43 equivale a un desacuerdo
 del 92 % de la magnitud del movimiento. La frase honesta no es "aprende la simetría" sino que la
 pérdida lo empuja en la dirección correcta de forma medible y consistente, sin acercarlo a ser
 equivariante.
@@ -162,6 +166,11 @@ contra 0,37, desacuerdo 0,45 contra 0,64 y diferencia de píxeles 4,99 contra 5,
 | 750 | 0,602 | 0,446 | 64° | 52° | 0,233 |
 | 875 | 0,508 | 0,460 | 59° | 55° | 0,110 |
 | 1000 | 0,596 | **0,427** | 63° | **51°** | 0,012 |
+
+**Cuánto importaba medir la cantidad correcta**, en la misma comparación de n = 60 del paso 250: sobre
+velocidades la equivarianza normalizada da 0,577 contra 0,455 con p = 0,0015 y gana en 42 de 60 clips;
+sobre aceleraciones —como estaba medida hasta el 9 de septiembre— da 0,238 contra 0,196 con p = 0,40 y
+gana en 22 de 60. La versión vieja medía ruido.
 
 Los p del entrenamiento son de un Mann-Whitney de una cola, legítimo porque la dirección estaba
 preregistrada; a dos colas darían 0,085 y 0,124. Salida cruda en
