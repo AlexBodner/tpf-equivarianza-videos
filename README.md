@@ -328,26 +328,41 @@ mueve** (0,853 contra 0,90–1,03 en todos los demás). No es casualidad: la val
 MSE crudo en px²/cuadro², no el cociente normalizado que se optimiza, así que baja cuando el video se
 mueve menos, y la suma hereda ese defecto.
 
-**Qué pasa en ese checkpoint, con las salvedades que corresponden.** En el paso 750 la diferencia
-contra el control es la mayor de los ocho: 4,212 contra 5,225 en error de velocidad, p = 0,003. Tres
-cosas hay que decir antes de leer eso como un resultado:
+**Cada brazo en su propio óptimo.** Si el criterio es "cada método en su mejor punto", cada brazo se
+elige por *su* objetivo de validación: el de física por la suma (paso 750) y el control por su
+validación de difusión, que es todo lo que entrena (paso 250, con 0,0667). Los dos toman un máximo
+sobre los mismos cuatro checkpoints, así que la ventaja de selección es simétrica. Sobre los mismos 30
+clips held-out:
 
-- **No es que el brazo con física esté en su peor momento.** Su peor valor es 5,312, en el paso 375.
-  Lo que pasa en el 750 es que el **control toca su propio mínimo** (4,212, el mejor de sus ocho), así
-  que la brecha se agranda por los dos lados.
-- **Es una observación post hoc sobre el conjunto de evaluación.** La regla de selección usa la
-  validación, que son otros clips, y hasta ahí está limpio; pero ir a buscar qué pasa en ese paso es
-  mirar una tabla de 8 checkpoints × 3 métricas ya calculada. Con Bonferroni sobre esas 24
-  comparaciones el umbral es 0,0021, y **p = 0,003 no lo pasa**.
-- **La validación de rotación tiene sólo cuatro puntos**, así que "el mínimo está en el 750" es una
-  afirmación sobre cuatro valores, no sobre una curva.
+| métrica | control (250) | con física (750) | gana | p |
+|---|---|---|---|---|
+| error de velocidad (↓) | 4,838 | 5,225 | 10/30 | **0,184** |
+| jerk (↓) | 1,592 | **1,101** | 22/30 | 0,004 |
+| MAE de aceleración (↓) | 1,746 | 1,755 | 15/30 | 0,968 |
+| pérdida de equivarianza cruda (↓) | 3,649 | **1,441** | 28/30 | &lt;0,001 |
 
-Lo que sí queda en pie, y no depende de ninguno de esos tres reparos, es el hecho de partida: el
-checkpoint que la pérdida señala como su óptimo es también el que menos se mueve. Esa es una relación
-entre dos cantidades medidas, no una comparación entre brazos.
+En la métrica principal no hay diferencia (p = 0,18), y por escenario tampoco (0,064 · 0,77 · 0,28).
+Las dos que sí dan significativas —jerk y la pérdida de equivarianza— son exactamente las dos que
+**gana un video quieto**, así que apuntan a la ruta degenerada, no a física aprendida.
 
-Por eso el trabajo mantiene el paso 1000 como elección primaria, que es la preregistrada y no
-selecciona nada, y reporta el 750 declarado como lo que es: el óptimo de la pérdida.
+**Las tres reglas dan la misma conclusión, y la única que da significativo es la que elige mal.**
+
+| regla | control | con física | p |
+|---|---|---|---|
+| preregistrada, sin selección (1000 contra 1000) | 4,619 | 4,900 | 0,213 |
+| mismo paso, en el óptimo de la pérdida (750 contra 750) | 4,212 | 5,225 | 0,003 |
+| cada uno en su óptimo (250 contra 750) | 4,838 | 5,225 | 0,184 |
+
+La fila del medio es la que hay que leer con cuidado: compara contra el control **en el punto donde el
+control está en su mejor momento** (4,212 es su mínimo de los ocho), así que exagera la brecha por los
+dos lados. Es además una observación post hoc sobre una tabla de 8 checkpoints × 3 métricas: con
+Bonferroni el umbral son 0,0021 y ese p = 0,003 no lo pasa. Con el control elegido por su propio
+criterio, la diferencia se va.
+
+Lo que sobrevive a las tres lecturas es el hecho de partida: el checkpoint que la pérdida señala como
+su óptimo es también el que menos se mueve. Y eso no se apoya sólo en estos cuatro puntos — el mismo
+mecanismo está medido aparte, sobre los cuatro brazos del barrido de la sección 12, donde la métrica
+cruda ordena al revés que la normalizada.
 
 **Qué habría que cambiar para la próxima corrida.** La validación corre cada 50 pasos y los checkpoints
 se guardan cada 125: sólo coinciden en cuatro puntos, así que la mitad de los checkpoints nunca pudo
