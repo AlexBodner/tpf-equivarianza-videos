@@ -14,6 +14,13 @@ contra esa señal incompleta el entrenamiento termina introduciendo
 **corrupciones** en la imagen que bajan la pérdida sin mejorar la dinámica. Cada sección indica a qué
 parte del póster corresponde.
 
+**Los pesos y el archivo completo de videos están en Hugging Face:
+[AlexBodner/tpf-equivarianza-video](https://huggingface.co/AlexBodner/tpf-equivarianza-video).** Acá
+van los videos *comentados*, elegidos para contar la historia; allá están **los 16 checkpoints LoRA**
+—los 8 del brazo con física y los 8 de su control, para poder reproducir cualquier comparación
+apareada— y **los ~2400 videos** que produjeron todos los experimentos, ordenados por experimento y
+por paso de entrenamiento, con un índice que rastrea cada archivo hasta su origen.
+
 
 > ## Estado de este documento
 >
@@ -789,3 +796,5 @@ generamos 33: nunca se ve una oscilación completa, ni en entrenamiento ni en ev
 
 Alexander Bodner y Mateo Costantini, Universidad de San Andrés, Visión Artificial Avanzada.
 Modelo base: SANA-Video 2B. Flujo óptico: RAFT. Los clips del simulador son sintéticos y propios.
+
+Pesos y archivo completo: [huggingface.co/AlexBodner/tpf-equivarianza-video](https://huggingface.co/AlexBodner/tpf-equivarianza-video)
