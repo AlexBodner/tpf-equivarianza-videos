@@ -794,10 +794,11 @@ ventana, sobre la pérdida arreglada y la cantidad que sí tiene señal.
 
 ![Barrido de ventanas de BPTT](figuras/barrido_ventanas_bptt.png)
 
-*Izquierda: el MSE crudo de validación, que ordena los brazos. Derecha: la diferencia apareada contra
-el BPTT completo sobre la cantidad que efectivamente se minimiza —el cociente con el piso del estimador
-restado—; los cuatro intervalos cruzan el cero. Reproducible con
-`scripts_figuras/gen_fig_barrido_ventanas.py`.*
+*Izquierda: la pérdida física en entrenamiento, promedio móvil sobre los 147 pasos con física de cada
+brazo; las curvas se cruzan todo el tiempo. Derecha: la misma pérdida en validación, donde hay sólo
+tres mediciones por brazo. Los brazos están agrupados por **cuántos pasos de Euler se retropropagan**,
+que es de lo que depende el costo: la cola y la ventana no contigua usan cuatro y cuestan lo mismo.
+Reproducible con `scripts_figuras/gen_fig_barrido_ventanas.py`.*
 
 | brazo | pasos retropropagados | val_rot cruda | cociente con el piso | energía | s/paso |
 |---|---|---|---|---|---|
