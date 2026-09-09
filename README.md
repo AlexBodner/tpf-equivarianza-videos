@@ -812,7 +812,27 @@ Todo lo de abajo sale de `config_resolved.json` de la corrida, publicado en
 | Generación dentro del paso | 12 pasos de Euler, condicionamiento de 2 latentes, decodificación troceada de a 1 latente |
 | BPTT | los 12 pasos (ver [la ventana de BPTT](#bptt)) |
 | Evaluación | 20 pasos de Euler, 33 cuadros, 384 px, 10 clips held-out por escenario, rotación de 45° |
-| Costo | L40S (AWS g6e.xlarge), 21,3 GB de VRAM en la mediana (pico 28,5), 46,7 s/paso, 16 h por corrida |
+| Hardware | una sola GPU L40S de 48 GB (AWS g6e.xlarge) |
+
+### Lo que cuesta
+
+Medido sobre los propios registros de cada corrida, no estimado. La fila del control es la misma
+receta **sin** el término físico, así que la diferencia entre las dos es el precio del método.
+
+| corrida | pasos | VRAM mediana | VRAM pico | s/paso | horas | USD |
+|---|---|---|---|---|---|---|
+| etapa 2, **con pérdida física** | 1000 | 21,3 GB | 28,5 GB | 46,7 | 16,0 | 30 |
+| etapa 2, control (sólo difusión) | 1000 | 6,8 GB | 9,1 GB | 12,4 | 3,5 | 6 |
+| barrido BPTT, ventana completa | 150 | 18,8 GB | 26,0 GB | 27,8 | 1,0 | 2 |
+| barrido BPTT, ventana de 4 pasos | 150 | 15,5 GB | 22,8 GB | 21,6 | 0,8 | 1,5 |
+
+**Imponer la simetría cuesta 3,1× la memoria y 3,8× el tiempo** de entrenar sólo con difusión. Es lo
+que se paga por generar, decodificar y estimar el flujo *dentro* del paso de entrenamiento, y
+retropropagar por todo eso. El pico de 28,5 GB es el que decide qué GPU hace falta: con 24 GB no entra
+a esta resolución y largo de clip.
+
+Las dos filas del barrido muestran de dónde sale ese costo: acortar la ventana de retropropagación
+baja el tiempo un 22 % y la memoria un 18 %, sin cambiar nada más.
 
 **Cómo se calibra λ_rot.** No se elige a mano: se corren sondas de 10 pasos midiendo la razón entre la
 norma del gradiente físico y la del gradiente de difusión, y se ajusta λ hasta que esa razón caiga en
