@@ -624,6 +624,13 @@ El período del péndulo es de 37,4 cuadros y generamos 33: **nunca se ve una os
 Para ver si la dinámica sobrevive más allá de lo que el modelo vio, se generaron los mismos clips a 65
 cuadros (1,74 períodos) y se midió cuánto movimiento queda después del cuadro 33.
 
+![Péndulo a 65 cuadros: control contra brazo con física](gifs/pendulo_65_cuadros.gif)
+
+*Checkpoint 1000 de los dos brazos, mismo clip y misma semilla, 65 cuadros. Hasta el cuadro 33 es el
+horizonte que el modelo vio en entrenamiento; desde ahí el borde se pone rojo y todo lo que sigue es
+extrapolación. Para el cuadro 50 el control mantiene la pelota y el hilo, y en el brazo con física la
+pelota se disolvió. Archivo: `videos/17_pendulo_65_cuadros_paso1000.mp4`.*
+
 | brazo | escenario | movimiento después del horizonte |
 |---|---|---|
 | control | péndulo | 0,57× |
