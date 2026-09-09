@@ -328,41 +328,32 @@ mueve** (0,853 contra 0,90–1,03 en todos los demás). No es casualidad: la val
 MSE crudo en px²/cuadro², no el cociente normalizado que se optimiza, así que baja cuando el video se
 mueve menos, y la suma hereda ese defecto.
 
-**Cada brazo en su propio óptimo.** Si el criterio es "cada método en su mejor punto", cada brazo se
-elige por *su* objetivo de validación: el de física por la suma (paso 750) y el control por su
-validación de difusión, que es todo lo que entrena (paso 250, con 0,0667). Los dos toman un máximo
-sobre los mismos cuatro checkpoints, así que la ventaja de selección es simétrica. Sobre los mismos 30
-clips held-out:
+**Cada brazo en su propio óptimo: por ahora no se puede.** Si el criterio es "cada método en su mejor
+punto", el brazo con física habría que elegirlo por *su* objetivo, que es la suma de los dos términos de
+validación. Esa suma da el paso 750. **Pero ese término está mal medido**: durante toda esta corrida la
+validación de rotación se calculó sobre *aceleraciones* y no sobre las velocidades que el brazo
+optimiza. El arreglo (commit `bbc6778d`, 8 de septiembre) es posterior a la corrida (commit `5de5e17a`,
+7 de septiembre). Así que la regla de la suma se apoya en una cantidad que sobre video generado es
+ruido, y el paso 750 que elige **no se sostiene**.
 
-| métrica | control (250) | con física (750) | gana | p |
+De paso explica por qué caía justo ahí: ese término es un MSE crudo, que se minimiza moviéndose menos, y
+el 750 es el checkpoint que menos se mueve de los siete medidos.
+
+**Las dos reglas que sí sobreviven** usan la validación de difusión, que no está afectada:
+
+| regla | paso | control | con física | p |
 |---|---|---|---|---|
-| error de velocidad (↓) | 4,838 | 5,225 | 10/30 | **0,184** |
-| jerk (↓) | 1,592 | **1,101** | 22/30 | 0,004 |
-| MAE de aceleración (↓) | 1,746 | 1,755 | 15/30 | 0,968 |
-| equivarianza cruda, **sobre aceleraciones** (↓) | 3,649 | 1,441 | 28/30 | &lt;0,001 |
+| preregistrada, sin selección | 1000 y 1000 | 4,619 | 4,900 | 0,213 |
+| mejor validación de difusión, misma para los dos | 250 y 250 | 4,838 | 5,190 | 0,096 |
 
-En la métrica principal no hay diferencia (p = 0,18), y por escenario tampoco (0,064 · 0,77 · 0,28).
-Las dos que sí dan significativas —jerk y la pérdida de equivarianza— son exactamente las dos que
-**gana un video quieto**, así que apuntan a la ruta degenerada, no a física aprendida.
+Las dos dan lo mismo: **ninguna diferencia significativa** en la métrica principal. Y las otras
+métricas en el paso 250 tampoco (razón de movimiento p = 0,21, jerk p = 0,16, MAE de aceleración
+p = 1,00).
 
-**Las tres reglas dan la misma conclusión, y la única que da significativo es la que elige mal.**
-
-| regla | control | con física | p |
-|---|---|---|---|
-| preregistrada, sin selección (1000 contra 1000) | 4,619 | 4,900 | 0,213 |
-| mismo paso, en el óptimo de la pérdida (750 contra 750) | 4,212 | 5,225 | 0,003 |
-| cada uno en su óptimo (250 contra 750) | 4,838 | 5,225 | 0,184 |
-
-La fila del medio es la que hay que leer con cuidado: compara contra el control **en el punto donde el
-control está en su mejor momento** (4,212 es su mínimo de los ocho), así que exagera la brecha por los
-dos lados. Es además una observación post hoc sobre una tabla de 8 checkpoints × 3 métricas: con
-Bonferroni el umbral son 0,0021 y ese p = 0,003 no lo pasa. Con el control elegido por su propio
-criterio, la diferencia se va.
-
-Lo que sobrevive a las tres lecturas es el hecho de partida: el checkpoint que la pérdida señala como
-su óptimo es también el que menos se mueve. Y eso no se apoya sólo en estos cuatro puntos — el mismo
-mecanismo está medido aparte, sobre los cuatro brazos del barrido de la sección 12, donde la métrica
-cruda ordena al revés que la normalizada.
+**Lo que falta para cerrar la pregunta.** Una selección por el objetivo físico necesita medir la
+equivarianza sobre velocidades, fuera del bucle, en los checkpoints de los **dos** brazos. Esa medición
+está corriendo: 8 checkpoints por brazo, con el piso pedido sobre velocidades. Hasta que esté, la
+elección primaria sigue siendo el paso 1000, que es la preregistrada y no selecciona nada.
 
 ### ¿Y qué tan bien medimos el error de velocidad?
 
