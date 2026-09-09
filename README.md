@@ -14,6 +14,22 @@ contra esa señal incompleta el entrenamiento termina introduciendo
 **corrupciones** en la imagen que bajan la pérdida sin mejorar la dinámica. Cada sección indica a qué
 parte del póster corresponde.
 
+
+> ## Estado de este documento
+>
+> **Última actualización: 9 de septiembre de 2026.** Hay tres mediciones corriendo que van a
+> cambiar partes de este texto. Se marcan acá para que se pueda leer la historia completa ahora
+> y saber qué se va a mover.
+>
+> | qué | estado | qué sección cambia |
+> |---|---|---|
+> | Elección de checkpoint de cada brazo, por su propia validación sobre los **mismos 8 candidatos** | corriendo | 8 |
+> | Evaluación con las métricas de equivarianza medidas sobre **velocidades** (hoy están sobre aceleraciones y no son interpretables) | corriendo | 8 |
+> | **Test final** sobre los 30 clips por escenario que nunca se miraron (n = 90) | corriendo | va a ser el resultado principal |
+>
+> Lo que **no** va a cambiar: el error de velocidad nunca estuvo afectado por el defecto de medición,
+> así que la conclusión de que la física no mejora no depende de nada de lo anterior.
+
 ---
 
 ## 1. Cómo leer los paneles
@@ -579,6 +595,65 @@ la misma semilla, y el test es un Wilcoxon sobre las diferencias por clip. Las t
 todos los escenarios y todas las métricas, están en el repositorio principal del proyecto.
 
 <a id="ood"></a>
+
+### La equivarianza medida como corresponde: los 8 checkpoints de los dos brazos
+
+*Esta es la medición que reemplaza a las dos filas no interpretables de más arriba.* Se hace
+**fuera** del bucle de entrenamiento, sobre **velocidades** —la cantidad que el brazo optimiza— y
+sobre clips held-out, generando cada uno dos veces: normal y con la escena rotada 45°.
+
+![Equivarianza y física por checkpoint](figuras/por_checkpoint_equivarianza_y_fisica.png)
+
+*Arriba lo que la pérdida pide, abajo lo que queremos que mejore. ▲ verde marca los pasos donde la
+diferencia apareada favorece al brazo con física; ▼ naranja, donde lo perjudica. Reproducible con
+`scripts_figuras/gen_panel_checkpoints.py`.*
+
+**La fila de arriba es un resultado limpio.** La línea azul está por debajo de la gris en los ocho
+checkpoints en ρ, y por encima en los ocho en coseno. Nunca se cruzan.
+
+| paso | ρ control | ρ física | ángulo control | ángulo física | p |
+|---|---|---|---|---|---|
+| 125 | 0,587 | **0,417** | 65° | **48°** | 0,016 |
+| 250 | 0,597 | 0,522 | 64° | 60° | 0,791 |
+| 375 | 0,597 | **0,419** | 61° | **53°** | 0,021 |
+| 500 | 0,527 | **0,388** | 59° | **51°** | 0,064 |
+| 625 | 0,626 | **0,404** | 67° | **53°** | 0,042 |
+| 750 | 0,602 | 0,446 | 64° | 52° | 0,233 |
+| 875 | 0,508 | 0,460 | 59° | 55° | 0,110 |
+| 1000 | 0,596 | **0,427** | 63° | **51°** | 0,012 |
+
+El **ángulo** es el coseno leído como lo que es: cuántos grados separan las velocidades de las dos
+ramas. Simetría perfecta serían 0°. Conviene mirarlo porque ρ engaña: 0,43 suena bien hasta que uno
+nota que **ρ = 1 es "dos movimientos sin ninguna relación"**, y que 0,43 equivale a un desacuerdo del
+92% de la magnitud del movimiento. La afirmación honesta no es "el modelo aprende la simetría" sino
+que **la pérdida lo mueve en la dirección correcta de forma medible y consistente, y aun así el modelo
+sigue lejos de ser equivariante**: 51° contra 63°, cuando lo ideal es 0°.
+
+**Y no mejora con más entrenamiento.** La ventaja sobre el control ya está entera en el primer
+checkpoint: en el paso 125 la diferencia en ρ es −0,170 y en el 1000 es −0,168. La tendencia a lo
+largo de los ocho es plana (Spearman +0,19, p = 0,65). Los 1000 pasos movieron el ángulo de 63° a 51°,
+todo eso pasó en los primeros 125, y después se estancó. Entrenar más no parece el ingrediente que
+falta.
+
+### Generaciones más largas que el horizonte de entrenamiento
+
+El período del péndulo es de 37,4 cuadros y generamos 33: **nunca se ve una oscilación completa**.
+Para ver si la dinámica sobrevive más allá de lo que el modelo vio, se generaron los mismos clips a 65
+cuadros (1,74 períodos) y se midió cuánto movimiento queda después del cuadro 33.
+
+| brazo | escenario | movimiento después del horizonte |
+|---|---|---|
+| control | péndulo | 0,57× |
+| **con física** | péndulo | **0,22×** |
+| control | rebote | 0,29× |
+| **con física** | rebote | **0,16×** |
+| control | caída libre | 0,59× |
+| con física | caída libre | 0,57× |
+
+Los dos brazos se frenan pasado el horizonte, pero el brazo con física se frena **más del doble** en
+péndulo y rebote. En caída libre, donde el ground truth ya va a velocidad constante, se comportan
+igual. Es la misma firma de la ruta degenerada, ahora en el eje temporal: donde el modelo tiene que
+inventar dinámica que nunca vio, el brazo entrenado con la restricción se queda más quieto.
 
 ## 9. Fuera de dominio: las corrupciones aparecen con los pasos
 
