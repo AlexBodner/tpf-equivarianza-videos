@@ -339,7 +339,7 @@ clips held-out:
 | error de velocidad (↓) | 4,838 | 5,225 | 10/30 | **0,184** |
 | jerk (↓) | 1,592 | **1,101** | 22/30 | 0,004 |
 | MAE de aceleración (↓) | 1,746 | 1,755 | 15/30 | 0,968 |
-| pérdida de equivarianza cruda (↓) | 3,649 | **1,441** | 28/30 | &lt;0,001 |
+| equivarianza cruda, **sobre aceleraciones** (↓) | 3,649 | 1,441 | 28/30 | &lt;0,001 |
 
 En la métrica principal no hay diferencia (p = 0,18), y por escenario tampoco (0,064 · 0,77 · 0,28).
 Las dos que sí dan significativas —jerk y la pérdida de equivarianza— son exactamente las dos que
@@ -419,8 +419,8 @@ semilla por clip. El modelo base y las cotas triviales van de referencia.
 | razón de movimiento (→1) | 0.356 | 0.608 | 0.645 | 13/30 | 0.584 |
 | jerk (↓) | 2.710 | 1.592 | 1.101 | 22/30 | 0.004 |
 | MAE de aceleración (↓) | 1.931 | 1.746 | 1.755 | 15/30 | 0.968 |
-| pérdida de equivarianza cruda (↓) | 7.902 | 3.649 | 1.441 | 28/30 | 0.000 |
-| pérdida de equivarianza normalizada (↓) | 0.000 | 0.264 | 0.144 | 13/30 | 0.124 |
+| equivarianza cruda, **sobre aceleraciones** (↓) | 7.902 | 3.649 | 1.441 | 28/30 | 0.000 |
+| equivarianza normalizada, **sobre aceleraciones** (↓) | 0.000 | 0.264 | 0.144 | 13/30 | 0.124 |
 
 #### Por escenario
 
@@ -432,8 +432,8 @@ semilla por clip. El modelo base y las cotas triviales van de referencia.
 | razón de movimiento (→1) | 0.471 | 0.664 | 0.574 | 1/10 | 0.020 |
 | jerk (↓) | 4.010 | 1.423 | 1.137 | 8/10 | 0.010 |
 | MAE de aceleración (↓) | 1.136 | 0.786 | 0.833 | 6/10 | 0.695 |
-| pérdida de equivarianza cruda (↓) | 13.094 | 2.170 | 1.053 | 9/10 | 0.004 |
-| pérdida de equivarianza normalizada (↓) | 0.000 | 0.081 | 0.000 | 2/10 | 0.500 |
+| equivarianza cruda, **sobre aceleraciones** (↓) | 13.094 | 2.170 | 1.053 | 9/10 | 0.004 |
+| equivarianza normalizada, **sobre aceleraciones** (↓) | 0.000 | 0.081 | 0.000 | 2/10 | 0.500 |
 
 **péndulo**
 
@@ -443,8 +443,8 @@ semilla por clip. El modelo base y las cotas triviales van de referencia.
 | razón de movimiento (→1) | 0.504 | 0.649 | 0.878 | 8/10 | 0.020 |
 | jerk (↓) | 3.512 | 0.769 | 0.940 | 5/10 | 0.625 |
 | MAE de aceleración (↓) | 1.425 | 0.631 | 0.661 | 3/10 | 0.625 |
-| pérdida de equivarianza cruda (↓) | 10.399 | 3.128 | 0.929 | 10/10 | 0.002 |
-| pérdida de equivarianza normalizada (↓) | 0.000 | 0.477 | 0.000 | 8/10 | 0.008 |
+| equivarianza cruda, **sobre aceleraciones** (↓) | 10.399 | 3.128 | 0.929 | 10/10 | 0.002 |
+| equivarianza normalizada, **sobre aceleraciones** (↓) | 0.000 | 0.477 | 0.000 | 8/10 | 0.008 |
 
 **rebote**
 
@@ -454,8 +454,8 @@ semilla por clip. El modelo base y las cotas triviales van de referencia.
 | razón de movimiento (→1) | 0.094 | 0.511 | 0.484 | 4/10 | 0.625 |
 | jerk (↓) | 0.607 | 2.584 | 1.226 | 9/10 | 0.010 |
 | MAE de aceleración (↓) | 3.232 | 3.820 | 3.771 | 6/10 | 0.695 |
-| pérdida de equivarianza cruda (↓) | 0.214 | 5.648 | 2.340 | 9/10 | 0.006 |
-| pérdida de equivarianza normalizada (↓) | 0.000 | 0.233 | 0.431 | 3/10 | 0.469 |
+| equivarianza cruda, **sobre aceleraciones** (↓) | 0.214 | 5.648 | 2.340 | 9/10 | 0.006 |
+| equivarianza normalizada, **sobre aceleraciones** (↓) | 0.000 | 0.233 | 0.431 | 3/10 | 0.469 |
 
 #### Cotas triviales, por escenario
 
@@ -469,22 +469,30 @@ En caída libre la cota de velocidad constante es **0,00**: el GT ya está en ve
 así que la respuesta correcta es una recta y ese escenario no puede sostener conclusiones.
 
 
-#### El hallazgo que deja esta tabla: las métricas de equivarianza las gana el modelo base
+#### Las dos filas de equivarianza de esta tabla no son interpretables
 
-En la fila de **pérdida de equivarianza normalizada** el modelo **base saca 0,000** —el puntaje
-perfecto— en los tres escenarios. Y en rebote también gana jerk por lejos (0,607 contra 2,584 del
-control). El base es el peor modelo de los tres por error de velocidad (9,26 contra 4,84) y aun así
-gana las dos métricas de equivarianza y una de suavidad.
+Al revisar la tabla completa apareció que las dos métricas de equivarianza de la evaluación están
+calculadas **sobre aceleraciones**, no sobre las velocidades que este brazo optimiza. En
+`evaluation/run_eval.py`, `compute_l_rot` y `compute_l_rot_norm` toman el segundo retorno de
+`extract_kinematics` —que es la aceleración— y el piso se pide sin argumento, con lo que también sale
+sobre aceleraciones. Es el mismo defecto que se corrigió en la validación del entrenamiento (commit
+`bbc6778d`), que nunca se aplicó acá.
 
-La razón es mecánica: el base se mueve un tercio de lo que debería (razón de movimiento 0,356, y sólo
-0,094 en rebote). Con tan poco movimiento el desacuerdo entre ramas cae **por debajo del piso de
-RAFT**, el numerador se recorta en cero y la pérdida normalizada da exactamente 0. Es decir que la
-normalización —que era nuestra defensa contra la ruta degenerada— **también la gana el que menos se
-mueve**, sólo que por el piso en vez de por la escala.
+Importa porque la aceleración estimada sobre video generado es **ruido**: el diagnóstico de la
+sección 4 mide un acuerdo de 0,07. Así que el "28 de 30 clips, p < 0,001" de esas filas no es evidencia
+de simetría aprendida; es una diferencia en una cantidad que no mide lo que dice.
 
-Esto deja el error de velocidad y la razón de movimiento como las únicas dos métricas donde el base
-queda claramente último, y es exactamente por eso que son las primarias. Cualquier lectura de las otras
-cuatro tiene que ir acompañada de la fila del base y de la razón de movimiento.
+Se nota en la fila del **modelo base**, que saca 0,000 —el puntaje perfecto— en la versión normalizada
+y en los tres escenarios, siendo el peor modelo de los tres por error de velocidad (9,26 contra 4,84).
+No es que sea equivariante: el piso del instrumento se mide **sobre su propio video generado**, así que
+para un modelo cuya generación condicionada es mala el piso se come la señal entera y el numerador
+recortado da cero.
+
+**Qué sobrevive.** La única medición de equivarianza del trabajo hecha sobre velocidades es el
+diagnóstico directo del checkpoint 1000 (sección 5): coseno 0,56 contra 0,37 del control, sobre 9 pares,
+con la salida cruda publicada. El error de velocidad y la razón de movimiento no están afectados —se
+calculan con RAFT sobre velocidades— y son las dos donde el base queda claramente último, que es
+exactamente por qué son las primarias.
 
 
 
@@ -533,7 +541,7 @@ Cota del video quieto, error de velocidad por escenario: 11,498, 7,519, 9,953.
 | error de velocidad (↓) | 4,838 | 5,190 | 13/30 | 0,096 |
 | razón de movimiento (→1) | 0,608 | 0,568 | 16/30 | 0,213 |
 | jerk (↓) | 1,592 | 1,271 | 18/30 | 0,164 |
-| pérdida de equivarianza cruda (↓) | 3,649 | 2,277 | 25/30 | &lt;0,001 |
+| equivarianza cruda, **sobre aceleraciones** (↓) | 3,649 | 2,277 | 25/30 | &lt;0,001 |
 
 ### Por checkpoint y por escenario
 
