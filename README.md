@@ -78,8 +78,11 @@ derecha la escena rotada 45°. La pérdida compara la cinemática de una contra 
 
 ![Qué ve la pérdida](gifs/que_ve_la_perdida.gif)
 
-*De izquierda a derecha: el video, el campo de flujo que devuelve RAFT (el tono es la dirección, el
-brillo la magnitud), y el único vector que queda después de agregar toda la escena. **Ese vector, uno
+*De izquierda a derecha: el video; el campo de flujo que devuelve RAFT, con el tono como dirección, el
+brillo como magnitud y flechas submuestreadas encima; y el único vector que queda después de agregar
+toda la escena, sobre un dial cuyos círculos son 1, 2 y 3 px por cuadro, con la estela de los ocho
+cuadros anteriores. El vector va sobre ejes y no sobre la imagen porque **no tiene ubicación**: es el
+promedio de la escena entera. **Ese vector, uno
 por cuadro, es todo lo que la pérdida mira.** Ahí se ve por qué dos objetos moviéndose en direcciones
 opuestas se cancelan: el agregado promedia la escena entera. Archivo:
 `videos/18_que_ve_la_perdida.mp4`, generado con `scripts_figuras/gen_que_ve_la_perdida.py`.*
