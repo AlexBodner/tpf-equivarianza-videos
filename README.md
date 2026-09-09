@@ -409,6 +409,94 @@ fuerte aparece fuera de distribución, donde la pérdida no vio ningún vector. 
 los dos atajos de [cómo satisface la simetría](#degeneracion), que operan sobre cuadros que la pérdida **sí** mira. Las correcciones
 de la última sección apuntan a las dos cosas.
 
+**Buscamos algo positivo acá y no lo encontramos.** Con el prompt de la pelota rodando —un escenario
+que no existe en el entrenamiento— parecía, mirando la altura media de lo que se mueve, que el brazo
+con física mantenía la pelota contra el piso mientras la del control flotaba. No se sostiene: esa
+altura es el centroide de **varias manchas repartidas**, no de una pelota.
+
+![Rodando fuera de dominio, los dos brazos](gifs/ood_rodando_875.gif)
+
+*Checkpoint 875 de los dos brazos, misma semilla y misma ruta de generación. Los dos producen varios
+objetos tenues y descoloridos en vez de una pelota. Archivo: `videos/19_ood_rodando_paso875.mp4`.*
+
+Contando objetos separados de tamaño apreciable en vez de mirar el centroide, en el paso 875 el brazo
+con física tiene más de uno en 13 de los 33 cuadros, con hasta 5 a la vez, y la saturación máxima del
+video es 15 sobre 255: la pelota sale gris. El control está igual o peor. En los cinco checkpoints
+medidos, ninguno de los dos brazos genera una pelota única en la mayoría de los cuadros.
+
+Vale la pena dejarlo escrito porque es un resultado negativo que costó: **la primera lectura de esta
+medición fue favorable al brazo con física, y era un artefacto de resumir con una media lo que había
+que contar objeto por objeto.**
+
+Archivos: `videos/03_rebote_pelota_duplicada_paso1000.mp4`, `videos/05_caida_libre_paso1000.mp4`,
+`videos/07_fuera_de_dominio_rodando.mp4`
+
+### Cómo se cerraría cada atajo
+
+El primero, moverse menos, es una propiedad de la restricción: sin un ancla de escala siempre está
+disponible.
+
+El segundo es un defecto del **estimador**, y es más difícil de cerrar de lo que parece. La dificultad
+de fondo es que las dos ramas son **generaciones independientes**: el modelo genera dos videos a partir
+de dos condicionamientos distintos, no rota un video ya hecho. Nada garantiza que la pelota esté en la
+misma fase ni en la posición correspondiente en ambos. Por eso:
+
+- **Comparar los campos de flujo densos** píxel a píxel, $R\,\Phi_{\text{orig}}(x)$ contra
+  $\Phi_{\text{rot}}(Rx)$, **no alcanza**: supone correspondencia espacial entre las dos generaciones.
+  Si la pelota quedó en otra fase, la diferencia es enorme aunque la dinámica sea perfectamente
+  equivariante. Confunde "está en otro lugar" con "se mueve distinto".
+- **Quedarse con el objeto más grande** tampoco: es esencialmente lo que ya hace el agregador, no está
+  justificado, y se cae apenas hay varios objetos o cuando el movimiento del fondo es informativo, que
+  además hoy se descarta al restar el flujo medio global.
+
+Las dos salidas que quedan:
+
+1. **Comparar la distribución de velocidades** de las dos ramas (momentos, histograma o transporte
+   óptimo) en vez de un promedio o de una comparación posición a posición. Es invariante a dónde esté
+   cada objeto y a permutarlos, así que **no necesita correspondencia**, y tolera que las dos ramas
+   generen distinta cantidad de objetos. Es la única de la lista que esquiva el problema de raíz.
+2. **Emparejar las velocidades entre los dos videos generados**, con segmentación y asociación de
+   identidad. Es lo que hace falta para cualquier comparación que no sea distribucional, y es un
+   problema en sí mismo: hay que resolver correspondencia entre dos generaciones que pueden diferir en
+   fase, en posición y hasta en cuántos objetos tienen. **Queda como trabajo futuro**, y es la pieza
+   que hoy falta para que la restricción se pueda imponer sobre escenas con más de un objeto.
+
+## Fuera de dominio: las corrupciones aparecen con los pasos
+
+*Póster: sección «Resultados», fila fuera de distribución.*
+
+Los prompts de abajo nunca se entrenaron. Es donde mejor se ve el mecanismo: no es que el modelo
+"aprenda mal la física", es que **la imagen se corrompe** a medida que avanza el entrenamiento, y la
+corrupción es justamente lo que baja la pérdida.
+
+![Rodando, evolución con los pasos](gifs/ood_rolling.gif)
+
+*Prompt «una pelota rodando por una superficie plana», el mismo en los cuatro paneles, generado por el
+modelo entrenado en distintos pasos. En el 250 y el 500 hay una pelota limpia; en el 750 aparecen
+**dos**; en el 1000 la pelota está deshecha. La pérdida no penaliza nada de eso: dos objetos que se
+mueven en direcciones distintas se cancelan en el flujo agregado, y el desacuerdo entre ramas baja.*
+
+![Péndulo fotográfico, evolución con los pasos](gifs/ood_pendulum_photo.gif)
+
+*Mismo efecto con otro prompt fuera de dominio.*
+
+![Fuera de dominio: control contra brazo con física](gifs/ood_control_vs_fisica.gif)
+
+*Y contra el control en el mismo paso: el control mantiene un objeto coherente.*
+
+En números, sobre el escenario fuera de distribución con ground truth (tiro vertical): la razón de
+movimiento del brazo con física cae a 0,12 contra 0,43 del control, por debajo de la de un video
+estático (0,22). Es el mismo fenómeno, medido.
+
+**Por qué esto apunta a una limitación del método y no a la hipótesis.** La pérdida se calcula sobre
+una generación truncada, de 12 pasos de Euler en vez de 20, y sobre una parte de los 32 vectores de
+velocidad del clip: 24 en péndulo y rebote, 12 o 16 en caída libre (contado sobre los 1000 pasos de la
+corrida). El modelo puede degradar lo que la pérdida no mira. Conviene decir hasta dónde llega esta
+explicación: **no está medido** que la corrupción viva en los cuadros excluidos, y la degeneración más
+fuerte aparece fuera de distribución, donde la pérdida no vio ningún vector. Lo que sí está medido son
+los dos atajos de [cómo satisface la simetría](#degeneracion), que operan sobre cuadros que la pérdida **sí** mira. Las correcciones
+de la última sección apuntan a las dos cosas.
+
 **No es uniformemente peor.** Con el prompt de la pelota rodando —un escenario que no existe en el
 entrenamiento— el brazo con física mantiene la pelota contra el piso mejor que el control:
 
