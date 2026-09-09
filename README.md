@@ -18,7 +18,8 @@ mejora, y fuera de distribución el modelo degenera. Lo que sí podemos señalar
 pelota en dos hace que el flujo agregado de la escena se cancele. Las dos cosas bajan la pérdida sin
 mejorar la dinámica. A eso se suma que la pérdida ve una versión parcial de lo generado (24 de 32 vectores de velocidad en péndulo y rebote, 12 o 16 en caída libre, sobre 12 pasos de Euler contra los 20 de la inferencia) aunque **eso último es una hipótesis, no algo que hayamos medido**.
 
-Cada sección indica a qué parte del póster corresponde.
+Cada sección indica a qué parte del póster corresponde. Lo que queda abierto, incluido lo que no
+podemos explicar, está en [PENDIENTES.md](PENDIENTES.md).
 
 **Los pesos y el archivo completo de videos están en Hugging Face:
 [AlexBodner/tpf-equivarianza-video](https://huggingface.co/AlexBodner/tpf-equivarianza-video).** Acá

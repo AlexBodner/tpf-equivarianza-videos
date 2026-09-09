@@ -1,0 +1,72 @@
+{
+ "cantidad": "velocidad",
+ "lambda_rot": 0.0047,
+ "val_batches": 20,
+ "por_paso": {
+  "125": {
+   "step": 125,
+   "type": "val",
+   "val_loss_diffusion": 0.07916571199893951,
+   "val_loss_translation": 0.0,
+   "val_loss_rotation": 9.923675644397736,
+   "val_n_batches": 20
+  },
+  "250": {
+   "step": 250,
+   "type": "val",
+   "val_loss_diffusion": 0.06985654588788748,
+   "val_loss_translation": 0.0,
+   "val_loss_rotation": 8.92152202129364,
+   "val_n_batches": 20
+  },
+  "375": {
+   "step": 375,
+   "type": "val",
+   "val_loss_diffusion": 0.07099465690553189,
+   "val_loss_translation": 0.0,
+   "val_loss_rotation": 8.100003266334534,
+   "val_n_batches": 20
+  },
+  "500": {
+   "step": 500,
+   "type": "val",
+   "val_loss_diffusion": 0.08076153621077538,
+   "val_loss_translation": 0.0,
+   "val_loss_rotation": 10.078681176900863,
+   "val_n_batches": 20
+  },
+  "625": {
+   "step": 625,
+   "type": "val",
+   "val_loss_diffusion": 0.08077862821519374,
+   "val_loss_translation": 0.0,
+   "val_loss_rotation": 12.417513954639436,
+   "val_n_batches": 20
+  },
+  "750": {
+   "step": 750,
+   "type": "val",
+   "val_loss_diffusion": 0.08455355428159236,
+   "val_loss_translation": 0.0,
+   "val_loss_rotation": 8.343616318702697,
+   "val_n_batches": 20
+  },
+  "875": {
+   "step": 875,
+   "type": "val",
+   "val_loss_diffusion": 0.07754232734441757,
+   "val_loss_translation": 0.0,
+   "val_loss_rotation": 6.679154717922211,
+   "val_n_batches": 20
+  },
+  "1000": {
+   "step": 1000,
+   "type": "val",
+   "val_loss_diffusion": 0.07239101678133011,
+   "val_loss_translation": 0.0,
+   "val_loss_rotation": 11.87956953048706,
+   "val_n_batches": 20
+  }
+ },
+ "origen": "reconstruido desde logs/valckpt.log (el volcado original fallo por un bug en train_sana.py)"
+}

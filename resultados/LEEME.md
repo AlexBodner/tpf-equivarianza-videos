@@ -13,6 +13,17 @@ entrenamiento. Las instancias de AWS son efímeras: acá está la copia durable.
 | `informes/` | `RESULTADOS.md` (lectura), `NUMEROS_EN_CRUDO.md` (todas las tablas) y el prerregistro con sus 33 enmiendas, que documenta cada decisión con su fecha y si se tomó antes o después de ver los datos. |
 | `diag_raft.txt`, `diag_raft_vel.txt` | la salida cruda del diagnóstico del instrumento sobre aceleración y sobre velocidad. |
 
+## Los resultados finales
+
+| archivo | qué es |
+|---|---|
+| `evaluaciones/test_final__88_clips_nunca_mirados.json` | **el resultado principal**: los 88 clips held-out que no se miraron nunca, control en el paso 125 y brazo con física en el 875, cada uno elegido por su propia validación |
+| `evaluaciones/candidatos__n60_velocidades.json` | los siete brazos sobre los primeros 20 clips por escenario, con la equivarianza ya medida sobre velocidades |
+| `evaluaciones/equivarianza_por_checkpoint.json` | equivarianza fuera del bucle en los 8 checkpoints de los dos brazos (ojo: 3 escenas con sus 4 variantes, no 12 clips distintos) |
+| `validaciones/fisica_8_checkpoints.json` | la validación recalculada sobre velocidades que elige el checkpoint del brazo con física |
+| `validaciones/control_8_checkpoints.json` | la del control |
+| `logs_barrido/*.jsonl` | los cinco brazos del barrido de ventanas de BPTT, una línea por paso |
+
 ## Las evaluaciones, y cuál sirve para qué
 
 | evaluación | qué mide | brazos | estado |
