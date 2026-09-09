@@ -8,8 +8,9 @@ los propios videos generados, y todo se retropropaga hasta los pesos.
 Con el método tal como está hoy **no logramos mejorar la física generada**, y las secciones de abajo
 cuentan por qué, experimento por experimento. La conclusión no es que la idea no sirva, sino algo más
 concreto y más accionable: la pérdida ve una versión **parcial y cruda** de lo que el modelo genera
-(24 de los 32 vectores de velocidad del clip, calculados sobre una generación de 12 pasos de Euler y
-no de los 50 de la inferencia), y contra esa señal incompleta el entrenamiento termina introduciendo
+—de los 32 vectores de velocidad del clip mira 24 en péndulo y rebote, pero sólo 12 o 16 en caída
+libre, y los calcula sobre una generación de 12 pasos de Euler y no de los 20 de la inferencia—, y
+contra esa señal incompleta el entrenamiento termina introduciendo
 **corrupciones** en la imagen que bajan la pérdida sin mejorar la dinámica. Cada sección indica a qué
 parte del póster corresponde.
 
@@ -18,8 +19,9 @@ parte del póster corresponde.
 ## 1. Cómo leer los paneles
 
 - Videos de cuatro paneles: **ground truth del simulador · modelo base sin fine-tuning · generación
-  por texto · generación condicionada en el primer cuadro**. Fondo Perlin gris, pelota de color,
-  33 cuadros a 384 px.
+  por texto · generación condicionada**. Fondo Perlin gris, pelota de color, 33 cuadros a 384 px.
+  El condicionamiento son los **2 primeros cuadros latentes** del clip real, que en píxeles son los
+  primeros 8 cuadros; el resto lo genera el modelo.
 - Videos de equivarianza, tres paneles: **generación con el condicionamiento original · con el
   condicionamiento rotado 45° y luego des-rotada · diferencia absoluta**. Si el modelo fuera
   equivariante, los dos primeros serían iguales y el tercero negro.
@@ -46,9 +48,10 @@ primera rotada. La inconsistencia entre ambas es toda la señal de entrenamiento
 anotaciones. El costo es que hay que generar, decodificar y estimar flujo **dentro** del paso de
 entrenamiento, y retropropagar por todo eso.
 
-Archivo: `videos/06_dos_ramas_de_la_perdida.mp4`. El video de las ramas tal como las decodifica el
-entrenamiento dura sólo 5 cuadros, porque la rama física decodifica pocos latentes; el de acá es el par
-de generación completa, de 33 cuadros, que muestra lo mismo con más contexto.
+Archivo: `videos/06_dos_ramas_de_la_perdida.mp4`. Una aclaración para que no confunda: el
+entrenamiento decodifica las dos ramas **de a un latente por vez** para que entren en memoria, y cada
+uno de esos trozos son unos 5 cuadros. Eso es el troceado del decodificador, no el largo de la rama:
+las dos ramas cubren el clip entero, 33 cuadros, que es lo que muestra este video.
 
 <a id="colapso"></a>
 
@@ -105,8 +108,8 @@ baja**. Se ve en las curvas de entrenamiento, no en un cuadro.
 
 *Izquierda: el término de la pérdida, normalizado igual en los dos casos (0 sería equivarianza
 perfecta). Sobre aceleración se queda plano entre 0,5 y 0,6 durante 800 pasos; sobre velocidad baja un
-33 % (p = 0,010). Derecha: el acuerdo de dirección entre las dos ramas. Sobre aceleración arranca en
-0,42 y baja; sobre velocidad arranca en 0,81 y sube a 0,87 (p = 0,002). La curva de aceleración empieza
+31 % (p = 0,043 de una cola). Derecha: el acuerdo de dirección entre las dos ramas. Sobre aceleración arranca en
+0,42 y baja; sobre velocidad arranca en 0,81 y sube a 0,86 (p = 0,062 de una cola). La curva de aceleración empieza
 en el paso 280 porque el registro de esa cantidad se agregó cuando la corrida se retomó.*
 
 La razón es del instrumento, no del modelo. La aceleración es la segunda diferencia del flujo, y a esta
@@ -132,21 +135,39 @@ Archivos: `videos/15_aceleracion_evolucion_*.mp4` y `videos/11_aceleracion_pendu
 
 <a id="velocidad"></a>
 
-## 5. Tercer experimento: sobre velocidad el modelo sí aprende la simetría
+## 5. Tercer experimento: sobre velocidad el modelo sí se vuelve más equivariante
 
 *Póster: sección «Resultados».*
 
 La **velocidad** (primera diferencia del flujo) sí tiene señal: sobre video real rotado el estimador
-se contradice sólo un 2 %. Con la pérdida aplicada ahí, el modelo aprende lo que se le pide, y se
-verifica con tres instrumentos independientes: el término baja un 33 % (p = 0,010), el acuerdo de
-dirección entre las dos ramas sube de 0,81 a 0,87 (p = 0,002), y en generación libre el brazo termina
-más equivariante que su control (0,56 contra 0,37).
+se contradice sólo un 2 %. Con la pérdida aplicada ahí, el modelo sí se mueve en la dirección pedida.
+Antes de los números, cómo se decidió: el criterio de "la pérdida enseña equivarianza" se escribió
+**antes de correr**, y pedía dos cosas juntas — que el término baje durante el entrenamiento, y que el
+modelo resulte más equivariante que su control en una medición hecha fuera del bucle de entrenamiento.
+Las dos se cumplen.
+
+- **El término baja**: media de los últimos 100 pasos contra los primeros 100, 0,1834 → 0,1266, un
+  31 % menos (Mann-Whitney de una cola, **p = 0,043**; la dirección estaba preregistrada, así que el
+  test es unilateral — a dos colas sería p = 0,085). Junto con eso, el acuerdo de dirección entre las
+  dos ramas sube de 0,81 a 0,86 (p = 0,062 de una cola). Conviene aclarar que estas dos cantidades **no
+  son medidas independientes**: son la norma y el ángulo de la misma diferencia, calculadas en la misma
+  función sobre los mismos vectores.
+- **La medición externa**, sobre 9 pares condicionados del checkpoint 1000, donde el brazo gana en las
+  tres cantidades: coseno entre ramas 0,56 contra 0,37 del control, desacuerdo N/D 0,45 contra 0,64, y
+  diferencia de píxeles des-rotada 4,99 contra 5,38. Es n = 9 y sin test estadístico, pero es la única
+  lectura que no viene del propio término que se está optimizando. En el checkpoint 250 esta misma
+  medición daba a favor del control; se da vuelta recién al final.
+
+Salida cruda: `resultados/evaluaciones/e4vel__equiv_1000__diagnostico_completo.log`. La prueba de
+tendencia se reproduce con `scripts_figuras/gen_aceleracion_vs_velocidad.py`.
 
 ![Equivarianza del brazo entrenado](gifs/equivarianza_pendulo.gif)
 
 *Checkpoint 250. Condicionamiento original · rotado 45° y des-rotado · diferencia. Cuanto más oscuro el
-tercer panel, más equivariante. La medición equivalente en el checkpoint 1000 está en la tabla de la
-sección 8: 0,56 contra 0,37 del control.*
+tercer panel, más equivariante. En el 250 esta medición todavía daba a favor del control (5,07 contra
+4,78 de diferencia de píxeles); recién en el 1000 se da vuelta (4,99 contra 5,38), y ahí el coseno
+entre ramas es 0,56 contra 0,37. Las dos mediciones están en
+`resultados/evaluaciones/e4vel__equiv_1000__diagnostico_completo.log`.*
 
 ![Péndulo al paso 1000](gifs/pendulo_bien.gif)
 
@@ -172,7 +193,7 @@ comparación existe en números pero todavía no en video.
 
 ![Los tres escenarios, control contra brazo con física](gifs/tres_escenarios_i2v.gif)
 
-*Checkpoint 250 de los dos brazos. Los tres escenarios a la vez, generación condicionada en el primer cuadro. Arrancan idénticos porque
+*Checkpoint 250 de los dos brazos. Los tres escenarios a la vez, generación condicionada en los 2 primeros latentes. Arrancan idénticos porque
 el condicionamiento es el mismo. En **caída libre** las dos trayectorias son parecidas y el brazo con
 física termina más cerca del ground truth. En **péndulo** también. En **rebote** la pelota del brazo con
 física se desdibuja y queda atrás: es el escenario donde empeora, y donde después aparecen los
@@ -280,6 +301,59 @@ quiere probar. Los dos brazos caen en el paso 250. Pero esa elección **no es s�
   validación a lo largo del entrenamiento es del 8,6 % y el salto típico entre mediciones consecutivas
   es mayor que esa diferencia. Está **dentro del ruido**.
 
+Lo que sí juega a favor de esa regla: el *ranking* por validación de difusión es idéntico en los dos
+brazos (250, 1000, 500, 750), así que la comparación sigue apareada — los dos se leen en el mismo paso.
+
+**La tercera opción, y la más interesante: elegir por lo que el brazo realmente minimiza.** Si lo que
+se quiere es el mejor modelo *de la pérdida física*, la regla natural es la suma de los dos términos de
+validación, que es el objetivo de entrenamiento. Estos son los checkpoints donde hay validación y
+evaluación a la vez:
+
+| paso | validación de difusión | validación de rotación (MSE crudo) | suma (dif + λ·rot) | movimiento medio |
+|---|---|---|---|---|
+| 250 | **0,0698** | 11,2507 | 0,1227 | — |
+| 500 | 0,0808 | 10,3254 | 0,1293 | 0,987 |
+| **750** | 0,0846 | **6,7278** | **0,1162** | **0,853** |
+| 1000 | 0,0724 | 12,8185 | 0,1326 | 1,030 |
+
+![Elegir por la pérdida elige el que menos se mueve](figuras/seleccion_checkpoint.png)
+
+*Izquierda: los dos términos de validación y su suma, que es el objetivo de entrenamiento; el mínimo
+cae en el paso 750. Derecha: cuánto se mueve el video generado en la evaluación, contra el ground
+truth; el mínimo cae en el mismo paso. Reproducible con
+`scripts_figuras/gen_seleccion_checkpoint.py`.*
+
+La suma elige el **paso 750**. Y el 750 es, de los siete checkpoints con evaluación, **el que menos se
+mueve** (0,853 contra 0,90–1,03 en todos los demás). No es casualidad: la validación de rotación es un
+MSE crudo en px²/cuadro², no el cociente normalizado que se optimiza, así que baja cuando el video se
+mueve menos, y la suma hereda ese defecto.
+
+**Y acá está el resultado más limpio de todo el trabajo.** En el paso 750 —el que la propia pérdida
+señala como su mejor modelo— el brazo con física es **significativamente peor** que el control en error
+de velocidad: 4,212 contra 5,225, p = 0,003 (ver la tabla por checkpoint más abajo). O sea que la regla
+que elige por el objetivo de entrenamiento aterriza justo en el punto donde la física generada es peor.
+Minimizar esta pérdida y mejorar la física no son la misma cosa, y esto lo muestra sin necesidad de
+ningún argumento.
+
+Por eso el trabajo reporta el 750 **declarado como lo que es** —el óptimo de la pérdida, no el mejor
+modelo— y mantiene el paso 1000 como elección primaria, que es la preregistrada y no selecciona nada.
+
+**Qué habría que cambiar para la próxima corrida.** La validación corre cada 50 pasos y los checkpoints
+se guardan cada 125: sólo coinciden en cuatro puntos, así que la mitad de los checkpoints nunca pudo
+entrar en ninguna regla. Alcanza con alinear las dos cadencias. Y hay que registrar en validación la
+cantidad **normalizada** con el piso restado, además de la energía del movimiento, para que la regla no
+se pueda ganar generando menos.
+
+**Por qué no se puede elegir por la validación de equivarianza**, que sería lo natural dado lo que se
+quiere probar. Por dos razones distintas, y las dos son decisivas:
+
+- **El control no la tiene.** Con λ_rot = 0 el término nunca se calcula, así que su registro es 0,0000
+  en los 1000 pasos. Una regla que sólo se puede evaluar en un brazo no se puede aplicar a los dos, y
+  comparar brazos elegidos con criterios distintos no es comparar.
+- **Es un MSE sin normalizar**, así que premia generar menos movimiento. Lo verificamos sobre los cuatro
+  brazos del barrido de ventanas de la sección 12: esa métrica los ordena **al revés** que el cociente
+  normalizado que es lo que efectivamente se minimiza.
+
 Así que el paso 250 se reporta abajo como control de sensibilidad, no como "el mejor modelo". Lo
 relevante es que **las dos elecciones dan la misma respuesta**: nada se distingue del control.
 
@@ -385,9 +459,13 @@ movimiento del brazo con física cae a 0,12 contra 0,43 del control, por debajo 
 estático (0,22). Es el mismo fenómeno, medido.
 
 **Por qué esto apunta a una limitación del método y no a la hipótesis.** La pérdida se calcula sobre
-una generación truncada, de 12 pasos de Euler en vez de 50, y sobre 24 de los 32 vectores de velocidad
-del clip. El modelo puede degradar lo que la pérdida no mira, y eso es exactamente lo que hace. Las dos
-correcciones de la última sección apuntan ahí.
+una generación truncada, de 12 pasos de Euler en vez de 20, y sobre una parte de los 32 vectores de
+velocidad del clip: 24 en péndulo y rebote, 12 o 16 en caída libre (contado sobre los 1000 pasos de la
+corrida). El modelo puede degradar lo que la pérdida no mira. Conviene decir hasta dónde llega esta
+explicación: **no está medido** que la corrupción viva en los cuadros excluidos, y la degeneración más
+fuerte aparece fuera de distribución, donde la pérdida no vio ningún vector. Lo que sí está medido son
+los dos atajos de la sección 7, que operan sobre cuadros que la pérdida **sí** mira. Las correcciones
+de la última sección apuntan a las dos cosas.
 
 ## 10. Control: la simetría por datos tampoco enseña
 
@@ -404,13 +482,84 @@ Archivos: `videos/10_equivarianza_*_ablacion_aumentaciones.mp4`
 
 *Póster: sección «Trabajo futuro».*
 
-1. **Que la pérdida vea todo lo que el modelo genera**: hoy mira 24 de 32 vectores y una generación de
-   12 pasos de Euler en vez de 50. Lo que queda fuera es donde el modelo mete la corrupción.
+1. **Que la pérdida vea todo lo que el modelo genera**: hoy mira 24 de 32 vectores en péndulo y
+   rebote, 12 o 16 en caída libre, y una generación de 12 pasos de Euler en vez de 20. Es una hipótesis
+   razonable —no comprobada— que la corrupción se aloje en lo que queda fuera.
 2. **Emparejar las velocidades entre las dos generaciones**, que es la pieza que falta para escenas con
    más de un objeto. La única alternativa que esquiva el emparejamiento es comparar la **distribución**
    de velocidades, invariante a posición y a permutar objetos.
 3. **Anclar la escala del movimiento**, porque sin eso la restricción siempre admite el atajo de
    moverse menos. El costo es que deja de ser una restricción sin ground truth, que era el atractivo.
+
+## 12. Cuántos pasos de Euler hay que retropropagar (la ventana de BPTT)
+
+*Póster: sección «Análisis del gradiente».*
+
+La pérdida se calcula sobre un video que el modelo genera **dentro** del paso de entrenamiento, con 12
+pasos de Euler. Retropropagar por los doce cuesta memoria y tiempo, así que la pregunta práctica es si
+alcanza con una ventana. Ese parámetro es `physics_n_bptt` (cuántos pasos llevan gradiente) junto con
+`physics_bptt_steps` (cuáles).
+
+**Lo que está medido y no depende de la pérdida elegida:**
+
+- **El perfil del gradiente por paso de Euler es en U**, no concentrado al principio: los primeros
+  cuatro pasos aportan un 33-34 % de la norma y los últimos cuatro un 47-48 %, con el máximo en el
+  paso 11. Verificado sobre dos corridas independientes (656 y 538 pasos), coincidiendo dentro de un
+  punto porcentual.
+- **El BPTT completo cuesta un 29 % más por paso** que cualquier ventana truncada (27,8 s/paso contra
+  21,6-21,7 en los brazos de abajo).
+
+**Lo que el barrido no logra decidir.** Se corrieron cinco brazos de 150 pasos, idénticos salvo la
+ventana, sobre la pérdida arreglada y la cantidad que sí tiene señal. El resultado es que **ninguna
+ventana se distingue de las otras** sobre lo que efectivamente se minimiza, y que los instrumentos
+disponibles se contradicen entre sí:
+
+| brazo | pasos retropropagados | val_rot cruda | ρ = N/D apareado | energía de movimiento | s/paso |
+|---|---|---|---|---|---|
+| completo | los 12 | **10,31** (el mejor) | el peor de los cuatro | referencia | 27,8 |
+| ventana4 | 2, 3, 8, 11 | 11,17 | −0,014 (p = 0,21) | +2,2 % | 21,7 |
+| cola4 | 8, 9, 10, 11 | 13,59 | −0,012 (p = 0,15) | −0,9 % | 21,6 |
+| mejor6 | 0, 1, 2, 4, 5, 6 | **14,66** (el peor) | −0,020 (p = 0,005), el mejor | +9,6 % | 23,4 |
+
+Los dos instrumentos ordenan los brazos **al revés**, y la explicación es la energía del movimiento:
+el brazo que más se mueve gana en el cociente normalizado y pierde en el error crudo. Al restar el piso
+de RAFT —o sea, mirando exactamente la cantidad que se optimiza— la diferencia entre `mejor6` y el
+completo se va a cero (+0,0000, p = 0,66), y lo mismo pasa si se comparan sólo los pasos con energía
+pareja al 5 % (p = 0,57).
+
+**Conclusión honesta:** con 150 pasos por brazo y sin guardar pesos, este barrido no ordena ventanas.
+Lo que sí deja es la advertencia metodológica de la sección 8: ninguna de las métricas internas sirve
+para comparar brazos sin controlar por cuánto se mueve el video. Para decidir la ventana haría falta
+guardar checkpoints y evaluar el error de trayectoria contra el ground truth, que es la única métrica
+que no se puede ganar moviéndose más o menos.
+
+## 13. Parámetros
+
+Todo lo de abajo sale de `config_resolved.json` de la corrida, publicado en
+[`resultados/configs/`](resultados/configs).
+
+| | |
+|---|---|
+| Modelo base | SANA-Video 2B, 480p (`Efficient-Large-Model/SANA-Video_2B_480p_diffusers`) |
+| Adaptación | LoRA rango 32, alfa 64, sobre `to_q`, `to_k`, `to_v`, `to_out.0` |
+| Optimización | lr 1e-4, batch 1, bf16, gradient checkpointing, 1000 pasos, semilla 42 |
+| Datos | 500 clips sintéticos propios, 384×384, **33 cuadros**, con aumentaciones; validación de 20 clips fija (`split_seed` 42) |
+| Objetivo | difusión + condicionado (λ = 1,5) + equivarianza rotacional (λ_rot = 4,7e-03) |
+| Términos apagados | boost galileano, traslación, ground truth, flow matching y jerk, todos en λ = 0 |
+| Equivarianza | rotación de 45°, sobre **velocidades**, cociente invariante a escala con piso de RAFT restado y margen mínimo 3,0 |
+| Generación dentro del paso | 12 pasos de Euler, condicionamiento de 2 latentes, decodificación troceada de a 1 latente |
+| BPTT | los 12 pasos (ver sección 12) |
+| Evaluación | 20 pasos de Euler, 33 cuadros, 384 px, 10 clips held-out por escenario, rotación de 45° |
+| Costo | L40S (AWS g6e.xlarge), 21,3 GB de VRAM en la mediana (pico 28,5), 46,7 s/paso, 16 h por corrida |
+
+**Cómo se calibra λ_rot.** No se elige a mano: se corren sondas de 10 pasos midiendo la razón entre la
+norma del gradiente físico y la del gradiente de difusión, y se ajusta λ hasta que esa razón caiga en
+[0,40; 0,60], o sea que el término físico pese la mitad que el objetivo generativo. Para esta corrida
+hicieron falta cinco sondas y quedó en 4,7e-03. **Cualquier cambio en la fórmula de la pérdida invalida
+la calibración anterior** y obliga a repetir las sondas.
+
+**Un límite del montaje que conviene tener presente.** El período del péndulo es de 37,4 cuadros y
+generamos 33: nunca se ve una oscilación completa, ni en entrenamiento ni en evaluación.
 
 ---
 

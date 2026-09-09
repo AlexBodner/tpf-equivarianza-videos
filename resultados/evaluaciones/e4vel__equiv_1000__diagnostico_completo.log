@@ -1,0 +1,41 @@
+=== 2026-09-08 12:26 equivarianza directa paso 1000: checkpoints_sana/stage2_equiv_vel_s42_20260907-140554_5de5e17a-fixpiso-vel vs checkpoints_sana/stage2_ctrl_lambda_s42_20260906-162433_5de5e17a ===
+/home/ubuntu/venv_tpf/lib/python3.10/site-packages/diffusers/utils/deprecation_utils.py:23: FutureWarning: `torch_dtype` is deprecated and will be removed in version 1.0.0. Please use `dtype` instead.
+  deprecate("torch_dtype", "1.0.0", _TORCH_DTYPE_DEPRECATION_MESSAGE)
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+brazos: ['equiv_vel1000', 'ctrl_rep1000']
+clips: {'free_fall': 3, 'pendulum': 3, 'bouncing': 3}
+generaciones totales: 54
+Loading pipeline components...:   0%|          | 0/5 [00:00<?, ?it/s]Loading pipeline components...:  40%|████      | 2/5 [00:01<00:02,  1.12it/s]
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s][A
+Loading checkpoint shards:  50%|█████     | 1/2 [00:01<00:01,  1.03s/it][A
+Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.21it/s][ALoading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.17it/s]
+Loading pipeline components...:  60%|██████    | 3/5 [00:03<00:02,  1.25s/it]Loading pipeline components...:  80%|████████  | 4/5 [00:03<00:00,  1.20it/s]
+Loading weights:   0%|          | 0/288 [00:00<?, ?it/s][ALoading weights: 100%|██████████| 288/288 [00:00<00:00, 4504.74it/s]
+Loading pipeline components...: 100%|██████████| 5/5 [00:03<00:00,  1.64it/s]Loading pipeline components...: 100%|██████████| 5/5 [00:03<00:00,  1.29it/s]
+[SANA] LoRA trainable params: 22,937,600 (22.9M)
+[SANA] Gradient checkpointing: disabled
+[equiv_vel1000] free_fall 00500.mp4 listo
+[equiv_vel1000] free_fall 00501.mp4 listo
+[equiv_vel1000] free_fall 00502.mp4 listo
+[equiv_vel1000] pendulum 00500.mp4 listo
+[equiv_vel1000] pendulum 00501.mp4 listo
+[equiv_vel1000] pendulum 00502.mp4 listo
+[equiv_vel1000] bouncing 00500.mp4 listo
+[equiv_vel1000] bouncing 00501.mp4 listo
+[equiv_vel1000] bouncing 00502.mp4 listo
+[ctrl_rep1000] free_fall 00500.mp4 listo
+[ctrl_rep1000] free_fall 00501.mp4 listo
+[ctrl_rep1000] free_fall 00502.mp4 listo
+[ctrl_rep1000] pendulum 00500.mp4 listo
+[ctrl_rep1000] pendulum 00501.mp4 listo
+[ctrl_rep1000] pendulum 00502.mp4 listo
+[ctrl_rep1000] bouncing 00500.mp4 listo
+[ctrl_rep1000] bouncing 00501.mp4 listo
+[ctrl_rep1000] bouncing 00502.mp4 listo
+EXPLOR-DONE
+EQUIV-DIRECTA-1000 equiv_vel1000 media 4.99 (n=9) por escenario: {'bouncing': 5.63, 'free_fall': 4.1, 'pendulum': 5.23}
+EQUIV-DIRECTA-1000 ctrl_rep1000 media 5.38 (n=9) por escenario: {'bouncing': 6.63, 'free_fall': 4.2, 'pendulum': 5.3}
+referencia: replica 250 en aceleracion 4,78 | tratado-aceleracion 250 6,22 | calibracion 0,3 perfecto, 15 ninguna
+VEL-COS-1000 MEDIANAS ctrl_rep1000: cos +0.37 ratio 0.64 | con R(-45): cos +0.32
+VEL-COS-1000 MEDIANAS equiv_vel1000: cos +0.56 ratio 0.45 | con R(-45): cos +0.38
+EQUIV-VEL-1000-DONE 12:34
