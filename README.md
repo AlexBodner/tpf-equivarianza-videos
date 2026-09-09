@@ -36,17 +36,13 @@ por paso de entrenamiento, con un índice que rastrea cada archivo hasta su orig
 
 **Última actualización: 9 de septiembre de 2026.**
 
-| qué | estado |
-|---|---|
-| Elección de checkpoint de cada brazo, por su propia validación sobre los mismos 8 candidatos | **listo**: control 125, con física 875 |
-| Equivarianza medida sobre **velocidades** en la evaluación, n = 60 | **listo** |
-| Test final sobre los 30 clips por escenario que nunca se miraron (n = 90) | corriendo |
+Todas las mediciones están cerradas. El resultado principal sale del **test final**: los 88 clips
+held-out que nunca se miraron (00520–00549 de cada escenario), con el checkpoint de cada brazo elegido
+por su propia validación —control en el paso 125, brazo con física en el 875— sobre los mismos ocho
+candidatos.
 
-Los números de acá salen del conjunto held-out con n = 60, que nunca se usó para entrenar ni para
-elegir checkpoint: son válidos. El test final agrega n = 90 sobre clips que además **nunca miramos**,
-lo que cierra un hilo fino: la regla de selección se corrigió dos veces, y una de esas correcciones
-salió de mirar la razón de movimiento en el conjunto de evaluación. No esperamos que cambie la
-conclusión.
+Ni la regla de selección ni ninguno de los análisis exploratorios tocaron esos clips, así que es el
+único número del trabajo que no está contaminado por haber mirado los datos.
 
 </details>
 ---
@@ -126,16 +122,16 @@ imagen. En los ocho checkpoints el brazo con física es más equivariante, en la
 | ángulo entre las dos ramas (0° sería perfecto) | 63° | **51°** |
 | ρ, la fracción del movimiento que viola la simetría | 0,596 | **0,427** |
 
-Son los valores del checkpoint final; la diferencia no es casualidad (p = 0,012). Y se repite con
-cinco veces más clips: en el conjunto held-out, con **n = 60** y sobre la cantidad normalizada, el
-brazo con física da 0,366 contra 0,574 del control, ganando en 43 de los 60 clips (p < 0,0001). Además
-**mejora con el entrenamiento** —0,455 · 0,419 · 0,366 en los pasos 250, 750 y 1000— mientras el
-control queda plano en 0,577 y 0,574.
+Son los valores del checkpoint final; la diferencia no es casualidad (p = 0,012). Y se repite con más
+clips y en el conjunto limpio: en los **88 clips que nunca miramos**, con cada brazo en su checkpoint
+elegido, la cantidad normalizada da **0,306 contra 0,562** del control, ganando en 72 de los 88 clips
+(p < 0,0001). Además **mejora con el entrenamiento** —0,455 · 0,419 · 0,366 en los pasos 250, 750 y
+1000— mientras el control queda plano en 0,577 y 0,574.
 
-Y no se gana quedándose quieto: el video congelado da 0,493 y el modelo base 0,228, pero los dos
-**saturan** —el numerador cae por debajo del piso del instrumento y da exactamente cero en 24 y 38 de
-los 60 clips—. Entre los modelos que sí se mueven, que saturan en 1 o 2 de 60, la comparación es
-limpia.
+Y no se gana quedándose quieto: el video congelado da 0,496 y el modelo base 0,177, pero los dos
+**saturan** —el numerador cae por debajo del piso del instrumento y da exactamente cero en buena parte
+de los clips—. Entre los modelos que sí se mueven, que casi no saturan, la comparación es limpia, y el
+brazo con física (0,306) queda por debajo de la cota del video congelado (0,496).
 
 **Pero 51° no es poco.** ρ = 1 significa "dos movimientos sin ninguna relación", así que 0,43 equivale a un desacuerdo
 del 92 % de la magnitud del movimiento. La frase honesta no es "aprende la simetría" sino que la
@@ -192,37 +188,41 @@ preregistrada; a dos colas darían 0,085 y 0,124. Salida cruda en
 
 *Póster: sección «Resultados».*
 
-La métrica principal es el error de velocidad contra el simulador, y no se mueve.
+Ésta es la medición limpia: los **88 clips que nunca miramos**, con cada brazo en el checkpoint que
+eligió su propia validación —control en el paso 125, con física en el 875— sobre los mismos ocho
+candidatos.
 
-**Cada brazo se compara en su propio óptimo**, elegido por su propia validación sobre los mismos ocho
-candidatos: el control por su pérdida de difusión, que es todo lo que entrena, y el brazo con física
-por la suma de sus dos términos.
+| métrica | base | video quieto | control | con física | gana | p |
+|---|---|---|---|---|---|---|
+| **error de velocidad** (↓) | 9,134 | 9,261 | 5,110 | 4,945 | 48/88 | **0,362** |
+| razón de movimiento (→1) | 0,442 | 0,094 | 0,567 | 0,583 | 51/88 | 0,215 |
+| equivarianza normalizada (↓) | 0,177 | 0,496 | 0,562 | **0,306** | 72/88 | **<0,0001** |
+| jerk (↓) | 4,836 | 0,000 | 1,524 | 1,138 | 60/88 | <0,0001 |
+| MAE de aceleración (↓) | 2,015 | 1,260 | 1,729 | 1,663 | 45/88 | 0,162 |
 
-![Qué checkpoint elige cada brazo](figuras/seleccion_por_validacion.png)
+**En la métrica principal no hay diferencia** (p = 0,36), y tampoco en la razón de movimiento ni en el
+MAE de aceleración. Las dos que sí dan significativas son la equivarianza —lo que la pérdida pide— y el
+jerk, que es una de las que **gana un video quieto**: su cota es exactamente 0,000.
 
-*El control elige el paso 125 y el brazo con física el 875. En el panel derecho se ve por qué: el
-término de rotación baja a lo largo del entrenamiento mientras la difusión sube un poco, y la suma
-toca su mínimo donde lo primero ya bajó y lo segundo todavía no se degradó. Reproducible con
-`scripts_figuras/gen_seleccion_por_validacion.py`.*
+Las lecturas alternativas coinciden. Sobre los primeros 20 clips por escenario, en el paso 1000 sin
+selección alguna: 4,926 contra 4,994 (p = 0,31). En el 250: 5,189 contra 5,330 (p = 0,14).
 
-| métrica | control (125) | con física (875) | p |
-|---|---|---|---|
-| error de velocidad | 4,915 | 4,767 | 0,393 |
-| razón de movimiento | 0,604 | 0,617 | 0,730 |
-| jerk | 1,588 | 1,256 | 0,005 |
-| MAE de aceleración | 1,787 | 1,790 | 0,685 |
+### Un escenario donde sí mejora, y que replicó
 
-Ninguna diferencia en la métrica principal. Las dos lecturas alternativas dan lo mismo: en el paso
-1000 sin selección alguna, 4,926 contra 4,994 (p = 0,31); en el 250, 5,189 contra 5,330 (p = 0,14). El
-jerk sí da significativo, pero es una de las métricas que gana un video quieto, así que hay que leerlo
-junto a la razón de movimiento, que no cambia.
+| escenario | control | con física | n | p |
+|---|---|---|---|---|
+| **caída libre** | 4,946 | **3,966** | 28 | **<0,001** |
+| péndulo | 4,102 | 4,418 | 30 | 0,158 |
+| rebote | 6,272 | 6,386 | 30 | 0,404 |
 
-Por qué elegir checkpoint es un problema acá, y las tablas completas con el modelo base y las cotas
-triviales, están en el anexo.
+La mejora en caída libre era un hallazgo **post hoc**, encontrado mirando el conjunto de desarrollo. Que
+aparezca también en clips nunca vistos, con el checkpoint elegido de antemano, es una replicación: la
+saca de la categoría de exploratoria.
 
-**Sí hay un patrón por escenario**, y es post-hoc: en caída libre el brazo con física mejora y en
-rebote empeora. El del rebote tiene el mismo signo en los ocho checkpoints; el de caída libre cambia de
-signo en cuatro de ocho, así que sólo uno de los dos es una tendencia.
+Dos salvedades igual. Su signo **no es estable entre checkpoints** —en el conjunto de desarrollo cambia
+en cuatro de ocho—, y en caída libre el ground truth ya va a velocidad terminal, así que la respuesta
+correcta es una recta y la cota de velocidad constante da 0,02: es el escenario menos informativo de
+los tres. En **rebote**, que es donde hay impactos y donde aparece la pelota duplicada, no hay mejora.
 
 <a id="ladoalado"></a>
 
