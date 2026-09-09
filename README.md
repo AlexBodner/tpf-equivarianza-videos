@@ -62,8 +62,10 @@ por paso de entrenamiento, con un índice que rastrea cada archivo hasta su orig
 
 ![Las dos ramas de la pérdida](gifs/ramas_de_la_perdida.gif)
 
-*Checkpoint 250 del brazo con física. Las dos generaciones del mismo clip, con el mismo ruido: a la
-izquierda la escena original, a la derecha la escena rotada 45°. La pérdida compara la cinemática de una contra la de la otra rotada.*
+*Brazo con física, **‹checkpoint elegido por la pérdida de rotación›** — el video se va a regenerar
+con ese checkpoint cuando termine la medición en curso; el que se ve acá todavía es el del paso 250.
+Las dos generaciones del mismo clip, con el mismo ruido: a la izquierda la escena original, a la
+derecha la escena rotada 45°. La pérdida compara la cinemática de una contra la de la otra rotada.*
 
 En cada paso de entrenamiento el modelo genera el mismo clip dos veces, con el mismo ruido: una con la
 escena original y otra rotada. Si fuera equivariante, la cinemática de la segunda sería la de la
