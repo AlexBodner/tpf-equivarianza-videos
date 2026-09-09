@@ -405,6 +405,89 @@ ninguna conclusión sobre física aprendida.
 **Lo que arreglaría el instrumento** es medir la cinemática **por objeto** en vez de agregando sobre la
 escena, que es el primer punto de la sección 11.
 
+### Todas las evaluaciones sobre los checkpoints elegidos
+
+Control en el paso **250** (mínimo de su validación de difusión) y brazo con física en el paso
+**750** (mínimo de la suma de sus dos términos de validación). Mismos 30 clips held-out, misma
+semilla por clip. El modelo base y las cotas triviales van de referencia.
+
+#### Agregado sobre los 30 clips
+
+| métrica | base | control (250) | con física (750) | gana física | p (apareado) |
+|---|---|---|---|---|---|
+| error de velocidad (↓) | 9.258 | 4.838 | 5.225 | 10/30 | 0.184 |
+| razón de movimiento (→1) | 0.356 | 0.608 | 0.645 | 13/30 | 0.584 |
+| jerk (↓) | 2.710 | 1.592 | 1.101 | 22/30 | 0.004 |
+| MAE de aceleración (↓) | 1.931 | 1.746 | 1.755 | 15/30 | 0.968 |
+| pérdida de equivarianza cruda (↓) | 7.902 | 3.649 | 1.441 | 28/30 | 0.000 |
+| pérdida de equivarianza normalizada (↓) | 0.000 | 0.264 | 0.144 | 13/30 | 0.124 |
+
+#### Por escenario
+
+**caída libre**
+
+| métrica | base | control (250) | con física (750) | gana física | p |
+|---|---|---|---|---|---|
+| error de velocidad (↓) | 11.909 | 4.613 | 5.577 | 2/10 | 0.064 |
+| razón de movimiento (→1) | 0.471 | 0.664 | 0.574 | 1/10 | 0.020 |
+| jerk (↓) | 4.010 | 1.423 | 1.137 | 8/10 | 0.010 |
+| MAE de aceleración (↓) | 1.136 | 0.786 | 0.833 | 6/10 | 0.695 |
+| pérdida de equivarianza cruda (↓) | 13.094 | 2.170 | 1.053 | 9/10 | 0.004 |
+| pérdida de equivarianza normalizada (↓) | 0.000 | 0.081 | 0.000 | 2/10 | 0.500 |
+
+**péndulo**
+
+| métrica | base | control (250) | con física (750) | gana física | p |
+|---|---|---|---|---|---|
+| error de velocidad (↓) | 5.915 | 3.736 | 3.480 | 5/10 | 0.770 |
+| razón de movimiento (→1) | 0.504 | 0.649 | 0.878 | 8/10 | 0.020 |
+| jerk (↓) | 3.512 | 0.769 | 0.940 | 5/10 | 0.625 |
+| MAE de aceleración (↓) | 1.425 | 0.631 | 0.661 | 3/10 | 0.625 |
+| pérdida de equivarianza cruda (↓) | 10.399 | 3.128 | 0.929 | 10/10 | 0.002 |
+| pérdida de equivarianza normalizada (↓) | 0.000 | 0.477 | 0.000 | 8/10 | 0.008 |
+
+**rebote**
+
+| métrica | base | control (250) | con física (750) | gana física | p |
+|---|---|---|---|---|---|
+| error de velocidad (↓) | 9.950 | 6.163 | 6.620 | 3/10 | 0.275 |
+| razón de movimiento (→1) | 0.094 | 0.511 | 0.484 | 4/10 | 0.625 |
+| jerk (↓) | 0.607 | 2.584 | 1.226 | 9/10 | 0.010 |
+| MAE de aceleración (↓) | 3.232 | 3.820 | 3.771 | 6/10 | 0.695 |
+| pérdida de equivarianza cruda (↓) | 0.214 | 5.648 | 2.340 | 9/10 | 0.006 |
+| pérdida de equivarianza normalizada (↓) | 0.000 | 0.233 | 0.431 | 3/10 | 0.469 |
+
+#### Cotas triviales, por escenario
+
+| escenario | video quieto | velocidad constante | MAE estático |
+|---|---|---|---|
+| free_fall | 12.88 | 0.00 | 0.000 |
+| pendulum | 6.81 | 4.47 | 0.639 |
+| bouncing | 10.01 | 9.51 | 3.273 |
+
+En caída libre la cota de velocidad constante es **0,00**: el GT ya está en velocidad terminal,
+así que la respuesta correcta es una recta y ese escenario no puede sostener conclusiones.
+
+
+#### El hallazgo que deja esta tabla: las métricas de equivarianza las gana el modelo base
+
+En la fila de **pérdida de equivarianza normalizada** el modelo **base saca 0,000** —el puntaje
+perfecto— en los tres escenarios. Y en rebote también gana jerk por lejos (0,607 contra 2,584 del
+control). El base es el peor modelo de los tres por error de velocidad (9,26 contra 4,84) y aun así
+gana las dos métricas de equivarianza y una de suavidad.
+
+La razón es mecánica: el base se mueve un tercio de lo que debería (razón de movimiento 0,356, y sólo
+0,094 en rebote). Con tan poco movimiento el desacuerdo entre ramas cae **por debajo del piso de
+RAFT**, el numerador se recorta en cero y la pérdida normalizada da exactamente 0. Es decir que la
+normalización —que era nuestra defensa contra la ruta degenerada— **también la gana el que menos se
+mueve**, sólo que por el piso en vez de por la escala.
+
+Esto deja el error de velocidad y la razón de movimiento como las únicas dos métricas donde el base
+queda claramente último, y es exactamente por eso que son las primarias. Cualquier lectura de las otras
+cuatro tiene que ir acompañada de la fila del base y de la razón de movimiento.
+
+
+
 **Qué habría que cambiar para la próxima corrida.** La validación corre cada 50 pasos y los checkpoints
 se guardan cada 125: sólo coinciden en cuatro puntos, así que la mitad de los checkpoints nunca pudo
 entrar en ninguna regla. Alcanza con alinear las dos cadencias. Y hay que registrar en validación la
