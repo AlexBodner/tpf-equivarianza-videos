@@ -76,6 +76,14 @@ con ese checkpoint cuando termine la medición en curso; el que se ve acá todav
 Las dos generaciones del mismo clip, con el mismo ruido: a la izquierda la escena original, a la
 derecha la escena rotada 45°. La pérdida compara la cinemática de una contra la de la otra rotada.*
 
+![Qué ve la pérdida](gifs/que_ve_la_perdida.gif)
+
+*De izquierda a derecha: el video, el campo de flujo que devuelve RAFT (el tono es la dirección, el
+brillo la magnitud), y el único vector que queda después de agregar toda la escena. **Ese vector, uno
+por cuadro, es todo lo que la pérdida mira.** Ahí se ve por qué dos objetos moviéndose en direcciones
+opuestas se cancelan: el agregado promedia la escena entera. Archivo:
+`videos/18_que_ve_la_perdida.mp4`, generado con `scripts_figuras/gen_que_ve_la_perdida.py`.*
+
 En cada paso de entrenamiento el modelo genera el mismo clip dos veces, con el mismo ruido: una con la
 escena original y otra rotada. Si fuera equivariante, la cinemática de la segunda sería la de la
 primera rotada. La inconsistencia entre ambas es toda la señal de entrenamiento, y no requiere
@@ -181,6 +189,10 @@ Archivos: `videos/08_equivarianza_*_velocidad.mp4`, `videos/01_pendulo_bien_paso
 Los dos brazos entrenan con el mismo clip, el mismo ruido y los mismos pesos iniciales; lo único que
 los separa es la pérdida de equivarianza. Acá generan el **mismo clip**, así que la diferencia que se
 ve es atribuible a la pérdida y a nada más.
+
+> **Pendiente:** estos videos se van a regenerar con el checkpoint que elija la regla de validación
+> —la misma que decide la comparación principal— cuando termine la medición en curso. Los de ahora son
+> del paso 250.
 
 Los videos de esta sección son del **checkpoint 250 de ambos brazos**, y conviene ser claro sobre por
 qué: no porque sea el mejor (no lo es, ver [Los números](#numeros)), sino porque es el único paso donde se generaron
