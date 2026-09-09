@@ -13,6 +13,18 @@ entrenamiento. Las instancias de AWS son efímeras: acá está la copia durable.
 | `informes/` | `RESULTADOS.md` (lectura), `NUMEROS_EN_CRUDO.md` (todas las tablas) y el prerregistro con sus 33 enmiendas, que documenta cada decisión con su fecha y si se tomó antes o después de ver los datos. |
 | `diag_raft.txt`, `diag_raft_vel.txt` | la salida cruda del diagnóstico del instrumento sobre aceleración y sobre velocidad. |
 
+## Las evaluaciones, y cuál sirve para qué
+
+| evaluación | qué mide | brazos | estado |
+|---|---|---|---|
+| `*paso_N.json`, `indist`, `ood` | trayectoria: error de velocidad, razón de movimiento, jerk, MAE de aceleración, y las cotas triviales | base, control y con física, apareados | **es la que sostiene los resultados** |
+| las columnas `l_rot` y `l_rot_norm` de esos mismos JSON | equivarianza | los tres | **medidas sobre aceleraciones**, que sobre video generado son ruido. No interpretables. Se rehacen sobre velocidades |
+| `equiv_por_checkpoint.json` | equivarianza sobre velocidades, fuera del bucle de entrenamiento | control y con física | correcta, n = 12 por checkpoint |
+| `*equiv*.txt`, `*diagnostico_completo.log` | equivarianza directa: diferencia de píxeles y coseno entre ramas | control y con física | correcta, n = 9, sólo en los pasos 250 y 1000 |
+| `*analisis*.txt` (ajuste de parámetros físicos) | residuo del ajuste, aceleración recuperada, ω, amplitud, g | **sólo el brazo con física** | **no usar para comparar.** No tiene control al lado, así que no permite ninguna comparación; además el trazador de centroides detecta entre el 55 % y el 81 % de los cuadros, y en caída libre el ajuste parabólico mide suavidad y no gravedad, porque el ground truth ya va a velocidad terminal |
+
+Ninguna afirmación del README ni del póster se apoya en la última fila.
+
 ## Qué no está acá
 
 Los pesos LoRA de los checkpoints (2,1 GB por corrida) no entran en un repositorio de git. Están en la
