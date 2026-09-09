@@ -70,10 +70,10 @@ Ni la regla de selección ni ninguno de los análisis exploratorios tocaron esos
 
 ![Las dos ramas de la pérdida](gifs/ramas_de_la_perdida.gif)
 
-*Brazo con física, **‹checkpoint elegido por la pérdida de rotación›** — el video se va a regenerar
-con ese checkpoint cuando termine la medición en curso; el que se ve acá todavía es el del paso 250.
-Las dos generaciones del mismo clip, con el mismo ruido: a la izquierda la escena original, a la
-derecha la escena rotada 45°. La pérdida compara la cinemática de una contra la de la otra rotada.*
+*Brazo con física, paso 250: es el único checkpoint donde se guardaron las dos ramas del mismo clip.
+Sirve para ver qué compara la pérdida, que es lo que ilustra esta sección; la comparación entre los
+checkpoints elegidos está más abajo. Las dos generaciones del mismo clip con el mismo ruido: a la
+izquierda la escena original, a la derecha la escena rotada 45°.*
 
 ![Qué ve la pérdida](gifs/que_ve_la_perdida.gif)
 
@@ -122,16 +122,18 @@ imagen. En los ocho checkpoints el brazo con física es más equivariante, en la
 | ángulo entre las dos ramas (0° sería perfecto) | 63° | **51°** |
 | ρ, la fracción del movimiento que viola la simetría | 0,596 | **0,427** |
 
-Son los valores del checkpoint final; la diferencia no es casualidad (p = 0,012). Y se repite con más
-clips y en el conjunto limpio: en los **88 clips que nunca miramos**, con cada brazo en su checkpoint
-elegido, la cantidad normalizada da **0,306 contra 0,562** del control, ganando en 72 de los 88 clips
-(p < 0,0001). Además **mejora con el entrenamiento** —0,455 · 0,419 · 0,366 en los pasos 250, 750 y
-1000— mientras el control queda plano en 0,577 y 0,574.
+**La evidencia fuerte es el test final**: en los **88 clips que nunca miramos**, con cada brazo en su
+checkpoint elegido, la cantidad normalizada da **0,306 contra 0,562** del control, ganando en 72 de los
+88 clips (p < 0,0001).
 
-Y no se gana quedándose quieto: el video congelado da 0,496 y el modelo base 0,177, pero los dos
-**saturan** —el numerador cae por debajo del piso del instrumento y da exactamente cero en buena parte
-de los clips—. Entre los modelos que sí se mueven, que casi no saturan, la comparación es limpia, y el
-brazo con física (0,306) queda por debajo de la cota del video congelado (0,496).
+La serie por checkpoint de más arriba sirve para ver que el signo no se invierte, pero **no es evidencia
+independiente**: se midió sobre 3 escenas (una por escenario) con sus 4 variantes aumentadas cada una,
+así que las 12 mediciones no son 12 clips distintos. Por eso van sin p.
+
+Y no se gana quedándose quieto, pero eso hay que apoyarlo en la **razón de movimiento**, no en la cota:
+el brazo con física se mueve igual o un poco más que el control (0,583 contra 0,567). La cota del video
+congelado no sirve acá porque **satura en 45 de los 88 clips** —el numerador cae por debajo del piso del
+instrumento y da exactamente cero—, y el modelo base todavía más.
 
 **Pero 51° no es poco.** ρ = 1 significa "dos movimientos sin ninguna relación", así que 0,43 equivale a un desacuerdo
 del 92 % de la magnitud del movimiento. La frase honesta no es "aprende la simetría" sino que la
@@ -159,16 +161,16 @@ Fuera del bucle, en 9 pares del checkpoint 1000, el brazo gana en las tres canti
 contra 0,37, desacuerdo 0,45 contra 0,64 y diferencia de píxeles 4,99 contra 5,38. En el checkpoint
 250 esa última daba a favor del control (5,07 contra 4,78): se da vuelta recién al final.
 
-| paso | ρ control | ρ física | ángulo control | ángulo física | p |
-|---|---|---|---|---|---|
-| 125 | 0,587 | **0,417** | 65° | **48°** | 0,016 |
-| 250 | 0,597 | 0,522 | 64° | 60° | 0,791 |
-| 375 | 0,597 | **0,419** | 61° | **53°** | 0,021 |
-| 500 | 0,527 | **0,388** | 59° | **51°** | 0,064 |
-| 625 | 0,626 | **0,404** | 67° | **53°** | 0,042 |
-| 750 | 0,602 | 0,446 | 64° | 52° | 0,233 |
-| 875 | 0,508 | 0,460 | 59° | 55° | 0,110 |
-| 1000 | 0,596 | **0,427** | 63° | **51°** | 0,012 |
+| paso | ρ control | ρ física | ángulo control | ángulo física |
+|---|---|---|---|---|
+| 125 | 0,587 | **0,417** | 65° | **48°** |
+| 250 | 0,597 | 0,522 | 64° | 60° |
+| 375 | 0,597 | **0,419** | 61° | **53°** |
+| 500 | 0,527 | **0,388** | 59° | **51°** |
+| 625 | 0,626 | **0,404** | 67° | **53°** |
+| 750 | 0,602 | 0,446 | 64° | 52° |
+| 875 | 0,508 | 0,460 | 59° | 55° |
+| 1000 | 0,596 | **0,427** | 63° | **51°** |
 
 **Cuánto importaba medir la cantidad correcta**, en la misma comparación de n = 60 del paso 250: sobre
 velocidades la equivarianza normalizada da 0,577 contra 0,455 con p = 0,0015 y gana en 42 de 60 clips;
@@ -191,6 +193,16 @@ preregistrada; a dos colas darían 0,085 y 0,124. Salida cruda en
 Ésta es la medición limpia: los **88 clips que nunca miramos**, con cada brazo en el checkpoint que
 eligió su propia validación —control en el paso 125, con física en el 875— sobre los mismos ocho
 candidatos.
+
+Tres advertencias sobre esa regla, porque no es tan limpia como suena. **No estaba preregistrada**: se
+fijó el 9 de septiembre, después de haber visto las evaluaciones de desarrollo. Es **asimétrica**, porque
+cada brazo se elige por un criterio distinto —el control por difusión sola, el brazo con física por la
+suma de sus dos términos—. Y **decide por un margen mínimo**: entre el paso 875 (0,1089) y el 375
+(0,1091) hay un 0,2 %. La elección preregistrada, que no selecciona nada, es el paso 1000, y sobre los
+primeros 20 clips da lo mismo (4,926 contra 4,994, p = 0,31).
+
+Son 88 clips y no 90 porque dos de caída libre son más cortos que la ventana de condicionamiento y el
+evaluador los saltea; el salteo es del clip, así que afecta a los dos brazos por igual.
 
 | métrica | base | video quieto | control | con física | gana | p |
 |---|---|---|---|---|---|---|
@@ -365,7 +377,9 @@ receta **sin** el término físico, así que la diferencia entre las dos es el p
 | barrido BPTT, ventana completa | 150 | 18,8 GB | 26,0 GB | 27,8 | 1,0 | 2 |
 | barrido BPTT, ventana de 4 pasos | 150 | 15,5 GB | 22,8 GB | 21,6 | 0,8 | 1,5 |
 
-**Imponer la simetría cuesta 3,1× la memoria y 3,8× el tiempo** de entrenar sólo con difusión. Es lo
+**Imponer la simetría cuesta 3,1× la memoria y 4,6× el tiempo total** —16,0 horas contra 3,5— de
+entrenar sólo con difusión. Los segundos por paso de la tabla son medianas, y en mediana la relación es
+3,8×; la diferencia entre las dos cifras son los pasos lentos, que pesan más en el total. Es lo
 que se paga por generar, decodificar y estimar el flujo *dentro* del paso de entrenamiento, y
 retropropagar por todo eso. El pico de 28,5 GB es el que decide qué GPU hace falta: con 24 GB no entra
 a esta resolución y largo de clip.
@@ -398,7 +412,6 @@ pueda verificar, y porque los caminos que no funcionaron explican por qué el di
 
 ---
 
-# Anexo
 
 Todo lo que sigue está plegado: se despliega con un clic. Acá van las tablas completas, la validación
 del instrumental y los experimentos que no funcionaron. Nada de esto hace falta para entender el
@@ -412,9 +425,7 @@ diseño final es como es.
 
 > ⚠️ **Estas tablas usan el paso 750 para el brazo con física**, que era el que elegía la regla que
 > después resultó estar mal medida. Los números son mediciones reales de ese checkpoint, pero **ya no
-> es "el mejor"**: se rehacen con el checkpoint que elija la validación corregida, que está corriendo.
-> Lo que no cambia es la conclusión, porque en el paso 1000 y en el 250 —las dos elecciones que sí se
-> sostienen— tampoco hay diferencia.
+> es "el mejor"**: el resultado que vale es el del test final, más arriba. La conclusión no cambia.
 
 Control en el paso **250** (mínimo de su validación de difusión) y brazo con física en el paso
 **750** (mínimo de la suma de sus dos términos de validación). Mismos 30 clips held-out, misma
@@ -533,7 +544,7 @@ relevante es que **las dos elecciones dan la misma respuesta**: nada se distingu
 | métrica | control | con física | mejor | p |
 |---|---|---|---|---|
 | error de velocidad (↓) | 4,895 | 5,009 | 24/60 | 0,299 |
-| razón de movimiento (→1) | 0,616 | 0,598 | 29/60 | 0,802 |
+| razón de movimiento (→1) | 0,616 | 0,598 | 30/60 | 0,802 |
 | jerk (↓) | 1,640 | 1,495 | 35/60 | 0,067 |
 | MAE de aceleración (↓) | 1,828 | 1,880 | 24/60 | 0,126 |
 
@@ -661,10 +672,9 @@ quedó guardado. Además la diferencia entre el 250 y el 1000 es del 3,7 % cuand
 8,6 % a lo largo del entrenamiento: está dentro del ruido. Para la próxima corrida alcanza con alinear
 las dos cadencias y registrar en validación la cantidad normalizada con el piso restado.</sub>
 
-**Lo que falta para cerrar la pregunta.** Una selección por el objetivo físico necesita medir la
-equivarianza sobre velocidades, fuera del bucle, en los checkpoints de los **dos** brazos. Esa medición
-está corriendo: 8 checkpoints por brazo, con el piso pedido sobre velocidades. Hasta que esté, la
-elección primaria sigue siendo el paso 1000, que es la preregistrada y no selecciona nada.
+**Cómo se cerró.** Se midió la equivarianza sobre velocidades, fuera del bucle, en los ocho checkpoints
+de los **dos** brazos, y se revalidaron los ocho de cada uno. Con eso la elección quedó en control 125 y
+física 875, con las salvedades que están arriba.
 
 </details>
 
@@ -678,9 +688,7 @@ sino que el instrumento se rompe. Tres comprobaciones.
 
 > ⚠️ **Estas tablas usan el paso 750 para el brazo con física**, que era el que elegía la regla que
 > después resultó estar mal medida. Los números son mediciones reales de ese checkpoint, pero **ya no
-> es "el mejor"**: se rehacen con el checkpoint que elija la validación corregida, que está corriendo.
-> Lo que no cambia es la conclusión, porque en el paso 1000 y en el 250 —las dos elecciones que sí se
-> sostienen— tampoco hay diferencia.
+> es "el mejor"**: el resultado que vale es el del test final, más arriba. La conclusión no cambia.
 
 **No lo arruinan unos pocos clips.** Descartando el peor clip de cada brazo, después los dos peores, y
 así hasta cinco, la brecha entre brazos queda igual: +0,39 · +0,35 · +0,32 · +0,34 · +0,41. La
