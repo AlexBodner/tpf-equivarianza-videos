@@ -782,8 +782,8 @@ ventana, sobre la pérdida arreglada y la cantidad que sí tiene señal.
 
 ![Barrido de ventanas de BPTT](figuras/barrido_ventanas_bptt.png)
 
-*Izquierda: la pérdida física en entrenamiento, mediana móvil centrada sobre los 147 pasos con física
-de cada brazo; las curvas se cruzan todo el tiempo. Derecha: la misma pérdida en validación, donde hay
+*Izquierda: la pérdida física en entrenamiento, mediana por ventanas de quince pasos sobre los 147 de
+cada brazo; las curvas se cruzan todo el tiempo. Derecha: la misma pérdida en validación, donde hay
 sólo tres mediciones por brazo. Los brazos están agrupados por **cuántos pasos de Euler se retropropagan**,
 que es de lo que depende el costo: la cola y la ventana no contigua usan cuatro y cuestan lo mismo.
 Reproducible con `scripts_figuras/gen_fig_barrido_ventanas.py`.*

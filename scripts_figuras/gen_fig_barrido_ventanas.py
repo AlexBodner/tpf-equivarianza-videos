@@ -34,10 +34,18 @@ def cargar(a):
         tr[d["step"]] = max(n - piso, 0.0) / max(dd - piso, piso if piso > 0 else 1e-9)
     return tr, val
 
-def mediana_movil(v, k=15):
-    """Centrada: sin transitorio de arranque, y robusta a los picos por paso."""
-    h = k // 2
-    return [st.median(v[max(0, i - h): min(len(v), i + h + 1)]) for i in range(len(v))]
+def por_ventanas(xs, v, k=15):
+    """Mediana por ventanas de k pasos, no una móvil.
+
+    La móvil sobre datos con picos hace escalones y se ve mal; y con 147 pasos por brazo
+    no hay resolución para una curva por paso. Diez puntos por brazo es lo que hay.
+    """
+    px, py = [], []
+    for i in range(0, len(v), k):
+        tramo = v[i:i + k]
+        if not tramo: continue
+        px.append(st.mean(xs[i:i + k])); py.append(st.median(tramo))
+    return px, py
 
 D = {a: cargar(a) for a, _, _, _ in BR}
 PASOS_VAL = [50, 100, 150]
@@ -45,9 +53,9 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13.5, 4.8))
 
 for a, eti, k, col in BR:
     tr = D[a][0]; xs = sorted(tr)
-    ax1.plot(xs, mediana_movil([tr[x] for x in xs]), color=col, lw=2.3,
-             label=f"{eti} ({k} pasos)")
-ax1.set_title("(a) entrenamiento: 147 pasos con física por brazo", fontsize=12)
+    px, py = por_ventanas(xs, [tr[x] for x in xs])
+    ax1.plot(px, py, "o-", color=col, lw=2.1, ms=6, label=f"{eti} ({k} pasos)")
+ax1.set_title("(a) entrenamiento: mediana por ventanas de 15 pasos", fontsize=12)
 ax1.set_ylabel("pérdida física"); ax1.set_xlabel("paso de entrenamiento")
 ax1.set_ylim(bottom=0)
 
