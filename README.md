@@ -5,14 +5,23 @@ de difusión de video **sin ground truth físico**, imponiendo una simetría: si
 cinemática de lo generado tiene que rotar igual. El movimiento se estima con RAFT (flujo óptico) sobre
 los propios videos generados, y todo se retropropaga hasta los pesos.
 
-Con el método tal como está hoy **no logramos mejorar la física generada**, y las secciones de abajo
-cuentan por qué, experimento por experimento. La conclusión no es que la idea no sirva, sino algo más
-concreto y más accionable: la pérdida ve una versión **parcial y cruda** de lo que el modelo genera
-—de los 32 vectores de velocidad del clip mira 24 en péndulo y rebote, pero sólo 12 o 16 en caída
-libre, y los calcula sobre una generación de 12 pasos de Euler y no de los 20 de la inferencia—, y
-contra esa señal incompleta el entrenamiento termina introduciendo
-**corrupciones** en la imagen que bajan la pérdida sin mejorar la dinámica. Cada sección indica a qué
-parte del póster corresponde.
+El resultado tiene dos mitades y conviene separarlas.
+
+**La restricción se aprende.** Medido fuera del bucle de entrenamiento, sobre clips que el modelo nunca
+vio y contra un control idéntico salvo por la pérdida, las velocidades de las dos ramas pasan de estar
+a 63° de diferencia en el control a 51° en el brazo entrenado, y la ventaja es consistente en los ocho
+checkpoints. Pero conviene no exagerarlo: 51° sigue estando lejos de los 0° de la simetría perfecta, y
+toda la ventaja aparece en los primeros 125 pasos y después se estanca.
+
+**Y no se traduce en mejor física.** El error de velocidad contra el ground truth del simulador no
+mejora, y fuera de distribución el modelo degenera. Lo que sí podemos señalar como causa —medido, no
+conjeturado— es **cómo** el modelo satisface la restricción: se mueve menos, y descubre que partir la
+pelota en dos hace que el flujo agregado de la escena se cancele. Las dos cosas bajan la pérdida sin
+mejorar la dinámica. A eso se suma que la pérdida ve una versión parcial de lo generado —24 de 32
+vectores de velocidad en péndulo y rebote, 12 o 16 en caída libre, sobre 12 pasos de Euler contra los
+20 de la inferencia— aunque **eso último es una hipótesis, no algo que hayamos medido**.
+
+Cada sección indica a qué parte del póster corresponde.
 
 **Los pesos y el archivo completo de videos están en Hugging Face:
 [AlexBodner/tpf-equivarianza-video](https://huggingface.co/AlexBodner/tpf-equivarianza-video).** Acá
@@ -30,8 +39,8 @@ por paso de entrenamiento, con un índice que rastrea cada archivo hasta su orig
 >
 > | qué | estado | qué sección cambia |
 > |---|---|---|
-> | Elección de checkpoint de cada brazo, por su propia validación sobre los **mismos 8 candidatos** | corriendo | 8 |
-> | Evaluación con las métricas de equivarianza medidas sobre **velocidades** (hoy están sobre aceleraciones y no son interpretables) | corriendo | 8 |
+> | Elección de checkpoint de cada brazo, por su propia validación sobre los **mismos 8 candidatos** | corriendo | 7 |
+> | Evaluación con las métricas de equivarianza medidas sobre **velocidades** (hoy están sobre aceleraciones y no son interpretables) | corriendo | 7 |
 > | **Test final** sobre los 30 clips por escenario que nunca se miraron (n = 90) | corriendo | va a ser el resultado principal |
 >
 > Lo que **no** va a cambiar: el error de velocidad nunca estuvo afectado por el defecto de medición,
@@ -97,11 +106,15 @@ estimador (lo que RAFT se contradice a sí mismo al rotar un video real):
 
 $$\mathcal{L}_{\text{rot}} \;=\; \frac{N - A}{\max\left(D - A,\; A\right)}
 \qquad
-N = \lVert R(\theta)\,\hat a_{\text{orig}} - \hat a_{\text{rot}} \rVert^2
+N = \lVert R(\theta)\,\hat q_{\text{orig}} - \hat q_{\text{rot}} \rVert^2
 \qquad
-D = \lVert \hat a_{\text{orig}} \rVert^2 + \lVert \hat a_{\text{rot}} \rVert^2$$
+D = \lVert \hat q_{\text{orig}} \rVert^2 + \lVert \hat q_{\text{rot}} \rVert^2$$
 
-Restar $A$ es correcto: sin eso la pérdida premia generar aceleraciones enormes, porque el ruido pesa
+donde $\hat q$ es la cantidad cinemática sobre la que se impone la simetría. En la corrida que se
+reporta acá es la **velocidad**; se puede aplicar igual sobre aceleraciones, y por qué eso no funcionó
+está en la sección 9.
+
+Restar $A$ es correcto: sin eso la pérdida premia generar movimiento enorme, porque el ruido pesa
 proporcionalmente menos. El problema es qué pasa cuando el modelo **deja de moverse**. Ahí
 $N \to 0$ y $D \to 0$, y la pérdida tiende a
 
@@ -456,7 +469,7 @@ sobre aceleraciones. Es el mismo defecto que se corrigió en la validación del 
 `bbc6778d`), que nunca se aplicó acá.
 
 Importa porque la aceleración estimada sobre video generado es **ruido**: el diagnóstico de la
-sección 4 mide un acuerdo de 0,07. Así que el "28 de 30 clips, p < 0,001" de esas filas no es evidencia
+sección 9 mide un acuerdo de 0,07. Así que el "28 de 30 clips, p < 0,001" de esas filas no es evidencia
 de simetría aprendida; es una diferencia en una cantidad que no mide lo que dice.
 
 Se nota en la fila del **modelo base**, que saca 0,000 —el puntaje perfecto— en la versión normalizada
@@ -658,7 +671,7 @@ velocidad del clip: 24 en péndulo y rebote, 12 o 16 en caída libre (contado so
 corrida). El modelo puede degradar lo que la pérdida no mira. Conviene decir hasta dónde llega esta
 explicación: **no está medido** que la corrupción viva en los cuadros excluidos, y la degeneración más
 fuerte aparece fuera de distribución, donde la pérdida no vio ningún vector. Lo que sí está medido son
-los dos atajos de la sección 7, que operan sobre cuadros que la pérdida **sí** mira. Las correcciones
+los dos atajos de la sección 6, que operan sobre cuadros que la pérdida **sí** mira. Las correcciones
 de la última sección apuntan a las dos cosas.
 
 <a id="aceleracion"></a>
