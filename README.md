@@ -267,9 +267,16 @@ evaluador los saltea; el salteo es del clip, así que afecta a los dos brazos po
 |---|---|---|---|---|---|---|
 | **error de velocidad** (↓) | 9,134 | 9,261 | 5,110 | 4,945 | 48/88 | **0,362** |
 | razón de movimiento (→1) | 0,442 | 0,094 | 0,567 | 0,583 | 51/88 | 0,215 |
-| equivarianza normalizada (↓) | 0,177 | 0,496 | 0,562 | **0,306** | 72/88 | **<0,0001** |
-| jerk (↓) | 4,836 | 0,000 | 1,524 | 1,138 | 60/88 | <0,0001 |
+| equivarianza normalizada (↓) | 0,177 \* | 0,496 \* | 0,562 | **0,306** | 72/88 | **<0,0001** |
+| jerk (↓) | 4,836 | 0,000 \* | 1,524 | 1,138 | 60/88 | <0,0001 |
 | MAE de aceleración (↓) | 2,015 | 1,260 | 1,729 | 1,663 | 45/88 | 0,162 |
+
+\* **Estas celdas no se pueden leer como si fueran puntajes.** El 0,177 del base y el 0,496 del video
+quieto salen de **saturación**: cuando el movimiento no supera al piso del estimador el numerador
+clampea y la métrica da exactamente 0, que es puntaje perfecto. Pasa en 24 de 28 clips del base y 21 de
+28 del video quieto en caída libre, y **nunca** en los dos brazos entrenados. El 0,000 del jerk es la
+misma historia sin normalizar: un video congelado no tiene jerk. La comparación que sí vale es control
+contra física, que es la de la columna `p`.
 
 **En la métrica principal no hay diferencia** (p = 0,36), y tampoco en la razón de movimiento ni en el
 MAE de aceleración. Las dos que sí dan significativas son la equivarianza (lo que la pérdida pide) y el
@@ -458,20 +465,17 @@ es válido como razón; su traslado a la configuración de 33 cuadros no está m
 
 *Póster: sección «Trabajo futuro».*
 
-1. **Enriquecer el observable antes que buscar otra simetría.** Reducida la escena a un vector por
-   cuadro, las únicas transformaciones con acción no trivial son las de O(2), y ahí se agota el grupo
-   disponible: no es que falte imaginación, es que el observable no da para más. El campo de flujo
-   completo habilita además **penalizar el flujo que no tiene correspondencia** en la rama transformada,
-   que es lo que hoy permite que dos objetos opuestos se cancelen, y hay que hacerlo robusto a
-   generaciones ruidosas o rotas.
-2. **Medir la traslación antes de imponerla.** Que la ley no dependa de dónde ocurre es la más simple de
-   las propiedades disponibles, y trasladar no introduce remuestreo, así que no contamina el piso del
-   estimador. **Nunca se midió**: el término corrió en λ = 0 y las 7010 filas de registro que lo
-   contienen dan exactamente 0,0. Es una pasada de generación sobre el checkpoint que se reporta, sin
-   entrenar nada, y devuelve un número que cierra la pregunta en un sentido o en el otro.
-3. **Reflexión**, con la salvedad de que es el mismo enunciado que la rotación con otra matriz
-   ortogonal, no una propiedad nueva. Lo que aporta es que es exacta a nivel de píxel, así que sirve
-   para separar cuánto del piso `A` es RAFT y cuánto es el remuestreo de `grid_sample`.
+1. **Usar bien el flujo óptico, en escenas más complejas.** Hoy toda la escena se reduce a *un* vector
+   por cuadro, y por eso dos objetos que se mueven al revés se cancelan. Con el campo completo se puede
+   **penalizar el flujo que no tiene correspondencia** en la rama transformada, que castiga justamente
+   al objeto que aparece de más, y hay que hacerlo robusto a generaciones ruidosas o rotas.
+2. **Sumar traslación y reflexión.** La traslación pide que la ley no dependa de dónde ocurre y no
+   introduce remuestreo. La reflexión no es una propiedad nueva, es la rotación con otra matriz
+   ortogonal, pero al ser exacta a nivel de píxel sirve para separar cuánto del piso `A` es RAFT y
+   cuánto es el remuestreo de `grid_sample`.
+3. **Un portón de confianza sobre la energía del movimiento**, en la línea del recorte de PPO. El
+   guardián de margen es su caso degenerado: absoluto contra el piso, de un solo lado y con corte duro.
+   El detalle de las tres diferencias está en [PENDIENTES.md](PENDIENTES.md).
 4. **Que la pérdida vea todo lo que el modelo genera**: hoy mira 24 de 32 vectores en péndulo y
    rebote, 12 o 16 en caída libre, y una generación de 12 pasos de Euler en vez de 20. Es una hipótesis
    razonable (no comprobada) que la corrupción se aloje en lo que queda fuera.
@@ -1015,7 +1019,7 @@ que no se puede ganar moviéndose más o menos.
 <details>
 <summary><b>La pérdida original colapsa al video quieto</b>: el primer intento: la fórmula tenía su mínimo global en un video sin movimiento</summary>
 
-*Póster: sección «Diagnóstico y corrección».*
+*Póster: sección «Lo que apareció experimentando».*
 
 ![Colapso contra el control](gifs/colapso_vs_control.gif)
 
@@ -1065,7 +1069,7 @@ Archivo: `videos/12_colapso_vs_control_paso100.mp4`
 <details>
 <summary><b>Un desvío que no hacía falta: la pérdida sobre aceleración</b>: por qué la aceleración nunca fue necesaria y qué pasó cuando la usamos</summary>
 
-*Póster: sección «Diagnóstico y corrección».*
+*Póster: sección «Lo que apareció experimentando».*
 
 **Por qué está acá abajo y no en el hilo principal.** La restricción que este trabajo impone es de
 **rotación**, y bajo una rotación la velocidad es tan equivariante como la aceleración: si se rota la
