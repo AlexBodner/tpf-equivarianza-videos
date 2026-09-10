@@ -926,19 +926,47 @@ pasos de Euler. Retropropagar por los doce cuesta memoria y tiempo, así que la 
 alcanza con una ventana. Ese parámetro es `physics_n_bptt` (cuántos pasos llevan gradiente) junto con
 `physics_bptt_steps` (cuáles).
 
-**Lo que está medido y no depende de la pérdida elegida:**
+La pregunta tiene dos mitades, y conviene no confundirlas: **cuánta dirección conserva una ventana** es
+una cuenta que se hace en cada paso, y **qué pasa si entrenás siguiéndola** es un experimento. Tenemos
+las dos, y dan lo mismo.
 
-- **El perfil del gradiente por paso de Euler es en U**, no concentrado al principio: los primeros
-  cuatro pasos aportan un 33-34 % de la norma y los últimos cuatro un 47-48 %, con el máximo en el
-  paso 11. Verificado sobre dos corridas independientes (656 y 538 pasos), coincidiendo dentro de un
-  punto porcentual.
-- **El BPTT completo cuesta un 29 % más por paso** que cualquier ventana truncada (27,8 s/paso contra
-  21,6-21,7 en los brazos de abajo). Ojo con el absoluto: **el barrido corrió a 24 cuadros**, la mitad
-  de la ventana cinemática de la corrida principal, que a 33 cuadros paga 46,7 s/paso con esa misma
-  ventana completa. El 29 % es una razón interna al barrido, donde los cinco brazos comparten el largo.
+### Primera mitad: cuánta dirección conserva truncar
 
-**Lo que el barrido no logra decidir.** Se corrieron **cinco** brazos de 150 pasos, idénticos salvo la
-ventana, sobre la pérdida arreglada y la cantidad que sí tiene señal.
+El entrenador registra, en cada paso, las 12 normas de los aportes de cada paso de Euler al gradiente y
+**los 66 cosenos entre pares**. Eso determina la matriz de Gram de los doce vectores, y el coseno entre
+la suma de cualquier subconjunto y la suma completa sale de ahí por álgebra, sin recalcular ningún
+gradiente. Medido sobre los **869 pasos de la corrida que se reporta**:
+
+![Cuánta dirección conserva cada ventana](figuras/truncamiento_direccion.png)
+
+*Reproducible con `scripts/coseno_truncamiento_bptt.py` en el repositorio de código.*
+
+- **Se puede truncar.** Cuatro pasos de los doce conservan entre **0,86 y 0,93** de la dirección del
+  gradiente exacto. La cola de DRaFT-K da 0,86, y una ventana no contigua elegida a mano, 0,93. Incluso
+  un solo paso, el último, da 0,79.
+- **El perfil de la norma es en U**: los primeros cuatro pasos aportan el 36 % y los últimos cuatro el
+  47 %. Eso coincide con lo medido antes sobre otras corridas (33-34 % y 47-48 %).
+- **La cifra vieja de 0,28 para la cola de DRaFT-K queda anulada**: salía de las corridas sobre
+  aceleración, que es la cantidad que después resultó ser ruido. Sobre velocidad son 0,86.
+- Es una afirmación **por paso**: dice que la dirección truncada apunta casi para el mismo lado que la
+  exacta en ese momento, no qué pasa después de seguirla mil veces.
+
+Dos chequeos antes de creerle al número: no falta **ninguno** de los 132 cosenos fuera de la diagonal en
+ninguno de los 869 pasos (si faltara uno, el código lo tomaría como ortogonal y el resultado sería
+basura), y las matrices reconstruidas son de Gram válidas, con autovalor mínimo de −2,3e−4 relativo a la
+entrada más grande, que es el redondeo de los escalares guardados.
+
+**El costo**: el BPTT completo cuesta un 29 % más por paso que cualquier ventana truncada (27,8 s/paso
+contra 21,6-21,7). Ojo con el absoluto: **el barrido corrió a 24 cuadros**, la mitad de la ventana
+cinemática de la corrida principal, que a 33 cuadros paga 46,7 s/paso con esa misma ventana completa. El
+29 % es una razón interna al barrido, donde los cinco brazos comparten el largo.
+
+### Segunda mitad: qué pasa si entrenás con esas direcciones
+
+Ésta es la prueba empírica de la primera. Se corrieron **cinco** brazos de 150 pasos, idénticos salvo la
+ventana, sobre la pérdida arreglada y la cantidad que sí tiene señal. **No se distinguen**, y visto
+desde el coseno era lo esperable: si toda ventana razonable retiene más del 85 % de la dirección, 150
+pasos no alcanzan para separarlas. Las dos mitades cuentan la misma historia desde lados distintos.
 
 ![Barrido de ventanas de BPTT](figuras/barrido_ventanas_bptt.png)
 
