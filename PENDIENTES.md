@@ -112,5 +112,5 @@ movimiento, haría que la regla de selección no se pueda ganar quedándose quie
 - ~~Dos contrastes que no existen en los checkpoints elegidos.~~ **Cerrado el 10 de septiembre de 2026.**
   Se generaron sobre los pesos publicados en Hugging Face, en una L4 y sin entrenar nada: generación por
   texto y fuera de dominio, control en el paso 125 y brazo con física en el 875, con el modelo base como
-  referencia. Están en la sección «Sin condicionamiento y fuera de dominio» del README. Son **n = 2 clips
+  referencia. El de fuera de dominio está en «Fuera de dominio se rompe» y el de generación por texto en «Lado a lado». Son **n = 2 clips
   por prompt**, así que sirven para mirar y no para medir; para reportar cifras habría que subir n.
