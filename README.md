@@ -134,9 +134,38 @@ La serie por checkpoint de más arriba sirve para ver que el signo no se inviert
 independiente**: se midió sobre 3 escenas (una por escenario) con sus 4 variantes aumentadas cada una,
 así que las 12 mediciones no son 12 clips distintos. Por eso van sin p.
 
-Y no se gana quedándose quieto, pero eso hay que apoyarlo en la **razón de movimiento**, no en la cota:
-el brazo con física se mueve igual o un poco más que el control (0,583 contra 0,567). La cota del video
-congelado no sirve acá porque **satura en 45 de los 88 clips** (el numerador cae por debajo del piso del instrumento y da exactamente cero), y el modelo base todavía más.
+**Por escenario, y con la cota al lado, que es como hay que mirarlo:**
+
+| escenario | control | con física | video quieto | mejora | p |
+|---|---|---|---|---|---|
+| caída libre | 0,412 | **0,271** | **0,144** | 23/28 | 0,0009 |
+| péndulo | 0,694 | **0,337** | 0,773 | 29/30 | <0,0001 |
+| rebote | 0,569 | **0,306** | 0,548 | 20/30 | 0,0051 |
+
+La equivarianza mejora en los tres, pero **en caída libre la cota del video quieto le gana a los dos
+brazos**, y eso el agregado (0,496) lo escondía. No es que un video congelado sea más equivariante: es
+que cuando el movimiento no supera al piso del estimador el numerador clampea y la métrica da
+**exactamente 0**, que es puntaje perfecto. Contado:
+
+| escenario | video quieto satura | modelo base satura | control | con física |
+|---|---|---|---|---|
+| caída libre | **21/28** | 24/28 | 0/28 | 0/28 |
+| péndulo | 8/30 | 23/30 | 0/30 | 0/30 |
+| rebote | 16/30 | 15/30 | 4/30 | 4/30 |
+
+El modelo base satura todavía más que el video quieto, y por otro motivo: genera video incoherente, y un
+video incoherente infla su propio piso `A`, con lo cual el numerador cae debajo sin esfuerzo. **La
+métrica normalizada no sirve para comparar contra cotas triviales ni contra el base.** Sí sirve para
+comparar los dos brazos entrenados, que tienen cero saturados en caída libre y péndulo y los mismos
+cuatro en rebote, que es la comparación que sostiene el resultado.
+
+Para la afirmación de que no se gana quedándose quieto hay que apoyarse en la **razón de movimiento**,
+no en la cota: el brazo con física se mueve igual o un poco más que el control (0,583 contra 0,567).
+
+**Y las dos cosas están desacopladas.** Donde más se aprende la simetría es en péndulo (0,694 a 0,337,
+29 de 30 clips) y ahí el error de velocidad **empeora** (4,10 a 4,42). Caída libre tiene la mejora de
+equivarianza más chica de los tres y es el único escenario donde la física mejora. Si aprender la
+simetría arrastrara a la física, el orden debería ser el mismo, y no lo es.
 
 **Pero 51° no es poco.** ρ = 1 significa "dos movimientos sin ninguna relación", así que 0,43 equivale a un desacuerdo
 del 92 % de la magnitud del movimiento. La frase honesta no es "aprende la simetría" sino que la
