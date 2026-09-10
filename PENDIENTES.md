@@ -91,13 +91,21 @@ movimiento, haría que la regla de selección no se pueda ganar quedándose quie
   reflexión, que es exacta a nivel de píxel, separa las dos contribuciones. Importa porque la saturación
   del término (12 % de los pasos) y el hecho de que el video congelado gane la métrica normalizada
   dependen de cuán alto esté `A`.
-- **Un portón de confianza sobre la energía del movimiento, en la línea del recorte de PPO.** Hoy el
-  guardián de margen saltea el paso cuando `D/A < 3`, que es un piso absoluto contra el ruido del
-  estimador. La versión relativa sería rechazar el gradiente físico cuando la energía del movimiento
-  generado se aleja más de un factor dado de una referencia, y la referencia sin anotación son los
-  cuadros de condicionamiento, que traen el movimiento del clip real. Es un portón y no una
-  penalización, así que no agrega un objetivo que compita con la física. No hace falta para lo que se
-  reporta, porque a este λ el movimiento no cae (sube en caída libre con p = 0,001); haría falta para
-  subir λ, donde la pérdida original sí colapsó el movimiento a 0,13 contra 0,60 en 100 pasos. Costo a
-  tener en cuenta: cerrar más el portón quita señal, y entre los guardianes actuales ya se pierde entre
-  el 13 % y el 22 % de los pasos.
+- **Un portón de confianza sobre la energía del movimiento, en la línea del recorte de PPO.** El
+  guardián de margen ya es la versión degenerada de esto: saltea el paso cuando `D/A < 3`. La versión
+  con región de confianza se diferencia en tres cosas.
+
+  1. **Referencia relativa** en vez del piso del estimador: la magnitud del movimiento de los cuadros de
+     condicionamiento, que son datos del clip real y no una anotación.
+  2. **De dos lados**, que es lo que hoy falta. El guardián sólo atrapa el movimiento que cae, pero la
+     métrica normalizada **premia moverse de más**: dentro del brazo con física los clips que se mueven
+     más dan mejor `l_rot_norm` (ρ = −0,40 en péndulo, p = 0,031). Esa dirección no está vigilada. Hoy
+     no está viva (sólo 5 de 88 clips superan el movimiento del clip real, el modelo se queda corto en
+     casi todos), pero es la que aparecería al subir λ.
+  3. **Corte blando en vez de duro**: PPO toma el mínimo entre recortado y sin recortar; nosotros
+     descartamos el paso entero. Ponderar en vez de descartar importa porque entre los guardianes
+     actuales ya se pierde del 13 % al 22 % de los pasos.
+
+  No hace falta para lo que se reporta, porque a este λ el movimiento no cae, sube en caída libre con
+  p = 0,001. Haría falta para subir λ, donde la pérdida original sí colapsó el movimiento a 0,13 contra
+  0,60 del control en 100 pasos.
