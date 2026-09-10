@@ -20,6 +20,11 @@ import json, statistics as st
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+# Tipografia grande a proposito: la figura entra en el poster a 0,60 del ancho de columna,
+# asi que los tamanos se fijan relativos al alto del dibujo, no al de la pagina.
+plt.rcParams.update({"font.size": 14, "axes.titlesize": 15.5, "axes.labelsize": 14.5,
+                     "xtick.labelsize": 13, "ytick.labelsize": 13, "legend.fontsize": 13})
+
 BR = [("full",       "BPTT completo",               12, "#2e7d32"),
       ("ventana4",   "no contigua [2,3,8,11]",       4, "#2b7bba"),
       ("cola4",      "cola [8..11] (DRaFT-4)",       4, "#c0503d"),
@@ -53,37 +58,37 @@ def por_ventanas(xs, v, k=15):
 
 D = {a: cargar(a) for a, _, _, _ in BR}
 PASOS_VAL = [50, 100, 150]
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13.5, 4.8))
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.0, 5.2))
 
 for a, eti, k, col in BR:
     tr = D[a][0]; xs = sorted(tr)
     px, py = por_ventanas(xs, [tr[x] for x in xs])
-    ax1.plot(px, py, "o-", color=col, lw=2.1, ms=6, label=f"{eti} ({k} pasos)")
-ax1.set_title("(a) entrenamiento: mediana por ventanas de 15 pasos", fontsize=12)
+    ax1.plot(px, py, "o-", color=col, lw=2.6, ms=7, label=f"{eti} ({k} pasos)")
+ax1.set_title("(a) entrenamiento (mediana por 15 pasos)", fontsize=15.5)
 ax1.set_ylabel("pérdida física"); ax1.set_xlabel("paso de entrenamiento")
 ax1.set_ylim(bottom=0)
 
 # El costo, como tabla chica adentro del panel: depende de la cantidad de pasos.
 lineas = ["pasos    s/paso"] + [f"  {k:>2}      {COSTO[k]:.1f}" for k in (4, 6, 12)]
 ax1.text(0.985, 0.97, "\n".join(lineas), transform=ax1.transAxes, ha="right", va="top",
-         fontsize=9.5, family="monospace", color="#444",
+         fontsize=12.5, family="monospace", color="#444",
          bbox=dict(boxstyle="round,pad=0.45", fc="#f4f4f4", ec="#cccccc", lw=0.8))
 
 for a, eti, k, col in BR:
-    ax2.plot(PASOS_VAL, [D[a][1][p] for p in PASOS_VAL], "o-", color=col, lw=2.1, ms=7)
-ax2.set_title("(b) validación: 20 clips, sólo tres mediciones por brazo", fontsize=12)
-ax2.set_ylabel("pérdida física de validación"); ax2.set_xlabel("paso de entrenamiento")
+    ax2.plot(PASOS_VAL, [D[a][1][p] for p in PASOS_VAL], "o-", color=col, lw=2.6, ms=8.5)
+ax2.set_title("(b) validación (20 clips, 3 mediciones)", fontsize=15.5)
+ax2.set_ylabel("pérdida física"); ax2.set_xlabel("paso de entrenamiento")
 ax2.set_xticks(PASOS_VAL)
 
 for ax in (ax1, ax2):
     ax.grid(alpha=0.25); ax.spines[["top", "right"]].set_visible(False)
 
 manijas, etiquetas = ax1.get_legend_handles_labels()
-fig.legend(manijas, etiquetas, loc="lower center", ncol=3, frameon=False, fontsize=9.5,
+fig.legend(manijas, etiquetas, loc="lower center", ncol=3, frameon=False, fontsize=12.5,
            bbox_to_anchor=(0.5, 0.0))
-fig.suptitle("Barrido de ventanas de BPTT sobre velocidad: ninguna ventana se distingue sobre lo que se minimiza",
-             fontsize=12.5, y=0.98)
-fig.tight_layout(rect=[0, 0.11, 1, 0.93])
+fig.suptitle("Barrido de ventanas de BPTT sobre velocidad, a 24 cuadros: ninguna ventana se distingue",
+             fontsize=16, y=0.985)
+fig.tight_layout(rect=[0, 0.13, 1, 0.93], w_pad=3.0)
 fig.savefig("fig_barrido_ventanas.png", dpi=150)
 for a, eti, k, _ in BR:
     v = list(D[a][0].values())

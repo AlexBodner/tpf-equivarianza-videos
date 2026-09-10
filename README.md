@@ -361,12 +361,12 @@ simetría](#degeneracion), que operan sobre cuadros que la pérdida **sí** mira
 Medido sobre los propios registros de cada corrida, no estimado. La fila del control es la misma
 receta **sin** el término físico, así que la diferencia entre las dos es el precio del método.
 
-| corrida | pasos | VRAM mediana | VRAM pico | s/paso | horas | USD |
-|---|---|---|---|---|---|---|
-| etapa 2, **con pérdida física** | 1000 | 21,3 GB | 28,5 GB | 46,7 | 16,0 | 30 |
-| etapa 2, control (sólo difusión) | 1000 | 6,8 GB | 9,1 GB | 12,4 | 3,5 | 6 |
-| barrido BPTT, ventana completa | 150 | 18,8 GB | 26,0 GB | 27,8 | 1,0 | 2 |
-| barrido BPTT, ventana de 4 pasos | 150 | 15,5 GB | 22,8 GB | 21,6 | 0,8 | 1,5 |
+| corrida | cuadros | pasos | VRAM mediana | VRAM pico | s/paso | horas | USD |
+|---|---|---|---|---|---|---|---|
+| etapa 2, **con pérdida física** | 33 | 1000 | 21,3 GB | 28,5 GB | 46,7 | 16,0 | 30 |
+| etapa 2, control (sólo difusión) | 33 | 1000 | 6,8 GB | 9,1 GB | 12,4 | 3,5 | 6 |
+| barrido BPTT, ventana completa | 24 | 150 | 18,8 GB | 26,0 GB | 27,8 | 1,0 | 2 |
+| barrido BPTT, ventana de 4 pasos | 24 | 150 | 15,5 GB | 22,8 GB | 21,6 | 0,8 | 1,5 |
 
 **Imponer la simetría cuesta 3,1× la memoria y 4,6× el tiempo total** (16,0 horas contra 3,5) de
 entrenar sólo con difusión. Los segundos por paso de la tabla son medianas, y en mediana la relación es
@@ -375,8 +375,16 @@ que se paga por generar, decodificar y estimar el flujo *dentro* del paso de ent
 retropropagar por todo eso. El pico de 28,5 GB es el que decide qué GPU hace falta: con 24 GB no entra
 a esta resolución y largo de clip.
 
-Las dos filas del barrido muestran de dónde sale ese costo: acortar la ventana de retropropagación
-baja el tiempo un 22 % y la memoria un 18 %, sin cambiar nada más.
+**Las dos filas del barrido no se comparan en absoluto con las dos de arriba.** El barrido corrió con
+24 cuadros y no 33, así que la pérdida ve 12 vectores de velocidad por paso en vez de 24, y la mitad
+física del paso cuesta aproximadamente la mitad. La corrida principal **ya es** el BPTT completo
+(`physics_n_bptt = 12`, los doce pasos de Euler): los 46,7 s/paso contra 27,8 son el mismo ancho de
+ventana sobre un clip más largo, no una ventana más cara. La comprobación directa es el conteo por
+escenario: en péndulo la principal ve 24 vectores en sus 332 pasos y el barrido 12 en sus 52.
+
+Lo que sí se lee dentro del barrido, donde los cinco brazos comparten los 24 cuadros, es el efecto de
+acortar la ventana: baja el tiempo un 22 % y la memoria un 18 %, sin cambiar nada más. Ese porcentaje
+es válido como razón; su traslado a la configuración de 33 cuadros no está medido.
 
 <a id="recomendacion"></a>
 
@@ -776,7 +784,9 @@ alcanza con una ventana. Ese parámetro es `physics_n_bptt` (cuántos pasos llev
   paso 11. Verificado sobre dos corridas independientes (656 y 538 pasos), coincidiendo dentro de un
   punto porcentual.
 - **El BPTT completo cuesta un 29 % más por paso** que cualquier ventana truncada (27,8 s/paso contra
-  21,6-21,7 en los brazos de abajo).
+  21,6-21,7 en los brazos de abajo). Ojo con el absoluto: **el barrido corrió a 24 cuadros**, la mitad
+  de la ventana cinemática de la corrida principal, que a 33 cuadros paga 46,7 s/paso con esa misma
+  ventana completa. El 29 % es una razón interna al barrido, donde los cinco brazos comparten el largo.
 
 **Lo que el barrido no logra decidir.** Se corrieron **cinco** brazos de 150 pasos, idénticos salvo la
 ventana, sobre la pérdida arreglada y la cantidad que sí tiene señal.
@@ -803,6 +813,16 @@ movimiento: el brazo que más se mueve gana en el cociente y pierde en el error 
 
 **Y sobre lo que se minimiza no hay diferencia.** Los diez pares posibles dan p entre 0,15 y 0,66,
 ninguno significativo.
+
+**Los brazos no recibieron la misma cantidad de señal física.** El término se saltea cuando el
+desacuerdo queda por debajo del piso de RAFT o cuando el margen contra ese piso es menor que 3, y eso
+no cayó parejo: `full` entrenó con gradiente físico en **117 de 150** pasos contra 126-130 de los
+otros cuatro. Apareado paso a paso es una diferencia real, no ruido de muestreo (McNemar: p = 0,007
+contra `mejor6comp`, 0,023 contra `ventana4`, 0,027 contra `mejor6`, 0,093 contra `cola4`), y la
+causa es el guardián de margen, que se disparó 15 veces en `full` y 3 o 4 en el resto. O sea que el
+brazo más caro es también el que menos veces recibió el término. No invierte la conclusión (que es que
+no hay diferencia) pero sí la califica: si el barrido llegara a favorecer a una ventana truncada,
+parte de esa ventaja podría ser sólo que recibió más pasos con señal.
 
 <sub>Una aclaración sobre el quinto brazo. El prerregistro lo llamaba «magnitud compensada» y lo
 señalaba como la única comparación legible, con la idea de re-escalar λ para que su gradiente físico
