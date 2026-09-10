@@ -122,6 +122,14 @@ imagen. En los ocho checkpoints el brazo con física es más equivariante, en la
 checkpoint elegido, la cantidad normalizada da **0,306 contra 0,562** del control, ganando en 72 de los
 88 clips (p < 0,0001).
 
+![Test final, clip por clip](figuras/test_apareado.png)
+
+*Cada punto es un clip del test: el eje x es el control y el eje y el brazo con pérdida física, así que
+debajo de la diagonal gana la física. Es el mismo par que entra al Wilcoxon, no un resumen, así que se
+ven los 88. A la izquierda lo que la pérdida pide, y la nube cae del lado bueno en 72 de 88. A la
+derecha lo que queremos que mejore, y la nube se reparte a los dos lados de la diagonal: 48 de 88, que
+es lo que se espera si no hay efecto. Reproducible con `scripts_figuras/gen_fig_test_apareado.py`.*
+
 La serie por checkpoint de más arriba sirve para ver que el signo no se invierte, pero **no es evidencia
 independiente**: se midió sobre 3 escenas (una por escenario) con sus 4 variantes aumentadas cada una,
 así que las 12 mediciones no son 12 clips distintos. Por eso van sin p.
@@ -793,8 +801,9 @@ ventana, sobre la pérdida arreglada y la cantidad que sí tiene señal.
 
 ![Barrido de ventanas de BPTT](figuras/barrido_ventanas_bptt.png)
 
-*Izquierda: la pérdida física en entrenamiento, mediana por ventanas de quince pasos sobre los 147 de
-cada brazo; las curvas se cruzan todo el tiempo. Derecha: la misma pérdida en validación, donde hay
+*Izquierda: la pérdida física en entrenamiento, la cruda fina de fondo y la mediana por ventanas de
+quince pasos encima; las curvas se cruzan todo el tiempo. La cruda está recortada en 0,62 porque el 5 %
+de los pasos llega hasta 1,53 y aplastaría las medianas contra el eje. Derecha: la misma pérdida en validación, donde hay
 sólo tres mediciones por brazo. Los brazos están agrupados por **cuántos pasos de Euler se retropropagan**,
 que es de lo que depende el costo: la cola y la ventana no contigua usan cuatro y cuestan lo mismo.
 Reproducible con `scripts_figuras/gen_fig_barrido_ventanas.py`.*

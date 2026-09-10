@@ -60,13 +60,23 @@ D = {a: cargar(a) for a, _, _, _ in BR}
 PASOS_VAL = [50, 100, 150]
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.0, 5.2))
 
+# La cruda de fondo y la mediana encima: la mediana sola esconde cuanta dispersion
+# hay por paso, y la cruda sola es ilegible con cinco brazos superpuestos. Las dos
+# juntas dicen lo mismo que dice el test: las nubes se pisan.
+for a, eti, k, col in BR:
+    tr = D[a][0]; xs = sorted(tr)
+    ax1.plot(xs, [tr[x] for x in xs], "-", color=col, lw=0.9, alpha=0.22, zorder=1)
 for a, eti, k, col in BR:
     tr = D[a][0]; xs = sorted(tr)
     px, py = por_ventanas(xs, [tr[x] for x in xs])
-    ax1.plot(px, py, "o-", color=col, lw=2.6, ms=7, label=f"{eti} ({k} pasos)")
-ax1.set_title("(a) entrenamiento (mediana por 15 pasos)", fontsize=15.5)
+    ax1.plot(px, py, "o-", color=col, lw=2.6, ms=7, zorder=3, label=f"{eti} ({k} pasos)")
+ax1.set_title("(a) entrenamiento: cruda (fina) y mediana por 15 pasos", fontsize=15.5)
 ax1.set_ylabel("pérdida física"); ax1.set_xlabel("paso de entrenamiento")
-ax1.set_ylim(bottom=0)
+# Recorte al percentil 95 de la cruda: el 5 % restante llega a 1,53 y aplastaria las
+# medianas contra el eje. Se avisa en el propio panel para no esconder el recorte.
+ax1.set_ylim(0, 0.62)
+ax1.text(0.015, 0.965, "cruda recortada; el 5 % llega a 1,53",
+         transform=ax1.transAxes, ha="left", va="top", fontsize=11.5, color="#777")
 
 # El costo, como tabla chica adentro del panel: depende de la cantidad de pasos.
 lineas = ["pasos    s/paso"] + [f"  {k:>2}      {COSTO[k]:.1f}" for k in (4, 6, 12)]
