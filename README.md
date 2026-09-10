@@ -263,20 +263,33 @@ primeros 20 clips da lo mismo (4,926 contra 4,994, p = 0,31).
 Son 88 clips y no 90 porque dos de caída libre son más cortos que la ventana de condicionamiento y el
 evaluador los saltea; el salteo es del clip, así que afecta a los dos brazos por igual.
 
-| métrica | base | video quieto | control | con física | gana | p |
+**Métrica principal:**
+
+| métrica | base | video quieto | control | con física | gana física | p |
 |---|---|---|---|---|---|---|
 | **error de velocidad** (↓) | 9,134 | 9,261 | 5,110 | 4,945 | 48/88 | **0,362** |
+
+**Métricas de apoyo:**
+
+| métrica | base | video quieto | control | con física | gana física | p |
+|---|---|---|---|---|---|---|
 | razón de movimiento (→1) | 0,442 | 0,094 | 0,567 | 0,583 | 51/88 | 0,215 |
 | equivarianza normalizada (↓) | 0,177 \* | 0,496 \* | 0,562 | **0,306** | 72/88 | **<0,0001** |
 | jerk (↓) | 4,836 | 0,000 \* | 1,524 | 1,138 | 60/88 | <0,0001 |
 | MAE de aceleración (↓) | 2,015 | 1,260 | 1,729 | 1,663 | 45/88 | 0,162 |
 
-\* **Estas celdas no se pueden leer como si fueran puntajes.** El 0,177 del base y el 0,496 del video
-quieto salen de **saturación**: cuando el movimiento no supera al piso del estimador el numerador
-clampea y la métrica da exactamente 0, que es puntaje perfecto. Pasa en 24 de 28 clips del base y 21 de
-28 del video quieto en caída libre, y **nunca** en los dos brazos entrenados. El 0,000 del jerk es la
-misma historia sin normalizar: un video congelado no tiene jerk. La comparación que sí vale es control
-contra física, que es la de la columna `p`.
+\* Estas celdas no se pueden leer como puntajes comparables: salen de saturación o de una cota trivial.
+La comparación que sí vale es control contra física, que es la de la columna `p`.
+
+<details>
+<summary>Por qué esas celdas van marcadas con asterisco</summary>
+
+El 0,177 del base y el 0,496 del video quieto salen de **saturación**: cuando el movimiento no supera
+al piso del estimador el numerador clampea y la métrica da exactamente 0, que es puntaje perfecto. Pasa
+en 24 de 28 clips del base y 21 de 28 del video quieto en caída libre, y **nunca** en los dos brazos
+entrenados. El 0,000 del jerk es la misma historia sin normalizar: un video congelado no tiene jerk.
+
+</details>
 
 **En la métrica principal no hay diferencia** (p = 0,36), y tampoco en la razón de movimiento ni en el
 MAE de aceleración. Las dos que sí dan significativas son la equivarianza (lo que la pérdida pide) y el
@@ -939,7 +952,9 @@ gradiente. Medido sobre los **869 pasos de la corrida que se reporta**:
 
 ![Cuánta dirección conserva cada ventana](figuras/truncamiento_direccion.png)
 
-*Reproducible con `scripts/coseno_truncamiento_bptt.py` en el repositorio de código.*
+*Reproducible con `scripts/coseno_truncamiento_bptt.py` en el repositorio de código; los escalares
+necesarios están publicados acá en
+`resultados/logs_entrenamiento/vel_run__stage2_equiv_vel_s42_20260907-140554_5de5e17a-fixpiso-vel.jsonl`.*
 
 - **Se puede truncar.** Cuatro pasos de los doce conservan entre **0,86 y 0,93** de la dirección del
   gradiente exacto. La cola de DRaFT-K da 0,86, y una ventana no contigua elegida a mano, 0,93. Incluso
