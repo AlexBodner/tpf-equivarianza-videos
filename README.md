@@ -14,9 +14,10 @@ checkpoints. Pero conviene no exagerarlo: 51° sigue estando lejos de los 0° de
 toda la ventaja aparece en los primeros 125 pasos y después se estanca.
 
 **Y no se traduce en mejor física.** El error de velocidad contra el ground truth del simulador no
-mejora, y fuera de distribución el modelo degenera. Lo que sí podemos señalar como causa (medido, no conjeturado) es **cómo** el modelo satisface la restricción: se mueve menos, y descubre que partir la
-pelota en dos hace que el flujo agregado de la escena se cancele. Las dos cosas bajan la pérdida sin
-mejorar la dinámica. A eso se suma que la pérdida ve una versión parcial de lo generado (24 de 32 vectores de velocidad en péndulo y rebote, 12 o 16 en caída libre, sobre 12 pasos de Euler contra los 20 de la inferencia) aunque **eso último es una hipótesis, no algo que hayamos medido**.
+mejora, y fuera de distribución el modelo degenera. Lo que sí podemos señalar como mecanismo medido es
+**cómo** la restricción puede satisfacerse sin mejorar la dinámica: el observable agregado permite
+atajos como reducir movimiento en ciertos casos o partir la pelota en dos, haciendo que el flujo de la
+escena se cancele. A eso se suma que la pérdida ve una versión parcial de lo generado (24 de 32 vectores de velocidad en péndulo y rebote, 12 o 16 en caída libre, sobre 12 pasos de Euler contra los 20 de la inferencia) aunque **eso último es una hipótesis, no algo que hayamos medido**.
 
 Cada sección indica a qué parte del póster corresponde. Lo que queda abierto, incluido lo que no
 podemos explicar, está en [PENDIENTES.md](PENDIENTES.md).
@@ -28,7 +29,7 @@ por paso de entrenamiento, con un índice que rastrea cada archivo hasta su orig
 
 
 <details>
-<summary><b>Estado de este documento</b>: qué se está midiendo ahora y qué va a cambiar</summary>
+<summary><b>Estado de este documento</b>: qué mediciones quedaron cerradas</summary>
 
 **Última actualización: 9 de septiembre de 2026.**
 
@@ -265,13 +266,16 @@ evaluador los saltea; el salteo es del clip, así que afecta a los dos brazos po
 
 **Métrica principal:**
 
-| métrica | base | video quieto | control | con física | gana física | p |
+| métrica | base | video quieto | control | con física | gana con física | p |
 |---|---|---|---|---|---|---|
 | **error de velocidad** (↓) | 9,134 | 9,261 | 5,110 | 4,945 | 48/88 | **0,362** |
 
+Aunque el promedio del brazo con física es menor, la diferencia no es significativa y gana sólo 48 de
+88 clips: se lee como ausencia de mejora global.
+
 **Métricas de apoyo:**
 
-| métrica | base | video quieto | control | con física | gana física | p |
+| métrica | base | video quieto | control | con física | gana con física | p |
 |---|---|---|---|---|---|---|
 | razón de movimiento (→1) | 0,442 | 0,094 | 0,567 | 0,583 | 51/88 | 0,215 |
 | equivarianza normalizada (↓) | 0,177 \* | 0,496 \* | 0,562 | **0,306** | 72/88 | **<0,0001** |
@@ -981,7 +985,9 @@ cinemática de la corrida principal, que a 33 cuadros paga 46,7 s/paso con esa m
 Ésta es la prueba empírica de la primera. Se corrieron **cinco** brazos de 150 pasos, idénticos salvo la
 ventana, sobre la pérdida arreglada y la cantidad que sí tiene señal. **No se distinguen**, y visto
 desde el coseno era lo esperable: si toda ventana razonable retiene más del 85 % de la dirección, 150
-pasos no alcanzan para separarlas. Las dos mitades cuentan la misma historia desde lados distintos.
+pasos no alcanzan para separarlas. Lectura práctica: truncar parece viable para ahorrar costo, pero
+este barrido corto no demuestra que mejore el resultado final. Las dos mitades cuentan la misma
+historia desde lados distintos.
 
 ![Barrido de ventanas de BPTT](figuras/barrido_ventanas_bptt.png)
 
