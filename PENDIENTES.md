@@ -91,3 +91,13 @@ movimiento, haría que la regla de selección no se pueda ganar quedándose quie
   reflexión, que es exacta a nivel de píxel, separa las dos contribuciones. Importa porque la saturación
   del término (12 % de los pasos) y el hecho de que el video congelado gane la métrica normalizada
   dependen de cuán alto esté `A`.
+- **Un portón de confianza sobre la energía del movimiento, en la línea del recorte de PPO.** Hoy el
+  guardián de margen saltea el paso cuando `D/A < 3`, que es un piso absoluto contra el ruido del
+  estimador. La versión relativa sería rechazar el gradiente físico cuando la energía del movimiento
+  generado se aleja más de un factor dado de una referencia, y la referencia sin anotación son los
+  cuadros de condicionamiento, que traen el movimiento del clip real. Es un portón y no una
+  penalización, así que no agrega un objetivo que compita con la física. No hace falta para lo que se
+  reporta, porque a este λ el movimiento no cae (sube en caída libre con p = 0,001); haría falta para
+  subir λ, donde la pérdida original sí colapsó el movimiento a 0,13 contra 0,60 en 100 pasos. Costo a
+  tener en cuenta: cerrar más el portón quita señal, y entre los guardianes actuales ya se pierde entre
+  el 13 % y el 22 % de los pasos.

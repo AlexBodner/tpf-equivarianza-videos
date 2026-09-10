@@ -159,8 +159,21 @@ métrica normalizada no sirve para comparar contra cotas triviales ni contra el 
 comparar los dos brazos entrenados, que tienen cero saturados en caída libre y péndulo y los mismos
 cuatro en rebote, que es la comparación que sostiene el resultado.
 
-Para la afirmación de que no se gana quedándose quieto hay que apoyarse en la **razón de movimiento**,
-no en la cota: el brazo con física se mueve igual o un poco más que el control (0,583 contra 0,567).
+**¿Y si la equivarianza se está comprando con quietud?** Es la objeción obvia, porque moverse menos es
+una de las dos rutas degeneradas conocidas. Medida, la respuesta es que no:
+
+| escenario | movimiento control | con física | | p |
+|---|---|---|---|---|
+| caída libre | 0,644 | 0,709 | **sube** | 0,001 |
+| péndulo | 0,583 | 0,606 | sube | 0,777 |
+| rebote | 0,478 | 0,443 | baja | 0,318 |
+
+El brazo con física se mueve igual o más. Y adentro de ese brazo la correlación entre movimiento y
+equivarianza va **al revés** de la ruta degenerada: los clips que se mueven más son los que dan mejor
+`l_rot_norm` (Spearman ρ = −0,30 en caída libre, −0,40 en péndulo con p = 0,031, +0,26 en rebote sin
+significancia). Mecánicamente se entiende: más movimiento sube `D`, el cociente `N/D` baja, y de paso
+RAFT mide mejor. Clip a clip, además, ganar equivarianza no predice perder movimiento: ρ entre −0,11 y
++0,05, ninguno significativo en los tres escenarios.
 
 **Y las dos cosas están desacopladas.** Donde más se aprende la simetría es en péndulo (0,694 a 0,337,
 29 de 30 clips) y ahí el error de velocidad **empeora** (4,10 a 4,42). Caída libre tiene la mejora de
