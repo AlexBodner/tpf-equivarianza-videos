@@ -79,3 +79,15 @@ movimiento, haría que la regla de selección no se pueda ganar quedándose quie
 - El 13 % de los pasos de entrenamiento no aportan gradiente físico (96 porque el desacuerdo cae bajo el
   piso, 28 por falta de pares de RAFT, 7 por el margen). No está dicho en ningún lado.
 - La tabla de generaciones a 65 cuadros es n = 1 o n = 2 por celda y no lo declara.
+- **Cuánto viola el modelo la invarianza a traslación.** Nunca se midió: el término corrió en λ = 0 y
+  las 7010 filas de registro que tienen `loss_translation` dan exactamente 0,0. No hace falta entrenar:
+  con el checkpoint 875, generar los mismos clips desde un condicionamiento trasladado y comparar las
+  cinemáticas contra la rama sin trasladar. Si el desacuerdo queda en el orden del piso del estimador,
+  la traslación no tiene nada para enseñar y la pregunta se cierra; si es grande, es una restricción con
+  señal que además no introduce remuestreo. Los pesos están en Hugging Face, así que corre en cualquier
+  GPU.
+- **Cuánto del piso `A` es remuestreo y cuánto es RAFT.** El piso se mide rotando el video generado con
+  `grid_sample`, y ya está anotado que ese remuestreo difiere del de los datos. Medir `A` con una
+  reflexión, que es exacta a nivel de píxel, separa las dos contribuciones. Importa porque la saturación
+  del término (12 % de los pasos) y el hecho de que el video congelado gane la métrica normalizada
+  dependen de cuán alto esté `A`.

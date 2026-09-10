@@ -400,18 +400,24 @@ es válido como razón; su traslado a la configuración de 33 cuadros no está m
 
 *Póster: sección «Trabajo futuro».*
 
-1. **Cambiar cómo se usa el flujo óptico**, que es de donde salen las dos rutas degeneradas: reducir la
-   escena a un vector por cuadro es lo que permite que dos objetos opuestos se cancelen. Hay que
-   aprovechar el campo completo del video y hacerlo robusto a generaciones ruidosas o rotas. Una forma
-   directa: **penalizar el flujo que no tiene correspondencia** en la rama transformada, que castiga
-   justamente al objeto que aparece de más.
-2. **Que la pérdida vea todo lo que el modelo genera**: hoy mira 24 de 32 vectores en péndulo y
+1. **Enriquecer el observable antes que buscar otra simetría.** Reducida la escena a un vector por
+   cuadro, las únicas transformaciones con acción no trivial son las de O(2), y ahí se agota el grupo
+   disponible: no es que falte imaginación, es que el observable no da para más. El campo de flujo
+   completo habilita además **penalizar el flujo que no tiene correspondencia** en la rama transformada,
+   que es lo que hoy permite que dos objetos opuestos se cancelen, y hay que hacerlo robusto a
+   generaciones ruidosas o rotas.
+2. **Medir la traslación antes de imponerla.** Que la ley no dependa de dónde ocurre es la más simple de
+   las propiedades disponibles, y trasladar no introduce remuestreo, así que no contamina el piso del
+   estimador. **Nunca se midió**: el término corrió en λ = 0 y las 7010 filas de registro que lo
+   contienen dan exactamente 0,0. Es una pasada de generación sobre el checkpoint que se reporta, sin
+   entrenar nada, y devuelve un número que cierra la pregunta en un sentido o en el otro.
+3. **Reflexión**, con la salvedad de que es el mismo enunciado que la rotación con otra matriz
+   ortogonal, no una propiedad nueva. Lo que aporta es que es exacta a nivel de píxel, así que sirve
+   para separar cuánto del piso `A` es RAFT y cuánto es el remuestreo de `grid_sample`.
+4. **Que la pérdida vea todo lo que el modelo genera**: hoy mira 24 de 32 vectores en péndulo y
    rebote, 12 o 16 en caída libre, y una generación de 12 pasos de Euler en vez de 20. Es una hipótesis
    razonable (no comprobada) que la corrupción se aloje en lo que queda fuera.
-3. **Anclar la escala del movimiento** sin volver a depender de anotaciones: alcanza con la magnitud del
-   movimiento de los *cuadros de condicionamiento*, que son datos del clip real y no una medición
-   física.
-4. **Video real**: la pérdida no pide anotaciones, así que se puede entrenar sobre video natural
+5. **Video real**: la pérdida no pide anotaciones, así que se puede entrenar sobre video natural
    (Physics-IQ) sin simulador.
 
 ### Qué era el boost, y por qué no alcanza con sumar las otras dos simetrías
