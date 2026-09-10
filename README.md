@@ -414,20 +414,40 @@ es válido como razón; su traslado a la configuración de 33 cuadros no está m
 4. **Video real**: la pérdida no pide anotaciones, así que se puede entrenar sobre video natural
    (Physics-IQ) sin simulador.
 
-### Por qué no alcanza con sumar las otras dos simetrías
+### Qué era el boost, y por qué no alcanza con sumar las otras dos simetrías
 
-Es la pregunta obvia, y la respuesta corta es que **ninguna de las dos es equivalente a la rotación**.
+Es la pregunta obvia: si el proyecto arrancó con tres simetrías, ¿por qué terminó usando una sola?
+
+Un **boost galileano** es mirar la misma escena desde un sistema de referencia que se mueve a velocidad
+constante. El ejemplo de manual: si soltás una pelota adentro de un tren que va parejo, para alguien
+sentado adentro cae recto, y para alguien parado en el andén dibuja una parábola. Es la misma pelota y
+la misma gravedad, mirada desde dos lados. La simetría dice que **la velocidad no es absoluta**: sólo
+importan las velocidades relativas.
+
+Era el término más atractivo de los tres y fue uno de los dos originales, junto con la rotación, en
+`losses/combined.py`. Atractivo porque no menciona ni la masa ni el potencial, y sobre todo porque su
+forma matemática es la más limpia posible: **bajo un boost la aceleración no cambia en absoluto**, así
+que el objetivo es "las dos ramas tienen que dar la *misma* aceleración", diferencia cero, sin matriz de
+rotación ni normalización.
+
+**Y ahí está la importancia real del boost, que es negativa: es la razón por la que todo el proyecto
+midió aceleraciones.** El boost es el único de los tres que te obliga a la aceleración, porque bajo un
+boost la velocidad *sí* cambia (`v → v + c`). La rotación y la traslación funcionan perfectamente sobre
+velocidades. Así que la decisión de trabajar con `a` en vez de `v` se heredó del boost, y **el boost
+estaba apagado (λ_boost = 0) desde semanas antes**. Durante ese tiempo el entrenamiento y la evaluación
+midieron una cantidad que nadie necesitaba y que [no tiene señal](#aceleracion) sobre video generado:
+acuerdo 0,07 contra 0,97 de la velocidad. Desarmar eso fue la corrección más grande del trabajo.
+
+Con eso dicho, ninguna de las dos que faltan es un atajo hacia adelante:
 
 - La **traslación espacial** no agrega nada con este pipeline. `aggregate_flow` reduce la escena a un
   promedio pesado del flujo, así que correr la escena en el espacio devuelve prácticamente el mismo
   vector: la restricción se cumple antes de entrenar y el gradiente es ruido. No es un bug, es que el
   agregador ya es invariante a traslaciones.
-- El **boost** afirma que **la aceleración no cambia**, y ésa es la cantidad que
-  [no tiene señal](#aceleracion) sobre video generado (acuerdo 0,07). Así está escrito en
-  `l_equiv_boost`: `MSE(a1, a2)`. Se puede reescribir sobre velocidades, donde la restricción pasa a ser
-  que las dos ramas difieran en la deriva `c`, pero eso **se satisface generando el mismo video y
-  sumándole una deriva rígida**, sin que la dinámica sea correcta. Ancla la escala como efecto lateral,
-  no como física.
+- El **boost** vuelve a pedir la aceleración, que es donde no hay señal. Se puede reescribir sobre
+  velocidades, donde la restricción pasa a ser que las dos ramas difieran en la deriva `c`, pero eso
+  **se satisface generando el mismo video y sumándole una deriva rígida**, sin que la dinámica sea
+  correcta. Ancla la escala como efecto lateral, no como física.
 
 La rotación no tiene esa salida porque **al rotar la escena rota la gravedad**: la rama transformada
 tiene que ser una generación genuinamente distinta, no la misma con un desplazamiento encima. Eso es lo
