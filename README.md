@@ -400,38 +400,39 @@ es válido como razón; su traslado a la configuración de 33 cuadros no está m
 
 *Póster: sección «Trabajo futuro».*
 
-1. **Sumar el boost galileano, que es el ancla de escala que falta.** Es el punto más importante y hay
-   que decir por qué, porque las tres simetrías del proyecto no sirven para lo mismo:
-
-   - La **rotación** es la que está implementada. Es una restricción de *forma*: dice que las dos
-     cinemáticas tienen que ser una la rotada de la otra, y no dice nada sobre cuán grande es el
-     movimiento. Por eso admite el atajo de moverse menos, y por eso hubo que normalizar por la energía,
-     que le saca el premio al atajo pero no lo prohíbe.
-   - La **traslación espacial**, tal como está el pipeline, no agrega casi nada. `aggregate_flow` reduce
-     la escena a un promedio pesado del flujo, así que correr la escena en el espacio devuelve
-     prácticamente el mismo vector: la restricción ya se cumple antes de entrenar y el gradiente es
-     ruido. No es un problema del código, es que el agregador ya es invariante a traslaciones.
-   - El **boost** es distinto y es el que tiene filo. Si la escena arranca con una deriva conocida de
-     `c` px/cuadro, las velocidades de las dos ramas tienen que diferir **exactamente en `c`**. Eso es
-     una **referencia absoluta con unidades**, y no encoge cuando el modelo encoge: si el modelo achica
-     todo el movimiento por un factor `s`, la diferencia entre las ramas pasa a ser `s·c` y la pérdida
-     lo cobra. Ataca la ruta degenerada de frente, y sigue **sin usar anotaciones**, porque `c` no se
-     mide en ningún lado: lo elegimos nosotros al construir la rama.
-
-   Con una salvedad de implementación: `l_equiv_boost` y `l_equiv_translation` están escritas sobre
-   **aceleraciones** (`MSE(a1, a2)`, la aceleración no cambia bajo boost), que es justamente la cantidad
-   que [no tiene señal](#aceleracion) sobre video generado. Sumarlas como están agregaría ruido. La
-   versión que vale la pena es la de velocidad, que además es la que da el ancla.
-
+1. **Cambiar cómo se usa el flujo óptico**, que es de donde salen las dos rutas degeneradas: reducir la
+   escena a un vector por cuadro es lo que permite que dos objetos opuestos se cancelen. Hay que
+   aprovechar el campo completo del video y hacerlo robusto a generaciones ruidosas o rotas. Una forma
+   directa: **penalizar el flujo que no tiene correspondencia** en la rama transformada, que castiga
+   justamente al objeto que aparece de más.
 2. **Que la pérdida vea todo lo que el modelo genera**: hoy mira 24 de 32 vectores en péndulo y
    rebote, 12 o 16 en caída libre, y una generación de 12 pasos de Euler en vez de 20. Es una hipótesis
    razonable (no comprobada) que la corrupción se aloje en lo que queda fuera.
-3. **Cambiar cómo se usa el flujo óptico**, que es de donde salen las dos rutas degeneradas: reducir la
-   escena a un vector por cuadro es lo que permite que dos objetos opuestos se cancelen. Usar el campo
-   completo y penalizar el flujo que no tiene correspondencia en la rama transformada castiga
-   directamente al objeto que aparece de más.
+3. **Anclar la escala del movimiento** sin volver a depender de anotaciones: alcanza con la magnitud del
+   movimiento de los *cuadros de condicionamiento*, que son datos del clip real y no una medición
+   física.
 4. **Video real**: la pérdida no pide anotaciones, así que se puede entrenar sobre video natural
    (Physics-IQ) sin simulador.
+
+### Por qué no alcanza con sumar las otras dos simetrías
+
+Es la pregunta obvia, y la respuesta corta es que **ninguna de las dos es equivalente a la rotación**.
+
+- La **traslación espacial** no agrega nada con este pipeline. `aggregate_flow` reduce la escena a un
+  promedio pesado del flujo, así que correr la escena en el espacio devuelve prácticamente el mismo
+  vector: la restricción se cumple antes de entrenar y el gradiente es ruido. No es un bug, es que el
+  agregador ya es invariante a traslaciones.
+- El **boost** afirma que **la aceleración no cambia**, y ésa es la cantidad que
+  [no tiene señal](#aceleracion) sobre video generado (acuerdo 0,07). Así está escrito en
+  `l_equiv_boost`: `MSE(a1, a2)`. Se puede reescribir sobre velocidades, donde la restricción pasa a ser
+  que las dos ramas difieran en la deriva `c`, pero eso **se satisface generando el mismo video y
+  sumándole una deriva rígida**, sin que la dinámica sea correcta. Ancla la escala como efecto lateral,
+  no como física.
+
+La rotación no tiene esa salida porque **al rotar la escena rota la gravedad**: la rama transformada
+tiene que ser una generación genuinamente distinta, no la misma con un desplazamiento encima. Eso es lo
+que la hace la simetría útil de las tres, y por eso el trabajo futuro apunta a usarla mejor antes que a
+sumarle otras.
 
 ---
 
