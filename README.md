@@ -14,9 +14,10 @@ checkpoints. Pero conviene no exagerarlo: 51° sigue estando lejos de los 0° de
 toda la ventaja aparece en los primeros 125 pasos y después se estanca.
 
 **Y no se traduce en mejor física.** El error de velocidad contra el ground truth del simulador no
-mejora, y fuera de distribución el modelo degenera. Lo que sí podemos señalar como causa (medido, no conjeturado) es **cómo** el modelo satisface la restricción: se mueve menos, y descubre que partir la
-pelota en dos hace que el flujo agregado de la escena se cancele. Las dos cosas bajan la pérdida sin
-mejorar la dinámica. A eso se suma que la pérdida ve una versión parcial de lo generado (24 de 32 vectores de velocidad en péndulo y rebote, 12 o 16 en caída libre, sobre 12 pasos de Euler contra los 20 de la inferencia) aunque **eso último es una hipótesis, no algo que hayamos medido**.
+mejora, y fuera de distribución el modelo degenera. Lo que sí podemos señalar como mecanismo medido es
+**cómo** la restricción puede satisfacerse sin mejorar la dinámica: el observable agregado permite
+atajos como reducir movimiento en ciertos casos o partir la pelota en dos, haciendo que el flujo de la
+escena se cancele. A eso se suma que la pérdida ve una versión parcial de lo generado (24 de 32 vectores de velocidad en péndulo y rebote, 12 o 16 en caída libre, sobre 12 pasos de Euler contra los 20 de la inferencia) aunque **eso último es una hipótesis, no algo que hayamos medido**.
 
 Cada sección indica a qué parte del póster corresponde. Lo que queda abierto, incluido lo que no
 podemos explicar, está en [PENDIENTES.md](PENDIENTES.md).
@@ -28,7 +29,7 @@ por paso de entrenamiento, con un índice que rastrea cada archivo hasta su orig
 
 
 <details>
-<summary><b>Estado de este documento</b>: qué se está midiendo ahora y qué va a cambiar</summary>
+<summary><b>Estado de este documento</b>: qué mediciones quedaron cerradas</summary>
 
 **Última actualización: 9 de septiembre de 2026.**
 
@@ -263,20 +264,36 @@ primeros 20 clips da lo mismo (4,926 contra 4,994, p = 0,31).
 Son 88 clips y no 90 porque dos de caída libre son más cortos que la ventana de condicionamiento y el
 evaluador los saltea; el salteo es del clip, así que afecta a los dos brazos por igual.
 
-| métrica | base | video quieto | control | con física | gana | p |
+**Métrica principal:**
+
+| métrica | base | video quieto | control | con física | gana con física | p |
 |---|---|---|---|---|---|---|
 | **error de velocidad** (↓) | 9,134 | 9,261 | 5,110 | 4,945 | 48/88 | **0,362** |
+
+Aunque el promedio del brazo con física es menor, la diferencia no es significativa y gana sólo 48 de
+88 clips: se lee como ausencia de mejora global.
+
+**Métricas de apoyo:**
+
+| métrica | base | video quieto | control | con física | gana con física | p |
+|---|---|---|---|---|---|---|
 | razón de movimiento (→1) | 0,442 | 0,094 | 0,567 | 0,583 | 51/88 | 0,215 |
 | equivarianza normalizada (↓) | 0,177 \* | 0,496 \* | 0,562 | **0,306** | 72/88 | **<0,0001** |
 | jerk (↓) | 4,836 | 0,000 \* | 1,524 | 1,138 | 60/88 | <0,0001 |
 | MAE de aceleración (↓) | 2,015 | 1,260 | 1,729 | 1,663 | 45/88 | 0,162 |
 
-\* **Estas celdas no se pueden leer como si fueran puntajes.** El 0,177 del base y el 0,496 del video
-quieto salen de **saturación**: cuando el movimiento no supera al piso del estimador el numerador
-clampea y la métrica da exactamente 0, que es puntaje perfecto. Pasa en 24 de 28 clips del base y 21 de
-28 del video quieto en caída libre, y **nunca** en los dos brazos entrenados. El 0,000 del jerk es la
-misma historia sin normalizar: un video congelado no tiene jerk. La comparación que sí vale es control
-contra física, que es la de la columna `p`.
+\* Estas celdas no se pueden leer como puntajes comparables: salen de saturación o de una cota trivial.
+La comparación que sí vale es control contra física, que es la de la columna `p`.
+
+<details>
+<summary>Por qué esas celdas van marcadas con asterisco</summary>
+
+El 0,177 del base y el 0,496 del video quieto salen de **saturación**: cuando el movimiento no supera
+al piso del estimador el numerador clampea y la métrica da exactamente 0, que es puntaje perfecto. Pasa
+en 24 de 28 clips del base y 21 de 28 del video quieto en caída libre, y **nunca** en los dos brazos
+entrenados. El 0,000 del jerk es la misma historia sin normalizar: un video congelado no tiene jerk.
+
+</details>
 
 **En la métrica principal no hay diferencia** (p = 0,36), y tampoco en la razón de movimiento ni en el
 MAE de aceleración. Las dos que sí dan significativas son la equivarianza (lo que la pérdida pide) y el
@@ -939,7 +956,9 @@ gradiente. Medido sobre los **869 pasos de la corrida que se reporta**:
 
 ![Cuánta dirección conserva cada ventana](figuras/truncamiento_direccion.png)
 
-*Reproducible con `scripts/coseno_truncamiento_bptt.py` en el repositorio de código.*
+*Reproducible con `scripts/coseno_truncamiento_bptt.py` en el repositorio de código; los escalares
+necesarios están publicados acá en
+`resultados/logs_entrenamiento/vel_run__stage2_equiv_vel_s42_20260907-140554_5de5e17a-fixpiso-vel.jsonl`.*
 
 - **Se puede truncar.** Cuatro pasos de los doce conservan entre **0,86 y 0,93** de la dirección del
   gradiente exacto. La cola de DRaFT-K da 0,86, y una ventana no contigua elegida a mano, 0,93. Incluso
@@ -966,7 +985,9 @@ cinemática de la corrida principal, que a 33 cuadros paga 46,7 s/paso con esa m
 Ésta es la prueba empírica de la primera. Se corrieron **cinco** brazos de 150 pasos, idénticos salvo la
 ventana, sobre la pérdida arreglada y la cantidad que sí tiene señal. **No se distinguen**, y visto
 desde el coseno era lo esperable: si toda ventana razonable retiene más del 85 % de la dirección, 150
-pasos no alcanzan para separarlas. Las dos mitades cuentan la misma historia desde lados distintos.
+pasos no alcanzan para separarlas. Lectura práctica: truncar parece viable para ahorrar costo, pero
+este barrido corto no demuestra que mejore el resultado final. Las dos mitades cuentan la misma
+historia desde lados distintos.
 
 ![Barrido de ventanas de BPTT](figuras/barrido_ventanas_bptt.png)
 
