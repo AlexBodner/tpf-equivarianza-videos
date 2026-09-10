@@ -400,6 +400,33 @@ Las dos salidas que quedan:
 
 </details>
 
+## Sin condicionamiento y fuera de dominio, en los checkpoints elegidos
+
+Estas dos faltaban y se generaron el 10 de septiembre sobre los pesos publicados, con el checkpoint
+que eligió cada brazo. **Son n = 2 clips por prompt: alcanzan para mirar, no para medir**, así que acá
+no hay ninguna cifra.
+
+Sin condicionamiento, o sea generando sólo desde el texto:
+
+![Generación por texto en los checkpoints elegidos](gifs/t2v_elegidos_control_vs_fisica.gif)
+
+*Arriba el modelo base, que trae la estética fotorrealista de SANA y casi no se mueve. Abajo los dos
+brazos, ya adaptados al dominio sintético. Archivo: `videos/21_t2v_control_vs_fisica.mp4`.*
+
+Y con los dos prompts fuera de dominio, que nunca se entrenaron:
+
+![Fuera de dominio en los checkpoints elegidos](gifs/ood_elegidos_control_vs_fisica.gif)
+
+*Archivo: `videos/22_ood_control_vs_fisica.mp4`. En estos dos clips el control genera **dos pelotas** en
+`rolling` y le cambia el color a la pelota entre cuadros, y el brazo con física mantiene una sola. Es
+una observación sobre dos clips, no un resultado: la degradación fuera de dominio que sí está medida es
+la de la sección siguiente.*
+
+Reproducible con `scripts_figuras/componer_t2v_ood.py` sobre la salida de `run_eval.py --skip_iid
+--dump_videos`.
+
+---
+
 ## Fuera de dominio se rompe
 
 *Póster: sección «Resultados», fila fuera de distribución.*
