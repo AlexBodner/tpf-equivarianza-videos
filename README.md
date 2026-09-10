@@ -43,6 +43,22 @@ Ni la regla de selección ni ninguno de los análisis exploratorios tocaron esos
 </details>
 ---
 
+### Una palabra que aparece en todo el documento: **cota**
+
+Una cota es el puntaje que se saca **sin modelo**, con un video falso que no aprendió nada. Está para
+saber contra qué comparar. Hay dos en todo el trabajo:
+
+- **video quieto**: se congela el primer cuadro y no se mueve nada.
+- **velocidad constante**: el objeto va en línea recta a velocidad fija.
+
+Sirven porque una métrica sola no dice nada. Si un modelo no le gana a un video congelado, esa métrica
+no está midiendo lo que uno cree. El caso más claro es el error de velocidad en caída libre, donde la
+línea recta da 0,05 y le gana a todos los modelos: una caída de 33 cuadros se parece demasiado a una
+recta, así que ahí la métrica casi no informa. Por eso las cotas van **en cada tabla**, y nunca se
+promedian escenarios que tienen cotas distintas.
+
+---
+
 ## Cómo leer los paneles
 
 - Videos de cuatro paneles: **ground truth del simulador · modelo base sin fine-tuning · generación
