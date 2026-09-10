@@ -109,3 +109,16 @@ movimiento, haría que la regla de selección no se pueda ganar quedándose quie
   No hace falta para lo que se reporta, porque a este λ el movimiento no cae, sube en caída libre con
   p = 0,001. Haría falta para subir λ, donde la pérdida original sí colapsó el movimiento a 0,13 contra
   0,60 del control en 100 pasos.
+- **Dos contrastes que no existen en los checkpoints elegidos, y no se pueden armar con lo que hay.**
+  Al limpiar los videos superados quedaron dos huecos, los dos por falta de generaciones, no por
+  descuido de edición:
+  - **Control contra física sin condicionamiento (t2v).** El brazo de control **no tiene ninguna
+    generación por texto en ningún paso**, así que el contraste no se puede mostrar. Haría falta
+    generar t2v del control en el paso 125, tres escenarios. El brazo con física sí las tiene, en 125
+    y en 875.
+  - **Fuera de dominio en los checkpoints elegidos.** Las muestras OOD se guardaron cada 250 pasos, de
+    modo que no hay ni en el 125 ni en el 875 para ninguno de los dos brazos. Lo que el README muestra,
+    `19_ood_rodando_paso875.mp4`, es sólo el brazo con física y viene de una corrida aparte. Para el
+    contraste haría falta generar OOD en 125 para el control y en 875 para los dos.
+
+  Las dos son una pasada de generación sobre pesos que ya están en Hugging Face, sin entrenar nada.
