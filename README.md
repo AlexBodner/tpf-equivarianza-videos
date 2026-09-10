@@ -438,6 +438,32 @@ estaba apagado (λ_boost = 0) desde semanas antes**. Durante ese tiempo el entre
 midieron una cantidad que nadie necesitaba y que [no tiene señal](#aceleracion) sobre video generado:
 acuerdo 0,07 contra 0,97 de la velocidad. Desarmar eso fue la corrección más grande del trabajo.
 
+**Una objeción justa: las tres se justifican igual de bien desde la acción.** Es cierto. Con
+`L = Σ ½m·ẋ² − V`, la invarianza de boost pide que `V` dependa sólo de posiciones relativas, y sigue
+valiendo con gravedad uniforme porque el lagrangiano cambia en una derivada total; su carga de Noether
+es el teorema del centro de masa. La respuesta es que **ser una simetría verdadera es necesario pero no
+suficiente para ser una señal de entrenamiento útil**. Lo que decide el valor no es cuán fundamental es
+la simetría, sino cuánto descarta, y eso depende de si el grupo actúa de forma **no trivial** sobre la
+cantidad que uno puede medir:
+
+| | qué se le hace a la entrada | qué exige de la salida | ¿pasa "generá lo mismo"? |
+|---|---|---|---|
+| rotación | rotar la escena, gravedad incluida | `v_rot = R(θ)·v_orig` | **no** |
+| boost | agregar deriva constante `c` | `a_boost = a_orig` | **sí** |
+| traslación | correr la escena en el espacio | mismo flujo agregado | **sí** |
+
+La rotación tiene una acción **fiel** sobre el observable: la rama transformada tiene que ser una
+generación genuinamente distinta, con la trayectoria curvando para otro lado, y atada al ángulo.
+Generar lo mismo dos veces la viola. El boost actúa como la **identidad** sobre la aceleración, así que
+la restricción es una invarianza y la satisface cualquier cosa insensible a la deriva, incluido un
+modelo que genera el mismo video con un desplazamiento rígido encima. Es más fundamental como física y
+más pobre como restricción.
+
+Hay además una capa práctica: la carga de Noether del boost es el movimiento del centro de masa, y
+`aggregate_flow` **ya es** aproximadamente una velocidad de centro de masa, que además resta el flujo
+medio global antes de armar la máscara para que un clip con deriva seleccione los mismos píxeles. Parte
+de lo que el boost pediría está horneado en el instrumento.
+
 Con eso dicho, ninguna de las dos que faltan es un atajo hacia adelante:
 
 - La **traslación espacial** no agrega nada con este pipeline. `aggregate_flow` reduce la escena a un
