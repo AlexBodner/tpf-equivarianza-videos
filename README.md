@@ -446,18 +446,20 @@ suficiente para ser una señal de entrenamiento útil**. Lo que decide el valor 
 la simetría, sino cuánto descarta, y eso depende de si el grupo actúa de forma **no trivial** sobre la
 cantidad que uno puede medir:
 
-| | qué se le hace a la entrada | qué exige de la salida | ¿pasa "generá lo mismo"? |
-|---|---|---|---|
-| rotación | rotar la escena, gravedad incluida | `v_rot = R(θ)·v_orig` | **no** |
-| boost | agregar deriva constante `c` | `a_boost = a_orig` | **sí** |
-| traslación | correr la escena en el espacio | mismo flujo agregado | **sí** |
+La prueba concreta para saber si una restricción tiene filo es preguntarse: **¿la aprobaría un modelo
+que ignora por completo la transformación y genera el mismo video en las dos ramas?** Si la aprueba, la
+restricción no lo obliga a nada y no le enseña nada.
 
-La rotación tiene una acción **fiel** sobre el observable: la rama transformada tiene que ser una
-generación genuinamente distinta, con la trayectoria curvando para otro lado, y atada al ángulo.
-Generar lo mismo dos veces la viola. El boost actúa como la **identidad** sobre la aceleración, así que
-la restricción es una invarianza y la satisface cualquier cosa insensible a la deriva, incluido un
-modelo que genera el mismo video con un desplazamiento rígido encima. Es más fundamental como física y
-más pobre como restricción.
+| | qué se le hace a la entrada | qué exige de la salida | ¿la aprueba un modelo que genera lo mismo en las dos ramas? |
+|---|---|---|---|
+| rotación | rotar la escena, gravedad incluida | `v_rot = R(θ)·v_orig` | **no**: pediría `R(θ)·v = v`, falso salvo θ = 0 |
+| boost | agregar una deriva constante `c` | `a_boost = a_orig` | **sí**: se cumple sola |
+| traslación | correr la escena en el espacio | mismo flujo agregado | **sí**: `aggregate_flow` ya da lo mismo |
+
+O sea que la rotación tiene una acción **fiel** sobre el observable: obliga a que la rama transformada
+sea una generación genuinamente distinta, con la trayectoria curvando para otro lado, y atada al
+ángulo. El boost actúa como la **identidad** sobre la aceleración, así que un modelo que no se entera
+de la deriva la aprueba igual. Es más fundamental como física y más pobre como restricción.
 
 Hay además una capa práctica: la carga de Noether del boost es el movimiento del centro de masa, y
 `aggregate_flow` **ya es** aproximadamente una velocidad de centro de masa, que además resta el flujo
