@@ -814,13 +814,37 @@ movimiento: el brazo que más se mueve gana en el cociente y pierde en el error 
 **Y sobre lo que se minimiza no hay diferencia.** Los diez pares posibles dan p entre 0,15 y 0,66,
 ninguno significativo.
 
-**Los brazos no recibieron la misma cantidad de señal física.** El término se saltea cuando el
-desacuerdo queda por debajo del piso de RAFT o cuando el margen contra ese piso es menor que 3, y eso
-no cayó parejo: `full` entrenó con gradiente físico en **117 de 150** pasos contra 126-130 de los
+**Los brazos no recibieron la misma cantidad de señal física.** El entrenador puede decidir **no
+aplicar el término físico** en un paso, por dos motivos distintos, y conviene tenerlos separados
+porque salen de las dos mitades de la fórmula:
+
+- **Saturación (`N - A <= 0`)**, en el **numerador**: las dos ramas se parecen más de lo que RAFT sabe
+  distinguir, así que el numerador clampeado vale exactamente 0 y el gradiente también. No hay nada
+  que medir, porque no se puede separar "las ramas coinciden" de "el estimador no da para tanto". Es
+  la misma saturación por la que [el video congelado y el modelo base puntúan bien](#numeros).
+- **Guardián de margen (`margen_piso < 3`)**, en el **denominador**: `margen_piso` es `D / A`, cuántas
+  veces la energía del movimiento supera al piso del estimador. La pérdida es invariante a escala sólo
+  mientras `D` sea bastante mayor que `A`; cuando se acercan, el `max(D - A, A)` clampea contra una
+  constante y **la pérdida vuelve a premiar encoger**, que es justo la ruta degenerada que la
+  normalización venía a eliminar. Antes que entrenar con la pérdida rota, el paso se saltea y se
+  registra el motivo.
+
+En corto: saturado es que el video se mueve bien pero las ramas ya coinciden dentro del ruido; margen
+bajo es que el video casi no se mueve y con tan poco movimiento la fórmula deja de ser confiable.
+
+Ninguno de los dos cayó parejo entre brazos: `full` entrenó con gradiente físico en **117 de 150** pasos contra 126-130 de los
 otros cuatro. Apareado paso a paso es una diferencia real, no ruido de muestreo (McNemar: p = 0,007
 contra `mejor6comp`, 0,023 contra `ventana4`, 0,027 contra `mejor6`, 0,093 contra `cola4`), y la
 causa es el guardián de margen, que se disparó 15 veces en `full` y 3 o 4 en el resto. O sea que el
-brazo más caro es también el que menos veces recibió el término. No invierte la conclusión (que es que
+brazo más caro es también el que menos veces recibió el término.
+
+Y no es un corrimiento general del margen sino **la cola**: en mediana `full` está en el medio del
+pelotón (37,1 contra 33,4-44,8), pero su percentil 5 es 0,9 y el de los demás 4,6-5,9. El BPTT completo
+produce cada tanto pasos donde el video generado casi no se mueve, y las ventanas truncadas casi no.
+El comentario del código que introdujo el guardián dice que en el experimento anterior el brazo
+degenerado era el de menor margen, o sea que la degeneración acerca a la cornisa; la lectura natural
+es que el gradiente exacto empuja más fuerte hacia el rincón de moverse menos. Con 150 pasos y un solo
+barrido eso es una hipótesis, no un resultado. No invierte la conclusión (que es que
 no hay diferencia) pero sí la califica: si el barrido llegara a favorecer a una ventana truncada,
 parte de esa ventaja podría ser sólo que recibió más pasos con señal.
 
