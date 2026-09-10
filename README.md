@@ -336,6 +336,15 @@ física en el 875.
 control tiene una. En caída libre las dos trayectorias son parecidas, que es donde los números dan a
 favor del brazo con física. Archivo: `videos/20_elegidos_gt_control_fisica.mp4`.*
 
+Y sin condicionamiento, generando sólo desde el texto:
+
+![Generación por texto en los checkpoints elegidos](gifs/t2v_elegidos_control_vs_fisica.gif)
+
+*Mismo par de checkpoints, sin cuadros de condicionamiento. Arriba el modelo base, que trae la estética
+fotorrealista de SANA y casi no se mueve; abajo los dos brazos, ya adaptados al dominio sintético.
+También n = 2 por escenario. Archivo: `videos/21_t2v_control_vs_fisica.mp4`, reproducible con
+`scripts_figuras/componer_t2v_ood.py`.*
+
 Que la duplicación aparezca en el checkpoint elegido (y no sólo en los que descartamos) es lo que hace
 que el resultado no se pueda contar como «casi funciona»: el modelo que la regla señala como el mejor
 del brazo con física sigue partiendo el objeto en dos.
@@ -417,6 +426,20 @@ agregado.*
 
 En el único escenario fuera de distribución con ground truth (tiro vertical) el error de velocidad
 empeora de 7,63 a 8,80 (p = 0,005) y la razón de movimiento cae a 0,12 contra 0,43 del control.
+
+**En los checkpoints que se reportan** no había generaciones fuera de dominio, porque las muestras se
+guardaban cada 250 pasos. Se generaron el 10 de septiembre sobre los pesos publicados:
+
+![Fuera de dominio en los checkpoints elegidos](gifs/ood_elegidos_control_vs_fisica.gif)
+
+*Los dos prompts fuera de dominio con el modelo base arriba, el control (paso 125) en el medio y el
+brazo con física (paso 875) abajo. Archivo: `videos/22_ood_control_vs_fisica.mp4`.*
+
+En estos dos clips el base no mueve la pelota, el control genera **dos objetos** en `rolling` y el brazo
+con física mantiene uno solo. **No lo tomes como resultado**: son n = 2 clips por prompt, sin control de
+semilla, y es exactamente el caso contra el que advierte el desplegable de abajo, donde la misma
+comparación con tres semillas da entre 0 y 9 objetos para el mismo checkpoint. Además ninguno de los dos
+hace lo que el prompt pide, que es rodar: los dos hacen caer la pelota.
 
 <details>
 <summary>Lo que buscamos acá y no encontramos, y una advertencia sobre cómo medir esto</summary>
