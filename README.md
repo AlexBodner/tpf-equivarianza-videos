@@ -400,14 +400,38 @@ es válido como razón; su traslado a la configuración de 33 cuadros no está m
 
 *Póster: sección «Trabajo futuro».*
 
-1. **Que la pérdida vea todo lo que el modelo genera**: hoy mira 24 de 32 vectores en péndulo y
+1. **Sumar el boost galileano, que es el ancla de escala que falta.** Es el punto más importante y hay
+   que decir por qué, porque las tres simetrías del proyecto no sirven para lo mismo:
+
+   - La **rotación** es la que está implementada. Es una restricción de *forma*: dice que las dos
+     cinemáticas tienen que ser una la rotada de la otra, y no dice nada sobre cuán grande es el
+     movimiento. Por eso admite el atajo de moverse menos, y por eso hubo que normalizar por la energía,
+     que le saca el premio al atajo pero no lo prohíbe.
+   - La **traslación espacial**, tal como está el pipeline, no agrega casi nada. `aggregate_flow` reduce
+     la escena a un promedio pesado del flujo, así que correr la escena en el espacio devuelve
+     prácticamente el mismo vector: la restricción ya se cumple antes de entrenar y el gradiente es
+     ruido. No es un problema del código, es que el agregador ya es invariante a traslaciones.
+   - El **boost** es distinto y es el que tiene filo. Si la escena arranca con una deriva conocida de
+     `c` px/cuadro, las velocidades de las dos ramas tienen que diferir **exactamente en `c`**. Eso es
+     una **referencia absoluta con unidades**, y no encoge cuando el modelo encoge: si el modelo achica
+     todo el movimiento por un factor `s`, la diferencia entre las ramas pasa a ser `s·c` y la pérdida
+     lo cobra. Ataca la ruta degenerada de frente, y sigue **sin usar anotaciones**, porque `c` no se
+     mide en ningún lado: lo elegimos nosotros al construir la rama.
+
+   Con una salvedad de implementación: `l_equiv_boost` y `l_equiv_translation` están escritas sobre
+   **aceleraciones** (`MSE(a1, a2)`, la aceleración no cambia bajo boost), que es justamente la cantidad
+   que [no tiene señal](#aceleracion) sobre video generado. Sumarlas como están agregaría ruido. La
+   versión que vale la pena es la de velocidad, que además es la que da el ancla.
+
+2. **Que la pérdida vea todo lo que el modelo genera**: hoy mira 24 de 32 vectores en péndulo y
    rebote, 12 o 16 en caída libre, y una generación de 12 pasos de Euler en vez de 20. Es una hipótesis
    razonable (no comprobada) que la corrupción se aloje en lo que queda fuera.
-2. **Emparejar las velocidades entre las dos generaciones**, que es la pieza que falta para escenas con
-   más de un objeto. La única alternativa que esquiva el emparejamiento es comparar la **distribución**
-   de velocidades, invariante a posición y a permutar objetos.
-3. **Anclar la escala del movimiento**, porque sin eso la restricción siempre admite el atajo de
-   moverse menos. El costo es que deja de ser una restricción sin ground truth, que era el atractivo.
+3. **Cambiar cómo se usa el flujo óptico**, que es de donde salen las dos rutas degeneradas: reducir la
+   escena a un vector por cuadro es lo que permite que dos objetos opuestos se cancelen. Usar el campo
+   completo y penalizar el flujo que no tiene correspondencia en la rama transformada castiga
+   directamente al objeto que aparece de más.
+4. **Video real**: la pérdida no pide anotaciones, así que se puede entrenar sobre video natural
+   (Physics-IQ) sin simulador.
 
 ---
 
