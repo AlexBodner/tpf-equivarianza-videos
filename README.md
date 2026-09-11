@@ -3,96 +3,15 @@
 Material del TPF de Visión Artificial Avanzada (UdeSA). Este repositorio acompaña al póster: acá están
 los videos, las evaluaciones crudas y los scripts que rehacen cada figura y cada número.
 
-El trabajo le enseña física a un modelo de difusión de video **sin ground truth físico**. En vez de
-imponer una ley de conservación, que pide conocer la masa y el potencial, impone una **equivarianza**:
-si se rota la escena entera, incluida la gravedad, la cinemática de lo generado tiene que rotar igual.
-El movimiento se estima con RAFT sobre los propios videos generados y todo se retropropaga hasta los
-pesos, así que **la etiqueta se genera sola**.
-
-**El resultado, en dos líneas.** La simetría se aprende: el desacuerdo entre las dos ramas baja
-**46 %** sobre 88 clips que nunca se miraron. Pero en generación condicionada eso **no se traduce en
-mejor física**: el error de velocidad contra el simulador baja sólo 3 %, que no se distingue del cero.
-Donde sí aparecen diferencias es en **generación por texto**, y ahí no hay ground truth contra qué
-medirlas.
-
----
-
-## Lo que genera el modelo
-
-Lo más visible del trabajo no está en la tabla, está acá. Salvo donde se aclara, son generaciones
-**sólo desde el texto**, sin ningún frame real que sostenga el arranque, y el control y el brazo con
-física parten de la misma semilla.
-
-### Una pelota que rueda, con un prompt que el modelo nunca vio
-
-![Rodando, semilla 6](gifs/rodando_semilla6.gif)
-
-*El brazo con física deja la pelota sobre el piso y la hace rodar; el control la mantiene flotando.
-Archivo: [`videos/4_ocho_semillas/rodando/semilla6.mp4`](videos/4_ocho_semillas/rodando/semilla6.mp4).*
-
-Sobre las ocho semillas, juzgando el **tramo final** de cada clip (altura baja, estable y avanzando en
-horizontal), el brazo con física **termina rodando en 5 de 8** y el control **en ninguna**. Las ocho
-están en [`videos/4_ocho_semillas/rodando/`](videos/4_ocho_semillas/rodando) para que las juzgue quien lea,
-que es lo que corresponde: el criterio automático no distingue "apoyado en el piso" de "flotando bajo",
-y el único caso que marca para el control es una pelota que se desplaza en el aire. La medición está en
-[`scripts_figuras/medir_rodando.py`](scripts_figuras/medir_rodando.py).
-
-### Los cuatro escenarios, lado a lado
-
 ![Generación por texto, cuatro escenarios](gifs/por_texto_4_escenarios.gif)
 
-*Control arriba, brazo con física abajo, misma semilla. El péndulo sostiene la oscilación, el rebote
-mantiene una sola pelota donde el control la duplica y le cambia el color, la caída libre sale parecida
-en los dos, y rodando aparece sólo en el equivariante. Archivo:
+*Los cuatro escenarios generados **sólo desde el texto**, control arriba y brazo con física abajo, con
+la misma semilla, la 0 en los cuatro. El péndulo sostiene la oscilación, el rebote mantiene una sola
+pelota donde el control la duplica y le cambia el color, y rodando termina sobre el piso sólo en el
+equivariante. En caída libre pasa lo contrario: ahí el que duplica la pelota es el brazo con física, y
+se ve en este mismo video; el conteo sobre las ocho semillas está
+[más abajo](#cómo-satisface-la-simetría-sin-mejorar-la-física). Archivo:
 [`videos/2_resultados/por_texto_4_escenarios.mp4`](videos/2_resultados/por_texto_4_escenarios.mp4).*
-
-Cada uno de esos escenarios tiene sus ocho semillas, una por archivo, en
-[`videos/4_ocho_semillas/`](videos/4_ocho_semillas): [rebote](videos/4_ocho_semillas/rebote),
-[péndulo](videos/4_ocho_semillas/pendulo), [caída libre](videos/4_ocho_semillas/caida_libre) y
-[péndulo fotográfico](videos/4_ocho_semillas/pendulo_foto). La duplicación de la pelota en el control
-del rebote no es de una semilla sola.
-
-### Los otros dos prompts fuera de dominio
-
-![Fuera de dominio](gifs/fuera_de_dominio.gif)
-
-*Rodando y un péndulo pedido en estética fotográfica, con el modelo base arriba como referencia de lo
-que trae SANA sin fine-tuning. Archivo:
-[`videos/2_resultados/fuera_de_dominio.mp4`](videos/2_resultados/fuera_de_dominio.mp4).*
-
-### Extrapolación: 65 frames contra los 33 de entrenamiento
-
-El período del péndulo es de 37,4 frames, así que con 33 nunca se ve una oscilación completa. A 65 sí,
-y del frame 33 en adelante todo es extrapolación.
-
-![Péndulo a 65 frames, por texto](gifs/por_texto_65_frames.gif)
-
-*Generando sólo desde el texto, el péndulo **sigue oscilando** pasado el horizonte.*
-
-![Péndulo a 65 frames, condicionado](gifs/condicionado_65_frames.gif)
-
-*Condicionado en frames reales, **ninguno de los dos brazos sostiene el movimiento**. Archivos:
-[`condicionado_65_frames.mp4`](videos/3_extrapolacion/condicionado_65_frames.mp4) y
-[`por_texto_65_frames_semilla0.mp4`](videos/3_extrapolacion/por_texto_65_frames_semilla0.mp4), con una
-[segunda semilla](videos/3_extrapolacion/por_texto_65_frames_semilla1.mp4) al lado.*
-
-Medido como la amplitud de la segunda mitad sobre la primera:
-
-| | clip 1 | clip 2 |
-|---|---|---|
-| condicionado, control | 0,14 | 0,34 |
-| condicionado, con física | 0,63 | 0,54 |
-| por texto, control | 1,03 | 0,95 |
-| por texto, con física | 0,98 | 1,22 |
-
-Condicionado se apaga; por texto se mantiene entero. El desvanecimiento de la pelota que se ve en el
-condicionado ocurre en **los dos brazos** por igual: el área que ocupa cae a la mitad en ambos, así que
-no distingue brazos, distingue régimen.
-
-**Ninguna de estas diferencias tiene ground truth contra qué medirse**, y la pérdida física nunca se
-aplicó a generaciones por texto: sólo a las condicionadas. Donde sí hay con qué medir es en generación
-condicionada, y ahí el resultado es el de [la tabla](#la-simetría-se-aprende): la simetría se aprende y
-la física no mejora.
 
 ---
 
@@ -123,6 +42,9 @@ Los videos están en [`videos/`](videos), agrupados por el papel que cumplen:
 El índice archivo por archivo está en [`videos/LEEME.md`](videos/LEEME.md), para llegar a cualquier
 ejemplo sin buscar.
 
+Los cinco prompts, completos y textuales, están en [PROMPTS.md](PROMPTS.md): en generación por texto
+son la única entrada, así que conviene tenerlos a mano antes de mirar los videos.
+
 Las evaluaciones crudas están en [`resultados/`](resultados), con [`LEEME.md`](resultados/LEEME.md)
 explicando qué mide cada archivo y cuál sirve para qué. Los pesos y el archivo completo de videos
 están en [Hugging Face](https://huggingface.co/AlexBodner/tpf-equivarianza-video).
@@ -131,6 +53,87 @@ están en [Hugging Face](https://huggingface.co/AlexBodner/tpf-equivarianza-vide
 validación: **control en el paso 125** y **brazo con física en el paso 875**. Cualquier video de otro
 paso está en `9_checkpoints_superados/` y dice de dónde viene, y cómo se eligió cada uno está en
 [El método](#el-método).
+
+---
+
+## Lo que genera el modelo
+
+Lo más visible del trabajo no está en la tabla, está acá. Salvo donde se aclara, son generaciones
+**sólo desde el texto**, sin ningún frame real que sostenga el arranque, y el control y el brazo con
+física parten de la misma semilla.
+
+### Una pelota que rueda, con un prompt que el modelo nunca vio
+
+![Rodando, semilla 6](gifs/rodando_semilla6.gif)
+
+*El brazo con física deja la pelota sobre el piso y la hace rodar; el control la mantiene flotando.
+Archivo: [`videos/4_ocho_semillas/rodando/semilla6.mp4`](videos/4_ocho_semillas/rodando/semilla6.mp4).*
+
+Sobre las ocho semillas, juzgando el **tramo final** de cada clip (altura baja, estable y avanzando en
+horizontal), el brazo con física **termina rodando en 5 de 8** y el control **en ninguna**. Las ocho
+están en [`videos/4_ocho_semillas/rodando/`](videos/4_ocho_semillas/rodando) para que las juzgue quien lea,
+que es lo que corresponde: el criterio automático no distingue "apoyado en el piso" de "flotando bajo",
+y el único caso que marca para el control es una pelota que se desplaza en el aire. La medición está en
+[`scripts_figuras/medir_rodando.py`](scripts_figuras/medir_rodando.py).
+
+### Las ocho semillas de cada escenario
+
+El video de arriba muestra una semilla de cada escenario. Las ocho de cada uno, una por archivo, están
+en
+[`videos/4_ocho_semillas/`](videos/4_ocho_semillas): [rebote](videos/4_ocho_semillas/rebote),
+[péndulo](videos/4_ocho_semillas/pendulo), [caída libre](videos/4_ocho_semillas/caida_libre) y
+[péndulo en cámara lenta](videos/4_ocho_semillas/pendulo_camara_lenta). La duplicación de la pelota en
+el control del rebote no es de una semilla sola.
+
+### Qué trae el modelo base, sin fine-tuning
+
+![Fuera de dominio](gifs/fuera_de_dominio.gif)
+
+*Los dos prompts que no están en el dataset, con el modelo base arriba. A la izquierda el mismo clip de
+rodando de recién; a la derecha el péndulo pedido con otras palabras y en cámara lenta. El base produce
+una pelota fotorrealista que no se traslada: ese aspecto no lo pide el prompt, es lo que SANA trae de
+fábrica, y los dos brazos lo pierden. Archivo:
+[`videos/2_resultados/fuera_de_dominio.mp4`](videos/2_resultados/fuera_de_dominio.mp4).*
+
+Los dos prompts están fuera del dataset por motivos distintos, y conviene no mezclarlos: *rodando* pide
+un movimiento que el simulador no tiene, y el otro pide **el mismo péndulo de siempre**, reformulado y
+con `slow motion`. Los cinco prompts completos están en [PROMPTS.md](PROMPTS.md).
+
+### Extrapolación: 65 frames contra los 33 de entrenamiento
+
+El período del péndulo es de 37,4 frames, así que con 33 nunca se ve una oscilación completa. A 65 sí,
+y del frame 33 en adelante todo es extrapolación.
+
+![El mismo péndulo, condicionado y por texto](gifs/pendulo_i2v_vs_t2v.gif)
+
+*El mismo péndulo a 65 frames en los cuatro paneles, y el mismo modelo: lo único que cambia es de dónde
+arranca. A la izquierda condicionado en 8 frames reales, a la derecha sólo desde el texto; arriba el
+control, abajo el brazo con física. El borde rojo marca dónde empieza la extrapolación. **Condicionado
+se apaga y por texto sostiene la oscilación**, en los dos brazos. Archivo:
+[`videos/3_extrapolacion/pendulo_i2v_vs_t2v.mp4`](videos/3_extrapolacion/pendulo_i2v_vs_t2v.mp4).*
+
+Los tres escenarios juntos, cada régimen en su archivo, están en
+[`condicionado_65_frames.mp4`](videos/3_extrapolacion/condicionado_65_frames.mp4) y
+[`por_texto_65_frames_semilla0.mp4`](videos/3_extrapolacion/por_texto_65_frames_semilla0.mp4), con una
+[segunda semilla](videos/3_extrapolacion/por_texto_65_frames_semilla1.mp4) al lado.
+
+Medido como la amplitud de la segunda mitad sobre la primera:
+
+| | clip 1 | clip 2 |
+|---|---|---|
+| condicionado, control | 0,14 | 0,34 |
+| condicionado, con física | 0,63 | 0,54 |
+| por texto, control | 1,03 | 0,95 |
+| por texto, con física | 0,98 | 1,22 |
+
+Condicionado se apaga; por texto se mantiene entero. El desvanecimiento de la pelota que se ve en el
+condicionado ocurre en **los dos brazos** por igual: el área que ocupa cae a la mitad en ambos, así que
+no distingue brazos, distingue régimen.
+
+**Ninguna de estas diferencias tiene ground truth contra qué medirse**, y la pérdida física nunca se
+aplicó a generaciones por texto: sólo a las condicionadas. Donde sí hay con qué medir es en generación
+condicionada, y ahí el resultado es el de [la tabla](#la-simetría-se-aprende): la simetría se aprende y
+la física no mejora.
 
 ---
 
@@ -306,9 +309,23 @@ La solución trivial **sigue siendo un mínimo**: quedarse quieto puntúa 0. Lo 
 saca es el *gradiente* hacia ella. El cociente es de grado cero, así que achicar todo no paga, y los
 pasos donde el movimiento no supera al ruido se saltean. Y funciona: el brazo con física no colapsa.
 
-Pero aparece otra degeneración: **parte el objeto en dos**. Eso se observa en varios escenarios y
-checkpoints. La explicación intuitiva, dos mitades opuestas cuyo flujo promediado se cancela, **no se
-sostuvo al medirla**: sobre 48 clips por texto, los que tienen dos objetos conservan el 87 % del flujo
+Pero aparece otra degeneración: **parte el objeto en dos**. Contando a ojo las pelotas del último
+cuadro de las ocho semillas de cada prompt por texto:
+
+| escenario | control duplica | con física duplica |
+|---|---|---|
+| caída libre | 1 de 8 | **3 de 8** |
+| péndulo | 0 de 8 | 0 de 8 |
+| rebote | **7 de 8** | 1 de 8 |
+| rodando | 1 de 8 | 1 de 8 |
+
+Los dos brazos lo hacen, en escenarios distintos: el control en rebote, el brazo con física en caída
+libre. Es un conteo a ojo, sin detector en el medio, y los cuadros están en
+[`videos/4_ocho_semillas/`](videos/4_ocho_semillas) para que lo rehaga quien lea. Los escenarios donde
+el brazo con física se ve mejor no son entonces "no duplica": son rebote y rodando en particular.
+
+La explicación intuitiva, dos mitades opuestas cuyo flujo promediado se cancela, **no se sostuvo al
+medirla**: sobre 48 clips por texto, los que tienen dos objetos conservan el 87 % del flujo
 agregado contra el 90 % de los de uno. Si se cancelara, tendría que desplomarse. **No sabemos por qué
 lo hace.**
 
@@ -427,9 +444,11 @@ y abortan si no reproducen un caso de respuesta conocida:
 | `gen_fig_truncamiento.py` | cuánta dirección retiene cada ventana, y el resultado de entrenar con ella |
 | `gen_panel_checkpoints.py` | las seis métricas por checkpoint, equivarianza arriba y física abajo |
 | `gen_seleccion_por_validacion.py` | qué checkpoint elige cada brazo con su propio objetivo |
+| `componer_por_texto.py` | los cuatro escenarios por texto, que es el video que abre este README |
 | `componer_semillas.py` | las ocho semillas de cada prompt, control arriba y física abajo |
 | `componer_condicionado.py` | el contraste condicionado contra ground truth, por escenario |
-| `componer_i2v_65.py`, `componer_t2v_ood.py` | los videos comparados de 65 frames y fuera de dominio |
+| `componer_pendulo_i2v_vs_t2v.py` | el mismo péndulo condicionado y por texto, en un solo video |
+| `componer_t2v_ood.py`, `componer_i2v_65.py` | los prompts fuera del dataset y los 65 frames |
 
 Los dos scripts que componen videos leen [`videos/8_generaciones_crudas/`](videos/8_generaciones_crudas),
 así que los comparados se rehacen sin salir del repositorio:

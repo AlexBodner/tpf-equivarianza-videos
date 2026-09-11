@@ -19,11 +19,11 @@ BRAZOS = [("control_125", "control (paso 125)"), ("fisica_875", "con fisica (pas
 
 # nombre de salida -> (subcarpeta de la generación, prefijo del archivo)
 PROMPTS = {
-    "rodando":      ("ood", "rolling"),
-    "pendulo_foto": ("ood", "pendulum_photo"),
-    "pendulo":      ("t2v", "pendulum"),
-    "rebote":       ("t2v", "bouncing"),
-    "caida_libre":  ("t2v", "free_fall"),
+    "rodando":              ("ood", "rolling"),
+    "pendulo_camara_lenta": ("ood", "pendulum_photo"),
+    "pendulo":              ("t2v", "pendulum"),
+    "rebote":               ("t2v", "bouncing"),
+    "caida_libre":          ("t2v", "free_fall"),
 }
 SEMILLAS = range(8)
 
@@ -40,21 +40,35 @@ def cuadros(p):
     return fs
 
 
-def componer(rutas, salida):
-    """rutas: [(etiqueta, path)] apiladas de arriba hacia abajo."""
-    pilas = [cuadros(p) for _, p in rutas]
-    T = min(len(v) for v in pilas)
-    alto = len(pilas) * (LADO + BARRA) + (len(pilas) - 1) * SEP
+def componer_grilla(grilla, salida, marca=None):
+    """grilla: filas de [(etiqueta, path)], de arriba abajo y de izquierda a derecha.
+
+    marca: (primer_cuadro, texto). Desde ese cuadro se dibuja un borde rojo y el
+    texto abajo. Sirve para señalar dónde empieza la extrapolación, que es lo que
+    un espectador no puede deducir mirando el video.
+    """
+    pilas = [[cuadros(p) for _, p in fila] for fila in grilla]
+    T = min(len(v) for fila in pilas for v in fila)
+    n_col = max(len(fila) for fila in grilla)
+    ancho = n_col * LADO + (n_col - 1) * SEP
+    alto = len(grilla) * (LADO + BARRA) + (len(grilla) - 1) * SEP
     tmp = Path("/tmp/crudo_semillas.mp4")
-    vw = cv2.VideoWriter(str(tmp), cv2.VideoWriter_fourcc(*"mp4v"), FPS, (LADO, alto))
+    vw = cv2.VideoWriter(str(tmp), cv2.VideoWriter_fourcc(*"mp4v"), FPS, (ancho, alto))
     for t in range(T):
-        lienzo = np.zeros((alto, LADO, 3), np.uint8)
+        lienzo = np.zeros((alto, ancho, 3), np.uint8)
         y = 0
-        for (etiqueta, _), fs in zip(rutas, pilas):
-            cv2.putText(lienzo, etiqueta, (5, y + BARRA - 8),
-                        FUENTE, 0.48, (245, 245, 245), 1, cv2.LINE_AA)
-            lienzo[y + BARRA:y + BARRA + LADO] = fs[t]
+        for fila, pila in zip(grilla, pilas):
+            for i, ((etiqueta, _), fs) in enumerate(zip(fila, pila)):
+                x = i * (LADO + SEP)
+                cv2.putText(lienzo, etiqueta, (x + 5, y + BARRA - 8),
+                            FUENTE, 0.48, (245, 245, 245), 1, cv2.LINE_AA)
+                lienzo[y + BARRA:y + BARRA + LADO, x:x + LADO] = fs[t]
             y += LADO + BARRA + SEP
+        if marca and t >= marca[0]:
+            cv2.rectangle(lienzo, (1, 1), (ancho - 2, alto - 2), (60, 60, 235), 4)
+            texto = f"{marca[1]} (cuadro {t + 1} de {T})"
+            cv2.putText(lienzo, texto, (10, alto - 10),
+                        FUENTE, 0.55, (60, 60, 235), 1, cv2.LINE_AA)
         vw.write(lienzo)
     vw.release()
     # Constrained Baseline: es lo que abre en QuickTime sin convertir nada.
@@ -62,6 +76,11 @@ def componer(rutas, salida):
                     "-c:v", "libx264", "-profile:v", "baseline", "-level", "3.0",
                     "-pix_fmt", "yuv420p", str(salida)], check=True)
     return T
+
+
+def componer(rutas, salida):
+    """Una sola columna: cada entrada de `rutas` es una fila."""
+    return componer_grilla([[r] for r in rutas], salida)
 
 
 def main(raiz, salida):

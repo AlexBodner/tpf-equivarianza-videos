@@ -2,7 +2,7 @@
 
 Índice de todo lo que hay, para llegar a cualquier ejemplo sin buscar. Los videos comparados de las
 carpetas 1 a 6 se arman desde [`8_generaciones_crudas/`](8_generaciones_crudas), donde está cada
-generación suelta.
+generación suelta. Los prompts completos, uno por escenario, están en [PROMPTS.md](../PROMPTS.md).
 
 **Todo lo que está fuera de `9_checkpoints_superados/` sale del par de checkpoints que el trabajo
 reporta**: control en el paso 125 y brazo con física en el paso 875, elegidos cada uno por su propia
@@ -29,10 +29,11 @@ validación sobre los mismos ocho candidatos. Los pesos de los dos están en
 **2_resultados**
 [`condicionado_gt_control_fisica.mp4`](2_resultados/condicionado_gt_control_fisica.mp4) · los tres escenarios, ground truth contra los dos brazos
 [`por_texto_4_escenarios.mp4`](2_resultados/por_texto_4_escenarios.mp4) · caída libre, péndulo, rebote y rodando, sólo desde el texto
-[`fuera_de_dominio.mp4`](2_resultados/fuera_de_dominio.mp4) · rodando y péndulo fotográfico, con el modelo base de referencia
+[`fuera_de_dominio.mp4`](2_resultados/fuera_de_dominio.mp4) · los dos prompts fuera del dataset, con el modelo base de referencia
 [`condicionado_por_escenario/`](2_resultados/condicionado_por_escenario) · el mismo contraste condicionado, un archivo por escenario y por clip
 
 **3_extrapolacion**
+[`pendulo_i2v_vs_t2v.mp4`](3_extrapolacion/pendulo_i2v_vs_t2v.mp4) · el mismo péndulo condicionado y por texto, en un solo video, con la extrapolación marcada
 [`por_texto_65_frames_semilla0.mp4`](3_extrapolacion/por_texto_65_frames_semilla0.mp4) y [`semilla1`](3_extrapolacion/por_texto_65_frames_semilla1.mp4) · el péndulo por texto, que sostiene la oscilación
 [`condicionado_65_frames.mp4`](3_extrapolacion/condicionado_65_frames.mp4) · el mismo horizonte condicionado, donde ninguno de los dos la sostiene
 
@@ -41,7 +42,7 @@ validación sobre los mismos ocho candidatos. Los pesos de los dos están en
 [`rebote/`](4_ocho_semillas/rebote) · donde el control duplica la pelota y le cambia el color
 [`pendulo/`](4_ocho_semillas/pendulo) · la oscilación sostenida
 [`caida_libre/`](4_ocho_semillas/caida_libre) · el escenario donde los dos brazos salen parecidos
-[`pendulo_foto/`](4_ocho_semillas/pendulo_foto) · el mismo péndulo pedido en estética fotográfica
+[`pendulo_camara_lenta/`](4_ocho_semillas/pendulo_camara_lenta) · el mismo péndulo pedido con otras palabras y en cámara lenta
 
 **5_tiro_vertical**: [`clip_10000.mp4`](5_tiro_vertical/clip_10000.mp4) y [`clip_10001.mp4`](5_tiro_vertical/clip_10001.mp4)
 
