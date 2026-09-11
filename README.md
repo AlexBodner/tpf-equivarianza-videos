@@ -19,8 +19,24 @@ mejora, y fuera de distribución el modelo degenera. Lo que sí podemos señalar
 atajos como reducir movimiento en ciertos casos o partir la pelota en dos, haciendo que el flujo de la
 escena se cancele. A eso se suma que la pérdida ve una versión parcial de lo generado (24 de 32 vectores de velocidad en péndulo y rebote, 12 o 16 en caída libre, sobre 12 pasos de Euler contra los 20 de la inferencia) aunque **eso último es una hipótesis, no algo que hayamos medido**.
 
-Cada sección indica a qué parte del póster corresponde. Lo que queda abierto, incluido lo que no
-podemos explicar, está en [PENDIENTES.md](PENDIENTES.md).
+Lo que queda abierto, incluido lo que no podemos explicar, está en [PENDIENTES.md](PENDIENTES.md).
+
+## Si llegaste por el QR del póster
+
+Cada bloque del póster tiene su sección acá, con los videos y los números completos:
+
+| bloque del póster | sección |
+|---|---|
+| Método | [Las dos ramas que compara la pérdida](#el-método-las-dos-ramas-que-compara-la-pérdida) |
+| Resultados, panel de la izquierda | [Sí aprende la simetría, pero se queda lejos](#sí-aprende-la-simetría-pero-se-queda-lejos) |
+| Resultados, panel de la derecha | [Pero no mejora la física](#pero-no-mejora-la-física) |
+| Resultados, la tira de los dos brazos | [Lado a lado: el control contra el brazo con física](#lado-a-lado-el-control-contra-el-brazo-con-física) |
+| Conclusión de las dos rutas degeneradas | [La otra cara: cómo satisface la simetría](#la-otra-cara-cómo-satisface-la-simetría) |
+| Resultados, fuera de distribución | [Fuera de dominio se rompe](#fuera-de-dominio-se-rompe) |
+| Viabilidad computacional | [Lo que cuesta](#lo-que-cuesta) |
+| Análisis del gradiente | [Cuántos pasos de Euler hay que retropropagar](#bptt) |
+| Trabajo futuro | [Qué quedó como recomendación](#recomendacion) |
+| lo que no entró en el póster | [Anexo](#anexo): tablas completas, validación del instrumental y los experimentos que no funcionaron |
 
 **Los pesos y el archivo completo de videos están en Hugging Face:
 [AlexBodner/tpf-equivarianza-video](https://huggingface.co/AlexBodner/tpf-equivarianza-video).** Acá
