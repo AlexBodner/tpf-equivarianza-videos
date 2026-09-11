@@ -21,14 +21,23 @@ import numpy as np
 UMBRAL = 12.0
 AREA_MIN = 80
 N_SEMILLAS = 8
-# Rueda = esta abajo, no rebota y avanza. Los tres a la vez.
-ALTURA_MAX = 0.25
-DESVIO_MAX = 0.06
-RECORRIDO_MIN = 0.25
+FINAL = 11          # ultimos frames de 33: el tramo donde se juzga
+# Rueda AL FINAL: esta abajo, con altura estable y avanzando en horizontal.
+# El criterio mira el tramo final y no el clip entero porque la pelota suele caer
+# primero y rodar despues; pidiendo altura baja en TODO el clip, esos no contaban.
+ALTURA_MAX = 0.22
+DESVIO_MAX = 0.05
+AVANCE_MIN = 0.08
 
 
 def pista(ruta):
-    """Altura media (0 = piso, 1 = techo), su desvio y el recorrido horizontal."""
+    """Sobre el tramo final: altura media (0 = piso), su desvio y el avance en x.
+
+    Se sigue el objeto mas BAJO de cada frame y no el mas grande: cuando el modelo
+    parte la escena en dos, el mas grande salta entre objetos. Ojo que ninguno de
+    los dos criterios distingue "apoyado en el piso" de "flotando bajo": eso hay
+    que mirarlo, y por eso el conteo se contrasta con los videos.
+    """
     cap, fs = cv2.VideoCapture(str(ruta)), []
     while True:
         ok, f = cap.read()
@@ -41,20 +50,20 @@ def pista(ruta):
     fondo = np.median(arr, axis=0)
     alto, ancho = fondo.shape[:2]
     xs, ys = [], []
-    for f in arr:
+    for f in arr[-FINAL:]:
         d = np.abs(f - fondo).mean(axis=2)
         m = (d > UMBRAL).astype(np.uint8)
         n, _, stats, centros = cv2.connectedComponentsWithStats(m, 8)
         grandes = [j for j in range(1, n) if stats[j, cv2.CC_STAT_AREA] > AREA_MIN]
         if not grandes:
             continue
-        j = max(grandes, key=lambda k: stats[k, cv2.CC_STAT_AREA])
-        xs.append(centros[j][0])
-        ys.append(centros[j][1])
-    if len(ys) < 5:
-        raise SystemExit(f"[rodando] objeto no detectado en {ruta}")
+        j = max(grandes, key=lambda k: centros[k][1])
+        xs.append(centros[j][0] / ancho)
+        ys.append(1 - centros[j][1] / alto)
+    if len(ys) < FINAL - 2:
+        raise SystemExit(f"[rodando] objeto no detectado en el tramo final de {ruta}")
     xs, ys = np.array(xs), np.array(ys)
-    return (1 - ys.mean() / alto, ys.std() / alto, (xs.max() - xs.min()) / ancho)
+    return (ys.mean(), ys.std(), abs(xs[-1] - xs[0]))
 
 
 def main(raiz):
@@ -64,8 +73,8 @@ def main(raiz):
         filas = [pista(raiz / carpeta / "ood" / f"rolling_semilla{s}.mp4")
                  for s in range(N_SEMILLAS)]
         alturas[etiqueta] = np.array([f[0] for f in filas])
-        ruedan = [s for s, (a, d, r) in enumerate(filas)
-                  if a < ALTURA_MAX and d < DESVIO_MAX and r > RECORRIDO_MIN]
+        ruedan = [s for s, (a, d, av) in enumerate(filas)
+                  if a < ALTURA_MAX and d < DESVIO_MAX and av > AVANCE_MIN]
         print(f"{etiqueta:11s} ruedan {len(ruedan)}/{N_SEMILLAS}"
               + (f"  (semillas {ruedan})" if ruedan else "")
               + f"   altura media mediana {np.median(alturas[etiqueta]):.2f}")
