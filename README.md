@@ -1286,6 +1286,27 @@ generativo**. Para esta corrida hicieron falta cinco pruebas y quedó en 4,7e-03
 la fórmula de la pérdida invalida la calibración anterior** y obliga a repetirlas: el mismo λ sobre una
 fórmula distinta da otra razón.
 
+### Las curvas de entrenamiento
+
+![Las pérdidas de los dos brazos y cómo se eligió cada checkpoint](figuras/curvas_entrenamiento.png)
+
+*(a) La pérdida de difusión en entrenamiento es prácticamente la misma en los dos brazos: cada paso ve
+un clip distinto, así que la curva cruda es más ruido de muestreo que aprendizaje, y por eso va como
+mediana por ventanas de 50 pasos. (b) En validación, sobre 20 clips fijos, la diferencia sí se ve: el
+brazo con física queda **siempre por encima** del control, o sea que el término físico se paga en el
+objetivo generativo. (c) Lo que decidió el checkpoint: la suma que ese brazo efectivamente minimiza,
+difusión más λ por rotación. El mínimo cae en el 875, con el 375 a un 0,2 % de distancia. Reproducible
+con `scripts_figuras/gen_fig_curvas_entrenamiento.py`.*
+
+Tres advertencias sobre las escalas, porque es fácil dibujar esto mal y el primer intento salió mal:
+
+- El `loss_rotation` que guarda el log de entrenamiento es el término **ya multiplicado por λ**
+  (mediana 0,00086), no el cociente que la pérdida minimiza (mediana 0,078).
+- El `val_loss_rotation` del log vive en otra escala todavía, de 4 a 16: es el MSE crudo.
+- Las validaciones del log corren **cada 50 pasos**, así que ni el 125 ni el 875 aparecen ahí. Los
+  checkpoints se guardaron cada 125 y se validaron después, en una pasada aparte con el código ya
+  corregido; ésos son los archivos de `resultados/validaciones/`.
+
 **Un límite del montaje que conviene tener presente.** El período del péndulo es de 37,4 cuadros y
 generamos 33: nunca se ve una oscilación completa, ni en entrenamiento ni en evaluación.
 
