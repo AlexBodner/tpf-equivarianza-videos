@@ -959,6 +959,13 @@ horizonte, contra 5 de 32 del brazo con física). Archivo: `videos/23_elegidos_6
 reproducible con `scripts_figuras/componer_i2v_65.py`. **n = 2 clips por escenario**: alcanza para
 mirar, no para medir.*
 
+![Generación por texto a 65 cuadros](gifs/t2v_65_cuadros.gif)
+
+*Los mismos dos checkpoints generando **sólo desde el texto**, 65 cuadros. El entrenamiento vio 33, así que desde
+ahí el borde se pone rojo. El período del péndulo es de 37,4 cuadros: **recién acá se ve una oscilación completa**.
+Archivos: `videos/24_t2v_65_cuadros_semilla0.mp4` y `..._semilla1.mp4`, reproducibles con
+`evaluation/generar_t2v.py`. n = 2 semillas por escenario.*
+
 > ⚠️ **Esto corrige lo que decía esta sección.** Antes mostraba el paso 1000 de los dos brazos y
 > concluía que *el brazo con física disolvía la pelota y el control la mantenía*. En los checkpoints
 > que el trabajo efectivamente reporta pasa lo contrario: el que se desvanece es el control. La tabla
