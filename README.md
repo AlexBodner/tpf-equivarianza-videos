@@ -99,10 +99,12 @@ promedian escenarios que tienen cotas distintas.
 
 ![Las dos ramas de la pérdida](gifs/ramas_de_la_perdida.gif)
 
-*Brazo con física, paso 250: es el único checkpoint donde se guardaron las dos ramas del mismo clip.
-Sirve para ver qué compara la pérdida, que es lo que ilustra esta sección; la comparación entre los
-checkpoints elegidos está más abajo. Las dos generaciones del mismo clip con el mismo ruido: a la
-izquierda la escena original, a la derecha la escena rotada 45°.*
+*⚠️ **Este no es el modelo que reportamos**: es el brazo con física en el paso 250. Las dos ramas del
+mismo clip sólo se volcaron en los pasos 250 y 1000, así que en el checkpoint elegido (875) no existen;
+volver a generarlas pide otra corrida de GPU. Va acá porque lo que ilustra es **qué compara la
+pérdida**, que no depende del checkpoint. El modelo que sí reportamos está en
+[lado a lado](#ladoalado). Las dos generaciones del mismo clip con el mismo ruido: a la izquierda la
+escena original, a la derecha la escena rotada 45°.*
 
 ![Qué ve la pérdida](gifs/que_ve_la_perdida.gif)
 
@@ -376,6 +378,12 @@ p > 0,29), y **fuera de distribución el modelo degenera**: su razón de movimie
 0,43 del control, por debajo de la de un video estático. La restricción no fija la escala del
 movimiento, así que admite dos atajos.
 
+> **Qué checkpoint es cada clip.** Los dos atajos aparecen **en el checkpoint elegido**, el 875: están
+> en el video de [lado a lado](#ladoalado), donde el brazo con física parte la pelota del péndulo en
+> dos. Los clips de esta sección son del **paso 1000**, el último del entrenamiento, donde el mismo
+> efecto se ve más marcado y por eso se usan para ilustrarlo. No son de otra corrida ni de otro
+> experimento: es el mismo brazo, 125 pasos después del que reportamos.
+
 **Atajo 1: moverse menos.** Si todo se achica, el desacuerdo entre las dos ramas se achica solo.
 
 ![Caída libre, la pelota se achica](gifs/caida_libre_encoge.gif)
@@ -386,8 +394,9 @@ parcialmente: el vector agregado se achica y la pérdida baja sin que la dinámi
 
 ![Pelota duplicada en el rebote](gifs/pelota_duplicada.gif)
 
-*Checkpoint 1000. Dos pelotas de colores distintos en los paneles generados. Comparar con
-`videos/04_rebote_una_pelota_paso250.mp4`, el mismo escenario 750 pasos antes.*
+*Paso 1000, no el elegido. Dos pelotas de colores distintos en los paneles generados. Comparar con
+`videos/04_rebote_una_pelota_paso250.mp4`, el mismo escenario 750 pasos antes: ahí hay una sola, así
+que la duplicación aparece durante el entrenamiento con la pérdida física.*
 
 Archivos: `videos/03_rebote_pelota_duplicada_paso1000.mp4`, `videos/05_caida_libre_paso1000.mp4`,
 `videos/07_fuera_de_dominio_rodando.mp4`
@@ -939,12 +948,23 @@ El período del péndulo es de 37,4 cuadros y generamos 33: **nunca se ve una os
 Para ver si la dinámica sobrevive más allá de lo que el modelo vio, se generaron los mismos clips a 65
 cuadros (1,74 períodos) y se midió cuánto movimiento queda después del cuadro 33.
 
-![Péndulo a 65 cuadros: control contra brazo con física](gifs/pendulo_65_cuadros.gif)
+![65 cuadros en los checkpoints elegidos](gifs/elegidos_65_cuadros.gif)
 
-*Checkpoint 1000 de los dos brazos, mismo clip y misma semilla, 65 cuadros. Hasta el cuadro 33 es el
-horizonte que el modelo vio en entrenamiento; desde ahí el borde se pone rojo y todo lo que sigue es
-extrapolación. Para el cuadro 50 el control mantiene la pelota y el hilo, y en el brazo con física la
-pelota se disolvió. Archivo: `videos/17_pendulo_65_cuadros_paso1000.mp4`.*
+*Los **checkpoints elegidos**: control en el paso 125 y brazo con física en el 875, mismo clip y misma
+semilla, 65 cuadros. Hasta el cuadro 33 es el horizonte que el modelo vio en entrenamiento; desde ahí
+el borde se pone rojo y todo lo que sigue es extrapolación. En **péndulo** la pelota del control se
+desvanece hasta confundirse con el fondo y la del brazo con física se mantiene; en **caída libre** el
+control pierde el objeto (no hay nada detectable sobre el fondo en 26 de los 32 cuadros posteriores al
+horizonte, contra 5 de 32 del brazo con física). Archivo: `videos/23_elegidos_65_cuadros.mp4`,
+reproducible con `scripts_figuras/componer_i2v_65.py`. **n = 2 clips por escenario**: alcanza para
+mirar, no para medir.*
+
+> ⚠️ **Esto corrige lo que decía esta sección.** Antes mostraba el paso 1000 de los dos brazos y
+> concluía que *el brazo con física disolvía la pelota y el control la mantenía*. En los checkpoints
+> que el trabajo efectivamente reporta pasa lo contrario: el que se desvanece es el control. La tabla
+> de abajo es del paso 1000 y se deja como estaba, pero **no describe el modelo reportado**, y con
+> n = 2 lo de acá arriba no alcanza para reemplazarla: hace falta rehacer la medición de movimiento
+> posterior al horizonte sobre los checkpoints elegidos y con más clips.
 
 | brazo | escenario | movimiento después del horizonte |
 |---|---|---|
@@ -960,13 +980,16 @@ péndulo y rebote. En caída libre, donde el ground truth ya va a velocidad cons
 igual. Es la misma firma de la ruta degenerada, ahora en el eje temporal: donde el modelo tiene que
 inventar dinámica que nunca vio, el brazo entrenado con la restricción se queda más quieto.
 
-**No depende de qué checkpoint se mire.** El mismo par en el paso 250 da la misma dirección, así que
-esto no es una peculiaridad del checkpoint final ni de la regla con que se lo elija:
+**En los pasos 250 y 1000 la dirección es la misma**, así que dentro de esos dos checkpoints no es una
+peculiaridad de uno solo:
 
 | paso | control | con física |
 |---|---|---|
 | 250 | 0,42× | **0,29×** |
 | 1000 | 0,57× | **0,22×** |
+
+Lo que ya no se puede decir es que no dependa del checkpoint: ninguno de estos dos es el par que el
+trabajo reporta, y el video de arriba, en el par que sí se reporta, va para el otro lado.
 
 </details>
 

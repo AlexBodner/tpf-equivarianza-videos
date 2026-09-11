@@ -18,6 +18,7 @@ entrenamiento. Las instancias de AWS son efímeras: acá está la copia durable.
 | archivo | qué es |
 |---|---|
 | `evaluaciones/test_final__88_clips_nunca_mirados.json` | **el resultado principal**: los 88 clips held-out que no se miraron nunca, control en el paso 125 y brazo con física en el 875, cada uno elegido por su propia validación |
+| `evaluaciones/elegidos__i2v_65_cuadros.json` | generación a 65 cuadros (el entrenamiento vio 33) en los checkpoints elegidos, 125 y 875. Las métricas puntúan sólo los primeros 33, que es hasta donde llega el ground truth: los otros 32 son para mirar. n = 2 por escenario |
 | `evaluaciones/candidatos__n60_velocidades.json` | los siete brazos sobre los primeros 20 clips por escenario, con la equivarianza ya medida sobre velocidades |
 | `evaluaciones/equivarianza_por_checkpoint.json` | equivarianza fuera del bucle en los 8 checkpoints de los dos brazos (ojo: 3 escenas con sus 4 variantes, no 12 clips distintos) |
 | `validaciones/fisica_8_checkpoints.json` | la validación recalculada sobre velocidades que elige el checkpoint del brazo con física |
