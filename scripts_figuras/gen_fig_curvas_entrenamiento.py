@@ -57,7 +57,7 @@ def main(log_fis, log_ctrl, dir_val, salida):
     por, lam = fis["por_paso"], fis["lambda_rot"]
     pasos = sorted(por, key=int)
 
-    fig, (a1, a2, a3) = plt.subplots(1, 3, figsize=(16.5, 4.4))
+    fig, (a1, ab, a2, a3) = plt.subplots(1, 4, figsize=(21.5, 4.4))
 
     for tr, color, nombre in ((tr_c, CONTROL, "control"), (tr_f, FISICA, "con física")):
         a1.plot(*por_ventanas(tr, "loss_diffusion", k=50), "-", color=color, lw=2.4, label=nombre)
@@ -65,13 +65,22 @@ def main(log_fis, log_ctrl, dir_val, salida):
     a1.set_ylabel("pérdida de difusión")
     a1.legend(frameon=False)
 
+    # El termino fisico aislado: es el cociente que la perdida minimiza, no el
+    # loss_rotation logueado, que ya viene multiplicado por lambda.
+    px, py = cociente(tr_f, k=50)
+    ab.plot(px, py, "-", color=FISICA, lw=2.4)
+    ab.set_title("(b) el término físico, aislado")
+    ab.set_ylabel("cociente que la pérdida minimiza")
+    ab.set_ylim(bottom=0)
+    ab.axvline(875, color=ELEGIDO, ls=":", lw=1.8)
+
     for datos, color, nombre, elegido in ((ctrl, CONTROL, "control", "125"),
                                           (por, FISICA, "con física", "875")):
         ys = [datos[k]["val_loss_diffusion"] for k in pasos]
         a2.plot([int(k) for k in pasos], ys, "o-", color=color, lw=2.2, ms=7, label=nombre)
         a2.plot(int(elegido), datos[elegido]["val_loss_diffusion"], "o", ms=15,
                 mfc="none", mec=ELEGIDO, mew=2.6, zorder=5)
-    a2.set_title("(b) difusión, en validación")
+    a2.set_title("(c) difusión, en validación")
     a2.set_ylabel("pérdida de difusión")
     a2.legend(frameon=False)
 
@@ -79,19 +88,20 @@ def main(log_fis, log_ctrl, dir_val, salida):
     a3.plot([int(k) for k in pasos], suma, "o-", color=FISICA, lw=2.4, ms=7)
     a3.plot(875, por["875"]["val_loss_diffusion"] + lam * por["875"]["val_loss_rotation"],
             "o", ms=15, mfc="none", mec=ELEGIDO, mew=2.6, zorder=5)
-    a3.set_title("(c) el objetivo del brazo con física")
+    a3.set_title("(d) el objetivo que eligió el checkpoint")
     a3.set_ylabel("difusión $+\\ \\lambda\\cdot$rotación, en validación")
     a3.annotate("el 375 queda a 0,2 %\nde distancia", xy=(375, suma[pasos.index("375")]),
                 xytext=(300, min(suma) + (max(suma) - min(suma)) * 0.33), fontsize=12, color="#555",
                 ha="center", arrowprops=dict(arrowstyle="->", color="#555", lw=1.3,
                 connectionstyle="arc3,rad=-0.3"))
 
-    for ax in (a1, a2, a3):
+    for ax in (a1, ab, a2, a3):
         ax.set_xlabel("paso de entrenamiento")
         ax.grid(alpha=0.22)
         ax.spines[["top", "right"]].set_visible(False)
-    fig.text(0.5, 0.005, "El círculo rojo marca el checkpoint que eligió cada brazo por su propia "
-             "validación, sobre los mismos ocho candidatos.", ha="center", fontsize=12.5, color="#666")
+    fig.text(0.5, 0.005, "En rojo, el checkpoint que eligió cada brazo por su propia validación sobre los mismos "
+             "ocho candidatos. El control no aparece en (b) ni en (d) porque con $\\lambda=0$ no calcula ese término.",
+             ha="center", fontsize=12.5, color="#666")
     fig.tight_layout(rect=[0, 0.04, 1, 1])
     fig.savefig(salida, dpi=150)
     print("escrita", salida)

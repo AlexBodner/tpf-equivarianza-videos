@@ -1292,11 +1292,15 @@ fórmula distinta da otra razón.
 
 *(a) La pérdida de difusión en entrenamiento es prácticamente la misma en los dos brazos: cada paso ve
 un clip distinto, así que la curva cruda es más ruido de muestreo que aprendizaje, y por eso va como
-mediana por ventanas de 50 pasos. (b) En validación, sobre 20 clips fijos, la diferencia sí se ve: el
-brazo con física queda **siempre por encima** del control, o sea que el término físico se paga en el
-objetivo generativo. (c) Lo que decidió el checkpoint: la suma que ese brazo efectivamente minimiza,
-difusión más λ por rotación. El mínimo cae en el 875, con el 375 a un 0,2 % de distancia. Reproducible
-con `scripts_figuras/gen_fig_curvas_entrenamiento.py`.*
+mediana por ventanas de 50 pasos. (b) El término físico aislado, que es el cociente que la pérdida
+efectivamente minimiza: **baja**, de alrededor de 0,10 a entre 0,03 y 0,06. (c) En validación, sobre 20
+clips fijos, la difusión sí separa los dos brazos: el de física queda **siempre por encima** del
+control, o sea que el término se paga en el objetivo generativo. (d) Lo que decidió el checkpoint: la
+suma que ese brazo minimiza, difusión más λ por rotación. El mínimo cae en el 875, con el 375 a un 0,2 %
+de distancia. El control no aparece en (b) ni en (d) porque con λ = 0 no calcula ese término, así que en
+validación la pérdida física sólo existe para un brazo. Los ocho checkpoints son los de esta última
+corrida, la de velocidad con λ = 4,7e-03. Reproducible con
+`scripts_figuras/gen_fig_curvas_entrenamiento.py`.*
 
 Tres advertencias sobre las escalas, porque es fácil dibujar esto mal y el primer intento salió mal:
 
