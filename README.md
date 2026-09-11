@@ -1279,11 +1279,12 @@ Todo lo de abajo sale de `config_resolved.json` de la corrida, publicado en
 | Evaluación | 20 pasos de Euler, 33 cuadros, 384 px, 10 clips held-out por escenario, rotación de 45° |
 | Hardware | una sola GPU L40S de 48 GB (AWS g6e.xlarge) |
 
-**Cómo se calibra λ_rot.** No se elige a mano: se corren sondas de 10 pasos midiendo la razón entre la
-norma del gradiente físico y la del gradiente de difusión, y se ajusta λ hasta que esa razón caiga en
-[0,40; 0,60], o sea que el término físico pese la mitad que el objetivo generativo. Para esta corrida
-hicieron falta cinco sondas y quedó en 4,7e-03. **Cualquier cambio en la fórmula de la pérdida invalida
-la calibración anterior** y obliga a repetir las sondas.
+**Cómo se elige λ_rot.** No se elige a mano. Se corren 10 pasos de prueba midiendo dos cosas: la norma
+del gradiente que aporta el término físico y la del que aporta la difusión. Se ajusta λ hasta que la
+razón entre las dos caiga en [0,40; 0,60], o sea que **el término físico pese la mitad que el objetivo
+generativo**. Para esta corrida hicieron falta cinco pruebas y quedó en 4,7e-03. **Cualquier cambio en
+la fórmula de la pérdida invalida la calibración anterior** y obliga a repetirlas: el mismo λ sobre una
+fórmula distinta da otra razón.
 
 **Un límite del montaje que conviene tener presente.** El período del péndulo es de 37,4 cuadros y
 generamos 33: nunca se ve una oscilación completa, ni en entrenamiento ni en evaluación.
