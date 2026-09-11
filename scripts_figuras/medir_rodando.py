@@ -37,6 +37,11 @@ def pista(ruta):
     parte la escena en dos, el mas grande salta entre objetos. Ojo que ninguno de
     los dos criterios distingue "apoyado en el piso" de "flotando bajo": eso hay
     que mirarlo, y por eso el conteo se contrasta con los videos.
+
+    Caso concreto: el script cuenta 1/8 para el control, la semilla 1, donde la
+    pelota se desplaza en horizontal a altura baja pero EN EL AIRE, sin tocar la
+    linea del piso. Mirando los ocho videos el control no rueda en ninguno, y eso
+    es lo que reporta el poster.
     """
     cap, fs = cv2.VideoCapture(str(ruta)), []
     while True:
