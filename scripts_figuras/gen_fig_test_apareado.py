@@ -25,7 +25,7 @@ plt.rcParams.update({"font.size": 14, "axes.titlesize": 15, "axes.labelsize": 14
 ESC = [("free_fall", "caída libre", "#2b7bba"),
        ("pendulum",  "péndulo",     "#c98f2b"),
        ("bouncing",  "rebote",      "#c0503d")]
-D = json.load(open("test_final.json"))
+D = json.load(open("resultados/evaluaciones/test_final__88_clips_nunca_mirados.json"))
 
 def pares(met):
     out = {}
@@ -73,5 +73,5 @@ for ax, met, titulo in (
 
 # Sin suptitle: en el poster lo dice el epigrafe y en el README el texto de arriba.
 fig.tight_layout()
-fig.savefig("fig_test_apareado.png", dpi=150)
+fig.savefig("figuras/test_apareado.png", dpi=150)
 print("ok")

@@ -1,4 +1,4 @@
-"""figuras/por_checkpoint_todas_las_metricas.png
+"""figuras/por_checkpoint_equivarianza_y_fisica.png
 
 Las seis metricas que tenemos por checkpoint, para los dos brazos. Las tres de arriba
 son de EQUIVARIANZA (lo que la perdida pide) y las tres de abajo son de FISICA (lo que
@@ -13,7 +13,10 @@ PASOS = [125, 250, 375, 500, 625, 750, 875, 1000]
 GRIS, AZUL = "#6b6b6b", "#2b7bba"
 
 # --- equivarianza, medida sobre velocidades fuera del bucle (n=12 por checkpoint)
-eq = json.load(open("equiv_ckpt.json"))
+EQUIV = "resultados/evaluaciones/equivarianza_por_checkpoint.json"
+EVAL  = "resultados/evaluaciones/e4vel__paso_{}.json"
+
+eq = json.load(open(EQUIV))
 def eq_med(brazo, paso, campo):
     filas = eq.get(f"{brazo}/{paso}")
     return st.median([r[campo] for r in filas]) if filas else None
@@ -27,12 +30,12 @@ def eq_p(paso, campo):
 
 # --- fisica, de las evaluaciones held-out por checkpoint (n=30)
 def ev(paso, brazo, campo):
-    d = json.load(open(f"evals_ckpt/paso_{paso}.json"))[brazo]
+    d = json.load(open(EVAL.format(paso)))[brazo]
     vals = [v for e in ("free_fall", "pendulum", "bouncing")
             for v in d[e]["per_clip"][campo] if v is not None]
     return st.mean(vals)
 def ev_p(paso, campo):
-    d = json.load(open(f"evals_ckpt/paso_{paso}.json"))
+    d = json.load(open(EVAL.format(paso)))
     a, b = [], []
     for e in ("free_fall", "pendulum", "bouncing"):
         a += d["ctrl_l40s"][e]["per_clip"][campo]
@@ -88,7 +91,7 @@ fig.suptitle("Arriba: lo que la pérdida pide (equivarianza).   Abajo: lo que qu
              "▲ verde: diferencia significativa a favor del brazo con física.   ▼ naranja: significativa en contra.  (p < 0,05, apareado por clip)",
              fontsize=12.5, y=0.995)
 fig.tight_layout(rect=[0, 0, 1, 0.94])
-fig.savefig("panel_checkpoints.png", dpi=140)
+fig.savefig("figuras/por_checkpoint_equivarianza_y_fisica.png", dpi=140)
 print("listo")
 for p in PASOS:
     print(f"paso {p}: rho p={eq_p(p,'rho'):.3f}  cos p={eq_p(p,'cos'):.3f}  vel_mae p={ev_p(p,'vel_mae'):.3f}")

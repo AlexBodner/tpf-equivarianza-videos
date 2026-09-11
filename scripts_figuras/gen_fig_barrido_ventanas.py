@@ -34,7 +34,7 @@ COSTO = {4: 21.6, 6: 23.4, 12: 27.8}   # s/paso medianos por cantidad de pasos
 
 def cargar(a):
     tr, val = {}, {}
-    for l in open(f"{a}.jsonl"):
+    for l in open(f"resultados/logs_barrido/{a}.jsonl"):
         d = json.loads(l)
         if d.get("type") == "val":
             val[d["step"]] = d["val_loss_rotation"]; continue
@@ -99,7 +99,7 @@ fig.legend(manijas, etiquetas, loc="lower center", ncol=3, frameon=False, fontsi
 fig.suptitle("Barrido de ventanas de BPTT sobre velocidad, a 24 cuadros: ninguna ventana se distingue",
              fontsize=16, y=0.985)
 fig.tight_layout(rect=[0, 0.13, 1, 0.93], w_pad=3.0)
-fig.savefig("fig_barrido_ventanas.png", dpi=150)
+fig.savefig("figuras/barrido_ventanas_bptt.png", dpi=150)
 for a, eti, k, _ in BR:
     v = list(D[a][0].values())
     print(f"  {eti:<32} {k:>2} pasos  primeros 30 {st.mean(v[:30]):.3f}  ultimos 30 {st.mean(v[-30:]):.3f}")

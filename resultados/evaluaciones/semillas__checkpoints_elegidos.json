@@ -1,0 +1,45 @@
+{
+  "_prompts": {
+    "scenario_prompts": {
+      "pendulum": "a solid colored ball swinging like a pendulum from a pivot, side view",
+      "free_fall": "a solid colored ball in free fall, side view",
+      "bouncing": "a solid colored ball bouncing on a floor, side view"
+    },
+    "ood_prompts": {
+      "rolling": "a solid colored ball rolling along a flat surface from left to right, side view",
+      "pendulum_photo": "a solid colored ball swinging as a pendulum from a fixed pivot, side view, slow motion"
+    },
+    "fuente": "defaults de run_eval.py"
+  },
+  "_gen_frames": {
+    "generados": 33,
+    "entrenamiento": 33,
+    "regimen": "in-distribution"
+  },
+  "_eval_clips": {
+    "data_dir": "data/eval_holdout_384",
+    "split_json": null,
+    "assume_held_out": true
+  },
+  "base": {
+    "ood_t2v": {
+      "jerk_rms": 0.8010078873485327,
+      "vel_media": 1.1955637289211154,
+      "n": 8
+    }
+  },
+  "control": {
+    "ood_t2v": {
+      "jerk_rms": 3.0927567407488823,
+      "vel_media": 9.191240906715393,
+      "n": 8
+    }
+  },
+  "fisica": {
+    "ood_t2v": {
+      "jerk_rms": 1.6024677902460098,
+      "vel_media": 6.261855870485306,
+      "n": 8
+    }
+  }
+}
