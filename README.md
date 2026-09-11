@@ -367,6 +367,47 @@ Que la duplicación aparezca en el checkpoint elegido (y no sólo en los que des
 que el resultado no se pueda contar como «casi funciona»: el modelo que la regla señala como el mejor
 del brazo con física sigue partiendo el objeto en dos.
 
+<a id="angulos"></a>
+
+## La simetría se aprende en todo el rango, no sólo donde se mide
+
+*Póster: sección «Resultados».*
+
+Toda la evaluación principal mide la equivarianza en **un solo punto del grupo**: rotando la escena 45°. Que el
+desacuerdo baje ahí no prueba que baje a 15° o a 40°, y podría ser algo específico de ese ángulo en vez de la
+simetría. Se reevaluó con el **ángulo sorteado por clip** en [11°, 44°]: el ángulo sale del CRC32 del nombre del
+clip, así que es el mismo en los dos brazos —la comparación sigue apareada— y reproducible entre corridas.
+
+| escenario | n | ángulos | control | con física | mejora |
+|---|---|---|---|---|---|
+| caída libre | 15 | 11,7°–44,3° | 0,524 | 0,204 | **+61,2 %** [+44,6, +71,7] |
+| péndulo | 15 | 11,2°–41,8° | 0,557 | 0,308 | **+44,6 %** [+2,0, +69,7] |
+| rebote | 15 | 13,9°–41,8° | 0,378 | 0,197 | **+47,9 %** [+15,5, +67,2] |
+| **los tres** | **45** | 11,2°–44,3° | **0,486** | **0,236** | **+51,4 %** [+33,4, +63,4] |
+
+Intervalos del 95 % por bootstrap sobre clips; los cuatro excluyen el cero.
+
+**¿No será que mejora porque ahora medimos más cerca del rango entrenado?** El entrenamiento sorteaba θ en
+[−15°, +15°], así que los ángulos bajos del barrido están más cerca de lo visto. El desacuerdo sí sube con el
+ángulo (correlación r = +0,32 en control y +0,25 en física), pero **la ventaja del brazo con física no se achica**:
+
+| tercio de ángulo | ángulo medio | mejora |
+|---|---|---|
+| bajos | 16,6° | +39,6 % |
+| medios | 27,0° | +53,3 % |
+| altos | **39,0°** | **+55,4 %** |
+
+Si la mejora fuera un efecto de cercanía tendría que ser mayor en los ángulos bajos, y pasa lo contrario. La
+diferencia bajos−altos es −17,5 puntos con intervalo [−56, +14], o sea indistinguible de cero con n = 15: lo que
+se puede afirmar es que **no** decae, no que crezca.
+
+> ⚠️ **El error de velocidad de estos JSON no se reporta.** Se calcula sobre la generación *sin rotar*, así que no
+> depende del ángulo, y acá está medido sobre 15 clips por escenario contra los 30 del test principal. La medición
+> que vale para esa columna sigue siendo la de [test final](#resultados).
+
+Archivos: `resultados/evaluaciones/angulo_sorteado_11_45__*.json`, con el ángulo de cada clip en
+`per_clip.rot_grados`. Los números de acá se rehacen con `scripts_figuras/analizar_angulo_sorteado.py`.
+
 <a id="degeneracion"></a>
 
 ## La otra cara: cómo satisface la simetría
