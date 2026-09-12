@@ -333,8 +333,23 @@ lo hace.**
 
 ## Cuántos pasos de Euler hay que retropropagar
 
-Cada paso que se retropropaga se paga en memoria y en tiempo, así que se comparó el gradiente completo
-contra **todas** las ventanas de pasos, midiendo la alineación con el coseno.
+La pérdida vive sobre el video **generado**, así que el gradiente vuelve por los 12 pasos de Euler del
+sampler, y cada paso que se retropropaga se paga en memoria y en tiempo: 27,8 s por paso de
+entrenamiento con los doce, contra 21,6 s con cuatro. Cuántos hacen falta se contestó de dos maneras.
+
+**Primero, sin entrenar nada.** La corrida registra, en cada paso, el aporte de cada uno de los 12
+pasos de Euler al gradiente de la pérdida física respecto de los pesos: su norma y los cosenos contra
+los otros once. Esos números determinan la matriz de Gram de los doce aportes, y con ella sale el
+coseno entre la suma de **cualquier** subconjunto de pasos y la suma de los doce, sin volver a correr
+nada. Eso es exactamente cuánta dirección del gradiente verdadero retiene esa ventana, y por eso se
+pueden comparar *todas* y no unas pocas. Está promediado sobre los 869 pasos con gradiente físico de
+la corrida que se reporta, tomando la segunda mitad para que todas las ventanas se midan sobre el
+mismo tramo. El cálculo es
+[`scripts_figuras/coseno_truncamiento_bptt.py`](scripts_figuras/coseno_truncamiento_bptt.py).
+
+**Después, entrenando.** Cinco brazos de 150 pasos, idénticos salvo la lista de pasos que
+retropropagan, con validación sobre 20 clips en los pasos 50, 100 y 150. Los logs crudos están en
+[`resultados/logs_barrido/`](resultados/logs_barrido).
 
 ![Cuánta dirección conserva cada ventana y qué pasa al entrenar con ella](figuras/truncamiento_direccion.png)
 
@@ -345,6 +360,9 @@ cada paso de Euler que registra la corrida. (b) qué pasa entrenando con ellas.*
   el gradiente completo.
 - **Los pasos vecinos dan casi el mismo gradiente** (coseno 0,92 entre el 10 y el 11), así que una
   ventana contigua paga dos veces por la misma dirección.
+- **La norma no dice dónde está la dirección**: los últimos cuatro pasos concentran el 47 % de la
+  norma del gradiente y los primeros cuatro el 36 %, y sin embargo la cola de cuatro alinea 0,86 y la
+  ventana no contigua 0,93. Lo que importa es cómo se suman las direcciones, no cuánto pesa cada una.
 - **El truncamiento usado en DRaFT-K apunta al otro extremo**: trunca a los *últimos* pasos, donde
   se decide la apariencia en el refinamiento visual para el que se propuso. Acá importa cómo queda
   armada la dinámica, y la ventana que mejor alinea incluye un paso **temprano** que esa cola nunca
@@ -355,6 +373,13 @@ cada paso de Euler que registra la corrida. (b) qué pasa entrenando con ellas.*
 El barrido completo, con la validación y los cinco brazos que efectivamente se entrenaron:
 
 ![Barrido de ventanas de BPTT](figuras/barrido_ventanas_bptt.png)
+
+*Entrenamiento y validación no son la misma cantidad: a la izquierda la pérdida física normalizada
+(mediana por ventanas de 15 pasos sobre la curva cruda), a la derecha `l_rot` sin normalizar, que vive
+en otra escala. Los dos brazos «mejor-6» quedan arriba en validación y, según el código, deberían ser
+idénticos entre sí en la rama física; por qué no lo son está en [PENDIENTES.md](PENDIENTES.md).
+Figuras: [`gen_fig_truncamiento.py`](scripts_figuras/gen_fig_truncamiento.py) y
+[`gen_fig_barrido_ventanas.py`](scripts_figuras/gen_fig_barrido_ventanas.py).*
 
 ---
 
@@ -441,6 +466,7 @@ y abortan si no reproducen un caso de respuesta conocida:
 | `gen_fig_test_apareado.py` | la figura de diferencias por clip |
 | `gen_fig_curvas_entrenamiento.py` | las curvas de las dos corridas y cómo se eligió cada checkpoint |
 | `gen_fig_barrido_ventanas.py` | el barrido de ventanas de BPTT |
+| `coseno_truncamiento_bptt.py` | cuánta dirección retiene cada ventana de BPTT, desde la matriz de Gram de los 12 pasos |
 | `gen_fig_truncamiento.py` | cuánta dirección retiene cada ventana, y el resultado de entrenar con ella |
 | `gen_panel_checkpoints.py` | las seis métricas por checkpoint, equivarianza arriba y física abajo |
 | `gen_seleccion_por_validacion.py` | qué checkpoint elige cada brazo con su propio objetivo |
