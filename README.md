@@ -6,10 +6,10 @@ los videos, las evaluaciones crudas y los scripts que rehacen cada figura y cada
 ![Generación por texto, cuatro escenarios](gifs/por_texto_4_escenarios.gif)
 
 *Los cuatro escenarios generados **sólo desde el texto**, control arriba y brazo con física abajo, con
-la misma semilla, la 0 en los cuatro. El péndulo sostiene la oscilación, el rebote mantiene una sola
-pelota donde el control la duplica y le cambia el color, y rodando termina sobre el piso sólo en el
-equivariante. En caída libre pasa lo contrario: ahí el que duplica la pelota es el brazo con física, y
-se ve en este mismo video; el conteo sobre las ocho semillas está
+la misma semilla, la 0 en los cuatro. En péndulo y rebote el brazo con física muestra comportamientos
+más estables; en rodando termina sobre el piso donde el control queda flotando. En caída libre aparece
+una falla distinta: el brazo con física duplica la pelota más que el control, y se ve en este mismo
+video. El conteo sobre las ocho semillas está
 [más abajo](#cómo-satisface-la-simetría-sin-mejorar-la-física). Archivo:
 [`videos/2_resultados/por_texto_4_escenarios.mp4`](videos/2_resultados/por_texto_4_escenarios.mp4).*
 
@@ -58,9 +58,9 @@ paso está en `9_checkpoints_superados/` y dice de dónde viene, y cómo se elig
 
 ## Lo que genera el modelo
 
-Lo más visible del trabajo no está en la tabla, está acá. Salvo donde se aclara, son generaciones
-**sólo desde el texto**, sin ningún frame real que sostenga el arranque, y el control y el brazo con
-física parten de la misma semilla.
+La tabla resume la evaluación condicionada; las generaciones por texto muestran otro régimen, sin
+frames iniciales reales, donde aparecen diferencias visuales que todavía no capturan las métricas
+principales. Salvo donde se aclara, el control y el brazo con física parten de la misma semilla.
 
 ### Una pelota que rueda, con un prompt que el modelo nunca vio
 
@@ -130,8 +130,8 @@ Condicionado se apaga; por texto se mantiene entero. El desvanecimiento de la pe
 condicionado ocurre en **los dos brazos** por igual: el área que ocupa cae a la mitad en ambos, así que
 no distingue brazos, distingue régimen.
 
-**Ninguna de estas diferencias tiene ground truth contra qué medirse**, y la pérdida física nunca se
-aplicó a generaciones por texto: sólo a las condicionadas. Donde sí hay con qué medir es en generación
+**Ninguna de estas diferencias tiene ground truth contra el cual compararse**, y la pérdida física nunca
+se aplicó a generaciones por texto: sólo a las condicionadas. Donde sí hay con qué medir es en generación
 condicionada, y ahí el resultado es el de [la tabla](#la-simetría-se-aprende): la simetría se aprende y
 la física no mejora.
 
@@ -297,7 +297,7 @@ Es el único escenario fuera del dataset que tiene ground truth.
 | cota del video quieto | 9,05 |
 
 n = 10 clips. Los dos brazos están por debajo de la cota del video congelado, y el brazo con física es
-apenas mejor. **Ojo**: una versión anterior de este documento y del póster reportaba 7,63 contra 8,80,
+apenas mejor. **Nota**: una versión anterior de este documento y del póster reportaba 7,63 contra 8,80,
 con el brazo con física *peor*. Ese número era del **paso 1000**, que no es el checkpoint que el
 trabajo reporta. Está corregido.
 
@@ -345,7 +345,7 @@ cada paso de Euler que registra la corrida. (b) qué pasa entrenando con ellas.*
   el gradiente completo.
 - **Los pasos vecinos dan casi el mismo gradiente** (coseno 0,92 entre el 10 y el 11), así que una
   ventana contigua paga dos veces por la misma dirección.
-- **La práctica de la literatura apunta al otro extremo**: DRaFT-K trunca a los *últimos* pasos, donde
+- **El truncamiento usado en DRaFT-K apunta al otro extremo**: trunca a los *últimos* pasos, donde
   se decide la apariencia en el refinamiento visual para el que se propuso. Acá importa cómo queda
   armada la dinámica, y la ventana que mejor alinea incluye un paso **temprano** que esa cola nunca
   toca.
@@ -412,16 +412,16 @@ eso no mejora la física. Por texto aparecen diferencias que las métricas actua
 
 **Lo que sigue.**
 
-- **Usar bien el flujo óptico.** Hoy la escena se reduce a *un* vector por frame y dos objetos que van
-  al revés se cancelan; con el campo completo se puede penalizar el flujo sin correspondencia en la
-  rama rotada.
-- **Medir la física sin ground truth.** Un péndulo cumple *T* = 2π·raíz(L/g), y el largo y el período
-  salen los dos del video generado: la consistencia entre ellos se chequea sola. Hace falta un
-  estimador de largo validado para que el número signifique algo.
+- **Usar bien el flujo óptico.** Actualmente la escena se reduce a *un* vector por frame y dos objetos
+  que van al revés se cancelan; con el campo completo se puede penalizar el flujo sin correspondencia
+  en la rama rotada.
 - **Sumar traslación**, que pide que la ley no dependa de dónde ocurre.
 - **Descartar el paso cuando el movimiento se va de escala**, en vez de corregirlo.
 - **Definir una evaluación para la generación por texto**, que es donde se ven las mejoras que las
   métricas actuales no capturan.
+- **Una forma de hacerlo: medir la física sin ground truth.** Un péndulo cumple *T* = 2π·raíz(L/g), y el
+  largo y el período salen los dos del video generado: la consistencia entre ellos se chequea sola.
+  Hace falta un estimador de largo validado para que el número signifique algo.
 - **Video real sin anotaciones** (Physics-IQ), para ver si la pérdida sirve fuera del simulador.
 
 Lo que quedó abierto, incluido lo que no podemos explicar, está en [PENDIENTES.md](PENDIENTES.md).
