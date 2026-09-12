@@ -6,8 +6,8 @@ los videos, las evaluaciones crudas y los scripts que rehacen cada figura y cada
 ![Generación por texto, cuatro escenarios](gifs/por_texto_4_escenarios.gif)
 
 *Los cuatro escenarios generados **sólo desde el texto**, control arriba y brazo con física abajo. Los
-dos brazos comparten prompt, semilla y ruido en cada columna: la semilla 0 en caída libre y péndulo, y
-la 4 en rebote y rodando, que es la más limpia de las ocho. El péndulo sostiene la oscilación, el
+dos brazos comparten prompt, semilla y ruido en cada columna: la semilla 0 en caída libre y péndulo,
+la 2 en rebote y la 6 en rodando, que es la que aparece más abajo en su propia sección. El péndulo sostiene la oscilación, el
 rebote mantiene una sola pelota donde el control la duplica, y rodando termina sobre el piso sólo en el
 equivariante. En caída libre pasa lo contrario: ahí el que duplica la pelota es el brazo con física, y
 se ve en este mismo video. Elegir la semilla más limpia sirve para mirar y no para medir, así que el
@@ -335,30 +335,50 @@ lo hace.**
 ## Cuántos pasos de Euler hay que retropropagar
 
 La pérdida vive sobre el video **generado**, así que el gradiente vuelve por los 12 pasos de Euler del
-sampler, y cada paso que se retropropaga se paga en memoria y en tiempo: 27,8 s por paso de
-entrenamiento con los doce, contra 21,6 s con cuatro. Cuántos hacen falta se contestó de dos maneras.
+sampler, y cada paso que se retropropaga se paga: 27,8 s por paso de entrenamiento con los doce contra
+21,6 s con cuatro. Cuántos hacen falta se contestó de dos maneras.
 
-**Primero, con una sola corrida.** El entrenamiento de la corrida que se reporta registra, en cada
-paso, el aporte de cada uno de los 12 pasos de Euler al gradiente de la pérdida física respecto de los
-pesos: su norma y los cosenos contra los otros once. Esos números determinan la matriz de Gram de los
-doce aportes, y con ella sale el coseno entre la suma de **cualquier** subconjunto de pasos y la suma
-de los doce. Eso es exactamente cuánta dirección del gradiente verdadero retiene esa ventana, y como
-se calcula sobre lo ya registrado, se pueden comparar *todas* las ventanas sin entrenar una vez por
-cada una. Está promediado sobre los 869 pasos que tuvieron gradiente físico, tomando la segunda mitad
-para que todas las ventanas se midan sobre el mismo tramo. El cálculo es
-[`scripts_figuras/coseno_truncamiento_bptt.py`](scripts_figuras/coseno_truncamiento_bptt.py).
+**Una, calculando todas las ventanas desde una sola corrida.** Los pasos se numeran 0 a 11, del ruido
+al video. El algoritmo, que es
+[`coseno_truncamiento_bptt.py`](scripts_figuras/coseno_truncamiento_bptt.py):
 
-**Después, entrenando una vez por ventana.** Cinco brazos de 150 pasos, idénticos salvo la lista de
-pasos que retropropagan, con validación sobre 20 clips en los pasos 50, 100 y 150. Los logs crudos
-están en [`resultados/logs_barrido/`](resultados/logs_barrido).
+1. **Registrar durante el entrenamiento.** Un hook en la predicción de velocidad de cada paso *k*
+   guarda, en cada paso de entrenamiento, la norma del gradiente que le llega, `‖g_k‖`, y su coseno
+   contra los otros once. Son 12 normas y 66 cosenos por paso, y es lo que ya está en
+   [`resultados/logs_entrenamiento/`](resultados/logs_entrenamiento) bajo `bptt_grad_norms`.
+2. **Armar la matriz de Gram** de esos 12 vectores: `G[i][j] = ‖g_i‖ · ‖g_j‖ · cos(g_i, g_j)`, que es
+   el producto interno entre el aporte del paso *i* y el del paso *j*.
+3. **Puntuar una ventana** *S*, o sea el subconjunto de pasos que se retropropagan, con el coseno
+   entre lo que esa ventana suma y lo que suman los doce. Sale de `G` sin volver a derivar nada:
+
+   ```
+   cos(S) = suma(G[i][j] para i en S, j en todos)
+            / raiz( suma(G[i][j] para i,j en S) * suma(G[i][j] para i,j en todos) )
+   ```
+
+4. **Promediar** `cos(S)` sobre los 869 pasos de entrenamiento que tuvieron gradiente físico, usando
+   la segunda mitad para que todas las ventanas se midan sobre el mismo tramo.
+5. **Barrer las 4095 ventanas posibles** (todos los subconjuntos no vacíos de 12 pasos), al costo de
+   ninguna corrida extra. Para elegir *y* reportar sin hacer trampa, `direccion_por_tamano` elige la
+   mejor ventana de cada tamaño en la primera mitad de los pasos y la reporta en la segunda.
+
+Una salvedad sobre qué es `g_k`: es el gradiente que llega a la **predicción de velocidad** del paso
+*k*, que es donde el hook puede medirlo barato. El gradiente de los pesos es su imagen a través de una
+matriz distinta en cada paso, así que estos cosenos indican qué ventana conviene probar, no la
+reemplazan.
+
+**Otra, entrenando una vez por ventana.** Cinco brazos de 150 pasos, idénticos salvo la lista de pasos
+que retropropagan, con validación sobre 20 clips en los pasos 50, 100 y 150. Los logs crudos están en
+[`resultados/logs_barrido/`](resultados/logs_barrido).
 
 ![Cuánta dirección conserva cada ventana y qué pasa al entrenar con ella](figuras/truncamiento_direccion.png)
 
-*(a) cuánta dirección del gradiente completo retiene cada ventana, calculado desde el aporte exacto de
-cada paso de Euler que registra la corrida. (b) qué pasa entrenando con ellas.*
+*(a) cuánta dirección del gradiente completo retiene cada ventana, calculada con el procedimiento de
+arriba. (b) qué pasa entrenando con ellas.*
 
 - **La dirección se concentra en pocos pasos**: una ventana de dos, el 1 y el 10, alinea **0,98** con
-  el gradiente completo.
+  el gradiente completo, y un solo paso, el 5, ya alinea 0,90. Las dos cifras son fuera de muestra: la
+  ventana se eligió en la primera mitad de la corrida y se midió en la segunda.
 - **Los pasos vecinos dan casi el mismo gradiente** (coseno 0,92 entre el 10 y el 11), así que una
   ventana contigua paga dos veces por la misma dirección.
 - **La norma no dice dónde está la dirección**: los últimos cuatro pasos concentran el 47 % de la

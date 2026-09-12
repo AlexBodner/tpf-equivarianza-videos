@@ -19,7 +19,7 @@ RAIZ = "videos/8_generaciones_crudas/05_semillas"
 SALIDA = "videos/2_resultados/por_texto_4_escenarios.mp4"
 FILAS = [("control_125", "control 125"), ("fisica_875", "fisica 875")]
 COLUMNAS = [("t2v", "free_fall", "caida libre", 0), ("t2v", "pendulum", "pendulo", 0),
-            ("t2v", "bouncing", "rebote", 4), ("ood", "rolling", "rodando", 4)]
+            ("t2v", "bouncing", "rebote", 2), ("ood", "rolling", "rodando", 6)]
 
 
 def main(raiz=RAIZ, salida=SALIDA):
