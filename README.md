@@ -337,19 +337,19 @@ La pérdida vive sobre el video **generado**, así que el gradiente vuelve por l
 sampler, y cada paso que se retropropaga se paga en memoria y en tiempo: 27,8 s por paso de
 entrenamiento con los doce, contra 21,6 s con cuatro. Cuántos hacen falta se contestó de dos maneras.
 
-**Primero, sin entrenar nada.** La corrida registra, en cada paso, el aporte de cada uno de los 12
-pasos de Euler al gradiente de la pérdida física respecto de los pesos: su norma y los cosenos contra
-los otros once. Esos números determinan la matriz de Gram de los doce aportes, y con ella sale el
-coseno entre la suma de **cualquier** subconjunto de pasos y la suma de los doce, sin volver a correr
-nada. Eso es exactamente cuánta dirección del gradiente verdadero retiene esa ventana, y por eso se
-pueden comparar *todas* y no unas pocas. Está promediado sobre los 869 pasos con gradiente físico de
-la corrida que se reporta, tomando la segunda mitad para que todas las ventanas se midan sobre el
-mismo tramo. El cálculo es
+**Primero, con una sola corrida.** El entrenamiento de la corrida que se reporta registra, en cada
+paso, el aporte de cada uno de los 12 pasos de Euler al gradiente de la pérdida física respecto de los
+pesos: su norma y los cosenos contra los otros once. Esos números determinan la matriz de Gram de los
+doce aportes, y con ella sale el coseno entre la suma de **cualquier** subconjunto de pasos y la suma
+de los doce. Eso es exactamente cuánta dirección del gradiente verdadero retiene esa ventana, y como
+se calcula sobre lo ya registrado, se pueden comparar *todas* las ventanas sin entrenar una vez por
+cada una. Está promediado sobre los 869 pasos que tuvieron gradiente físico, tomando la segunda mitad
+para que todas las ventanas se midan sobre el mismo tramo. El cálculo es
 [`scripts_figuras/coseno_truncamiento_bptt.py`](scripts_figuras/coseno_truncamiento_bptt.py).
 
-**Después, entrenando.** Cinco brazos de 150 pasos, idénticos salvo la lista de pasos que
-retropropagan, con validación sobre 20 clips en los pasos 50, 100 y 150. Los logs crudos están en
-[`resultados/logs_barrido/`](resultados/logs_barrido).
+**Después, entrenando una vez por ventana.** Cinco brazos de 150 pasos, idénticos salvo la lista de
+pasos que retropropagan, con validación sobre 20 clips en los pasos 50, 100 y 150. Los logs crudos
+están en [`resultados/logs_barrido/`](resultados/logs_barrido).
 
 ![Cuánta dirección conserva cada ventana y qué pasa al entrenar con ella](figuras/truncamiento_direccion.png)
 
