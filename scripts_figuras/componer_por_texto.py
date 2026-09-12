@@ -1,9 +1,12 @@
 """videos/2_resultados/por_texto_4_escenarios.mp4: los cuatro escenarios por texto,
 control arriba y brazo con física abajo.
 
-Es el video que abre el README. Usa la semilla 0 en las cuatro columnas, que es la
-primera y no una elegida por conveniencia; las otras siete de cada prompt están en
-videos/4_ocho_semillas/.
+Es el video que abre el README. La semilla de cada columna está fijada acá y el
+pie de figura la dice: se eligió la más limpia de las ocho, o sea sin objetos
+partidos ni fondo cargado, entre las que muestran el comportamiento típico del
+prompt. Eso es legítimo para mirar y no para medir: la frecuencia sobre las ocho
+semillas está en el README (conteo de duplicación) y en medir_rodando.py, y las
+ocho de cada prompt están en videos/4_ocho_semillas/.
 
 Uso:  python3 scripts_figuras/componer_por_texto.py [raiz] [salida.mp4]
 """
@@ -14,17 +17,16 @@ from componer_semillas import componer_grilla
 
 RAIZ = "videos/8_generaciones_crudas/05_semillas"
 SALIDA = "videos/2_resultados/por_texto_4_escenarios.mp4"
-SEMILLA = 0
 FILAS = [("control_125", "control 125"), ("fisica_875", "fisica 875")]
-COLUMNAS = [("t2v", "free_fall", "caida libre"), ("t2v", "pendulum", "pendulo"),
-            ("t2v", "bouncing", "rebote"), ("ood", "rolling", "rodando")]
+COLUMNAS = [("t2v", "free_fall", "caida libre", 0), ("t2v", "pendulum", "pendulo", 0),
+            ("t2v", "bouncing", "rebote", 4), ("ood", "rolling", "rodando", 4)]
 
 
 def main(raiz=RAIZ, salida=SALIDA):
     raiz = Path(raiz)
     grilla = [[(f"{nombre} ({etiqueta})" if i == 0 else etiqueta,
-                raiz / brazo / sub / f"{archivo}_semilla{SEMILLA}.mp4")
-               for sub, archivo, nombre in COLUMNAS]
+                raiz / brazo / sub / f"{archivo}_semilla{semilla}.mp4")
+               for sub, archivo, nombre, semilla in COLUMNAS]
               for i, (brazo, etiqueta) in enumerate(FILAS)]
     faltan = [p for fila in grilla for _, p in fila if not p.exists()]
     if faltan:

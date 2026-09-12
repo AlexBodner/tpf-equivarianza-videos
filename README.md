@@ -5,12 +5,13 @@ los videos, las evaluaciones crudas y los scripts que rehacen cada figura y cada
 
 ![Generación por texto, cuatro escenarios](gifs/por_texto_4_escenarios.gif)
 
-*Los cuatro escenarios generados **sólo desde el texto**, control arriba y brazo con física abajo, con
-la misma semilla, la 0 en los cuatro. En péndulo y rebote el brazo con física muestra comportamientos
-más estables; en rodando termina sobre el piso donde el control queda flotando. En caída libre aparece
-una falla distinta: el brazo con física duplica la pelota más que el control, y se ve en este mismo
-video. El conteo sobre las ocho semillas está
-[más abajo](#cómo-satisface-la-simetría-sin-mejorar-la-física). Archivo:
+*Los cuatro escenarios generados **sólo desde el texto**, control arriba y brazo con física abajo. Los
+dos brazos comparten prompt, semilla y ruido en cada columna: la semilla 0 en caída libre y péndulo, y
+la 4 en rebote y rodando, que es la más limpia de las ocho. El péndulo sostiene la oscilación, el
+rebote mantiene una sola pelota donde el control la duplica, y rodando termina sobre el piso sólo en el
+equivariante. En caída libre pasa lo contrario: ahí el que duplica la pelota es el brazo con física, y
+se ve en este mismo video. Elegir la semilla más limpia sirve para mirar y no para medir, así que el
+conteo sobre las ocho está [más abajo](#cómo-satisface-la-simetría-sin-mejorar-la-física). Archivo:
 [`videos/2_resultados/por_texto_4_escenarios.mp4`](videos/2_resultados/por_texto_4_escenarios.mp4).*
 
 ---
@@ -376,7 +377,7 @@ El barrido completo, con la validación y los cinco brazos que efectivamente se 
 
 *Entrenamiento y validación no son la misma cantidad: a la izquierda la pérdida física normalizada
 (mediana por ventanas de 15 pasos sobre la curva cruda), a la derecha `l_rot` sin normalizar, que vive
-en otra escala. Los dos brazos «mejor-6» quedan arriba en validación y, según el código, deberían ser
+en otra escala. Los dos brazos "mejor-6" quedan arriba en validación y, según el código, deberían ser
 idénticos entre sí en la rama física; por qué no lo son está en [PENDIENTES.md](PENDIENTES.md).
 Figuras: [`gen_fig_truncamiento.py`](scripts_figuras/gen_fig_truncamiento.py) y
 [`gen_fig_barrido_ventanas.py`](scripts_figuras/gen_fig_barrido_ventanas.py).*
